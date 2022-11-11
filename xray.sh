@@ -114,6 +114,7 @@ port_check() {
 close_firewall() {
     if ! command -v iptables >/dev/null 2>&1; then
         # 主要针对oracle vps
+        apt-get purge netfilter-persistent
         iptables -P INPUT ACCEPT
         iptables -P FORWARD ACCEPT  
         iptables -P OUTPUT ACCEPT
@@ -302,11 +303,10 @@ trojan_grpc() {
   }
 }
 EOF
-
     systemctl start xray && systemctl enable xray
     sleep 3
 
-    cat >>/etc/nginx/conf.d/xray.conf <<EOF
+    cat >/etc/nginx/conf.d/xray.conf <<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -318,7 +318,7 @@ server {
 	server_name ${domain};
 
 	index index.html;
-	root /var/www/html;
+	root /home/xray/webpage/blog-main;
 
 	ssl_certificate /home/xray/xray_cert/xray.crt;
 	ssl_certificate_key /home/xray/xray_cert/xray.key;
@@ -326,7 +326,7 @@ server {
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
 	client_header_timeout 52w;
-        keepalive_timeout 52w;
+    keepalive_timeout 52w;
 	# 在 location 后填写 /你的 ServiceName
 	location /crayfish {
 		if (\$content_type !~ "application/grpc") {
@@ -401,7 +401,7 @@ EOF
     systemctl start xray && systemctl enable xray
     sleep 3
 
-    cat >>/etc/nginx/conf.d/xray.conf <<EOF
+    cat >/etc/nginx/conf.d/xray.conf <<EOF
 server {
     listen 80;
     server_name ${domain};
