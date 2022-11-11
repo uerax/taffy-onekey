@@ -226,6 +226,7 @@ xray_configure() {
 
 info_return() {
     echo -e "安装成功!"
+    echo -e "你的链接: ${link}"
     echo -e "你的密码为: ${Pword}"
 }
 
