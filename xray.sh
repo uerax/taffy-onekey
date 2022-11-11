@@ -32,6 +32,7 @@ install() {
     # increase_max_handle
     port_check 80
     port_check 443
+    close_firewall
     nginx_install
     domain_handle
     apply_certificate
@@ -53,7 +54,7 @@ is_root() {
     fi
 }
 
-function get_system() {
+get_system() {
     source /etc/os-release
     if [[ "${ID}"=="debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
@@ -87,7 +88,7 @@ function env_install() {
     judge "lsof 安装"
 }
 
-function increase_max_handle() {
+increase_max_handle() {
     # 最大文件打开数
     sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
     sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
@@ -110,7 +111,24 @@ port_check() {
     fi
 }
 
-function nginx_install() {
+close_firewall() {
+    if ! command -v iptables >/dev/null 2>&1; then
+        # 主要针对oracle vps
+        iptables -P INPUT ACCEPT
+        iptables -P FORWARD ACCEPT  
+        iptables -P OUTPUT ACCEPT
+        iptables -F
+        ok "关闭防火墙"
+    fi
+    systemctl stop firewalld
+    systemctl disable firewalld
+    systemctl stop nftables
+    systemctl disable nftables
+    systemctl stop ufw
+    systemctl disable ufw
+}
+
+nginx_install() {
     # 判断是否有 nginx 命令
     if ! command -v nginx >/dev/null 2>&1; then
         ${INS} nginx
@@ -201,7 +219,7 @@ EOF
 }
 
 xray_install() {
-    wget https://github.com/XTLS/Xray-install/raw/main/install-release.sh
+    wget --no-check-certificate https://github.com/XTLS/Xray-install/raw/main/install-release.sh
     judge "Xray安装脚本 下载"
     bash install-release.sh
     judge "Xray 安装"
@@ -210,7 +228,6 @@ xray_install() {
 
 xray_configure() {
     mkdir -p /home/xray/xray_log && touch /home/xray/xray_log/access.log && touch /home/xray/xray_log/error.log && chmod a+w /home/xray/xray_log/*.log
-
 }
 
 info_return() {
