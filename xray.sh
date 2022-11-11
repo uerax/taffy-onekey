@@ -120,12 +120,6 @@ close_firewall() {
         iptables -F
         ok "关闭防火墙"
     fi
-    systemctl stop firewalld
-    systemctl disable firewalld
-    systemctl stop nftables
-    systemctl disable nftables
-    systemctl stop ufw
-    systemctl disable ufw
 }
 
 nginx_install() {
