@@ -3,10 +3,6 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-# 伪装站位置 /home/xray/webpage/blog-main
-# xray配置文件 /usr/local/etc/xray/config.json
-#
-
 #fonts color
 Green="\033[32m"
 Red="\033[31m"
@@ -21,11 +17,18 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 version="1.0"
+xray_cfg="/usr/local/etc/xray/config.json"
+nginx_cfg="/etc/nginx/conf.d/xray.conf"
+web_path="/home/xray/webpage/blog-main"
+ca_crt="/home/xray/xray_cert/xray.crt"
+ca_key="/home/xray/xray_cert/xray.key"
+ws_path="/crayfish"
 
 INS="apt install -y"
-Pword=""
+password=""
 domain=""
 link=""
+port="1919"
 
 install() {
     is_root
@@ -135,7 +138,7 @@ nginx_install() {
     fi
 
     mkdir -p /home/xray/webpage/ && cd /home/xray/webpage/
-
+    
     wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
     unzip web.zip && mv -f hentai121.github.io-master blog-main && rm web.zip
@@ -170,8 +173,12 @@ EOF
 }
 
 apply_certificate() {
-    wget -O - https://get.acme.sh | sh
-    judge "安装acme"
+    if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
+        wget -O - https://get.acme.sh | sh
+        judge "安装 Acme"
+    else
+        ok "Acme 已安装"
+    fi
     cd ~ && . .bashrc
     /root/.acme.sh/acme.sh --upgrade --auto-upgrade
     /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
@@ -216,11 +223,17 @@ EOF
 }
 
 xray_install() {
-    wget --no-check-certificate https://github.com/XTLS/Xray-install/raw/main/install-release.sh
-    judge "Xray安装脚本 下载"
-    bash install-release.sh
-    judge "Xray 安装"
-    rm install-release.sh
+
+    if ! command -v xray >/dev/null 2>&1; then
+        wget --no-check-certificate https://github.com/XTLS/Xray-install/raw/main/install-release.sh
+        judge "Xray安装脚本 下载"
+        bash install-release.sh
+        judge "Xray 安装"
+        rm install-release.sh
+    else
+        ok "Xray 已安装"
+    fi
+    
 }
 
 xray_configure() {
@@ -229,8 +242,9 @@ xray_configure() {
 
 info_return() {
     echo -e "安装成功!"
-    echo -e "你的链接: ${link}"
-    echo -e "你的密码为: ${Pword}"
+    echo -e "链接: ${link}"
+    echo -e "密码为: ${password}"
+    echo -e "端口为: ${port}"
 }
 
 # 暂时懒得加 TODO
@@ -238,6 +252,8 @@ select_type() {
     echo -e "${Green} 选择安装的模式 ${Font}"
     echo -e "${Green} 1:Trojan-TCP-XTLS ${Font}"
     echo -e "${Green} 2:Trojan-gRpc ${Font}"
+    echo -e "${Green} 2:Vmess-ws-tls ${Font}"
+    echo -e "${Green} 2:Vless-ws-tls ${Font}"
     read -rp "请输入数字: " menu_num
     case $menu_num in
     1)
@@ -245,6 +261,12 @@ select_type() {
         ;;
     2)
         trojan_grpc
+        ;;
+    3)
+        vmess_ws_tls
+        ;;
+    4)
+        vless_ws_tls
         ;;
     *)
         error "请输入正确的数字"
@@ -254,7 +276,8 @@ select_type() {
 }
 
 trojan_grpc() {
-    Pword=$(xray uuid)
+    password=$(xray uuid)
+    port="443"
     cat >/usr/local/etc/xray/config.json <<EOF
 {
   "log": {
@@ -267,7 +290,7 @@ trojan_grpc() {
       "settings": {
         "clients": [
           {
-            "password": "${Pword}" // 填写你的 password
+            "password": "${password}" // 填写你的 password
           }
         ]
       },
@@ -344,13 +367,14 @@ server {
 }
 EOF
 
-link="trojan://${Pword}@${domain}:443?security=tls&type=grpc&path=crayfish&headerType=none#${domain}"
+systemctl restart nginx
 
-
+link="trojan://${password}@${domain}:443?security=tls&type=grpc&path=crayfish&headerType=none#${domain}"
 }
 
 trojan_tcp_xtls() {
-    Pword=$(xray uuid)
+    password=$(xray uuid)
+    port="443"
     cat >/usr/local/etc/xray/config.json <<EOF
 {
     "log": {
@@ -363,7 +387,7 @@ trojan_tcp_xtls() {
             "settings": {
                 "clients": [
                     {
-                        "password":"${Pword}",  // 密码
+                        "password":"${password}",  // 密码
                         "flow": "xtls-rprx-direct"
                     }
                 ],
@@ -417,7 +441,197 @@ server {
 }
 EOF
 
-link="trojan://${Pword}@${domain}:443?security=tls&type=tcp&headerType=none#${domain}"
+systemctl restart nginx
+
+link="trojan://${password}@${domain}:443?security=tls&type=tcp&headerType=none#${domain}"
+}
+
+vmess_ws_tls() {
+    password=$(xray uuid)
+    cat >/usr/local/etc/xray/config.json <<EOF
+{
+  "log":{
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "port": ${port},
+      "listen": "127.0.0.1",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [{
+          "id": "${password}",
+          "alterID": 0
+        }]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "${ws_path}"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPOnDemand",
+    "rules": [
+      {
+        "type": "field",
+        "protocol": ["bittorrent"],
+        "outboundTag": "blocked"
+      }
+    ]
+  }
+}
+EOF
+    systemctl start xray && systemctl enable xray
+    sleep 3
+
+    cat >/etc/nginx/conf.d/xray.conf <<EOF
+server {
+    listen 80;
+    server_name ${domain};
+    return 301 https://\$http_host\$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name ${domain};
+
+    index index.html;
+    root ${web_path};
+
+    ssl_certificate /home/xray/xray_cert/xray.crt;
+    ssl_certificate_key /home/xray/xray_cert/xray.key;
+    ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers           HIGH:!aNULL:!MD5;
+
+    # 在 location 
+    location /crayfish {
+    proxy_pass http://127.0.0.1:1919;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host \$http_host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}
+EOF
+
+systemctl restart nginx
+
+link="vmess://${password}@${domain}:${port}?security=tls&type=ws&path=${ws_path}&headerType=none#${domain}"
+}
+
+vless_ws_tls() {
+    password=$(xray uuid)
+    cat >/usr/local/etc/xray/config.json <<EOF
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "/dev/shm/Xray-VLESS-WSS-Nginx.socket,0666",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${password}" // 填写你的 UUID
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "${ws_path}" // 填写你的 path
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "blocked",
+      "protocol": "blackhole",
+      "settings": {}
+    }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "blocked"
+      }
+    ]
+  }
+}
+EOF
+    systemctl start xray && systemctl enable xray
+    sleep 3
+
+    cat >/etc/nginx/conf.d/xray.conf <<EOF
+server {
+    listen 80;
+    server_name ${domain};
+    return 301 https://\$http_host\$request_uri;
+}
+server {
+	listen 443 ssl http2;
+	server_name ${domain};
+
+	index index.html;
+	root ${web_path};
+
+	ssl_certificate /home/xray/xray_cert/xray.crt
+	ssl_certificate_key /home/xray/xray_cert/xray.key;
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+	
+	# 在 location 后填写 /你的 path
+	location ${ws_path} {
+	if (\$http_upgrade != "websocket") {
+		return 404;
+	}
+        proxy_pass http://unix:/dev/shm/Xray-VLESS-WSS-Nginx.socket;
+	proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_read_timeout 52w;
+    }
+}
+
+EOF
+
+systemctl restart nginx
+link="vless://${password}@${domain}:${port}?security=tls&type=ws&path=${ws_path}&headerType=none#${domain}"
 }
 
 info() {
@@ -473,6 +687,11 @@ open_bbr() {
     fi
 }
 
+show_path() {
+    echo -e "xray配置文件地址: ${xray_cfg}"
+    echo -e "nginx配置文件地址: ${nginx_cfg}"
+}
+
 menu() {
     echo -e "\t Xray 脚本"
     echo -e "\t---authored by uerax---"
@@ -486,6 +705,9 @@ menu() {
     case $menu_num in
     1)
     install
+    ;;
+    10)
+    show_path
     ;;
     101)
     open_bbr
