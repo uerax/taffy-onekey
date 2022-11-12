@@ -138,7 +138,7 @@ nginx_install() {
     fi
 
     mkdir -p /home/xray/webpage/ && cd /home/xray/webpage/
-    
+
     wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
     unzip web.zip && mv -f hentai121.github.io-master blog-main && rm web.zip
@@ -692,6 +692,18 @@ show_path() {
     echo -e "nginx配置文件地址: ${nginx_cfg}"
 }
 
+uninstall() {
+    info "Xray 卸载"
+    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge
+    rm -rf /home/xray
+    info "Nginx 卸载"
+    apt purge nginx nginx-common nginx-core
+    apt autoremove
+    info "Acme 卸载"
+    /root/.acme.sh/acme.sh --uninstall
+    rm -r  ~/.acme.sh
+
+}
 menu() {
     echo -e "\t Xray 脚本"
     echo -e "\t---authored by uerax---"
@@ -705,6 +717,9 @@ menu() {
     case $menu_num in
     1)
     install
+    ;;
+    9)
+    uninstall
     ;;
     10)
     show_path
