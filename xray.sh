@@ -20,6 +20,8 @@ Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
+version="1.0"
+
 INS="apt install -y"
 Pword=""
 domain=""
@@ -439,4 +441,61 @@ judge() {
     fi
 }
 
-install
+open_bbr() {
+    is_root
+    source /etc/os-release
+    info "过于老的系统版本会导致开启失败"
+    if [[ "${ID}"=="debian" ]]; then
+        info "检测系统为 debian"
+        echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+        apt update && apt -t buster-backports install linux-image-amd64
+        echo net.core.default_qdisc=fq >> /etc/sysctl.conf
+        echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
+        sysctl -p
+    elif [[ "${ID}"=="ubuntu" ]]; then
+        info "检测系统为 ubuntu"
+        echo net.core.default_qdisc=fq >> /etc/sysctl.conf
+        echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
+        sysctl -p
+    elif ["${ID}"=="centos"]; then
+        error "centos fuck out!"
+        exit 1
+    #    INS = "yum install -y"
+    # RedHat 系发行版关闭 SELinux
+    #if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
+    #  sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+    #  setenforce 0
+    #fi
+    #    env_install
+    else
+        error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
+        exit 1
+    fi
+}
+
+menu() {
+    echo -e "\t Xray 脚本"
+    echo -e "\t---authored by uerax---"
+    echo -e "\thttps://github.com/uerax\n"
+    echo -e "当前版本：${version}"
+    echo -e "—————————————— 安装向导 ——————————————"""
+    echo -e "1. 一键安装xray"
+    echo -e "101. 开启bbr"
+
+    read -rp "输入数字：" menu_num
+    case $menu_num in
+    1)
+    install
+    ;;
+    101)
+    open_bbr
+    ;;
+    *)
+    print_error "请输入正确的数字"
+    ;;
+    esac
+}
+
+menu
+
+
