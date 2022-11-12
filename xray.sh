@@ -114,11 +114,11 @@ port_check() {
 }
 
 close_firewall() {
-    if ! command -v iptables >/dev/null 2>&1; then
+    if command -v iptables >/dev/null 2>&1; then
         # 主要针对oracle vps
-        apt-get purge netfilter-persistent
+        apt purge netfilter-persistent -y
         iptables -P INPUT ACCEPT
-        iptables -P FORWARD ACCEPT  
+        iptables -P FORWARD ACCEPT
         iptables -P OUTPUT ACCEPT
         iptables -F
         ok "关闭防火墙"
