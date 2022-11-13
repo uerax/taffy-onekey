@@ -243,13 +243,12 @@ xray_configure() {
 }
 
 info_return() {
-    echo -e "${Green}安装成功!"
-    echo -e "${Green}链接: ${link}"
-    echo -e "${Green}密码为: ${password}"
-    echo -e "${Green}端口为: ${port}"
+    echo -e "${Green}安装成功!${Font}"
+    echo -e "${Green}链接:${Font} ${link}"
+    echo -e "${Green}密码为:${Font} ${password}"
+    echo -e "${Green}端口为:${Font} ${port}"
 }
 
-# 暂时懒得加 TODO
 select_type() {
     echo -e "${Green} 选择安装的模式 ${Font}"
     echo -e "${Green} 1:Trojan-TCP-XTLS ${Font}"
@@ -734,20 +733,20 @@ open_bbr() {
 }
 
 show_path() {
-    echo -e "${Green}xray配置文件地址: ${xray_cfg}"
-    echo -e "${Green}nginx配置文件地址: ${nginx_cfg}"
+    echo -e "${Green}xray配置文件地址:${Font} ${xray_cfg}"
+    echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
 }
 
 show_info() {
     source '/usr/local/etc/xray/info'
     judge "查看配置"
-    echo -e "${Green}协议: ${XRAY_TYPE}"
-    echo -e "${Green}地址: ${XRAY_ADDR}"
-    echo -e "${Green}密码: ${XRAY_PWORD}"
-    echo -e "${Green}端口: ${XRAY_PORT}"
-    echo -e "${Green}混淆: ${XRAY_OBFS}"
-    echo -e "${Green}混淆路径: ${OBFS_PATH}"
-    echo -e "${Green}分享链接: ${XRAY_LINK}"
+    echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
+    echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
+    echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
+    echo -e "${Green}端口:${Font} ${XRAY_PORT}"
+    echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
+    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
+    echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
 }
 
 uninstall() {
@@ -764,17 +763,18 @@ uninstall() {
 
 }
 menu() {
-    echo -e "\t${Green}Xray 脚本"
-    echo -e "\t${Green}---authored by uerax---"
-    echo -e "\t${Green}https://github.com/uerax\n"
-    echo -e "\t${Green}当前版本：${version}"
-    echo -e "—————————————— 安装向导 ——————————————"""
-    echo -e "${Green}1. 安装"
-    echo -e "${Green}9. 卸载"
-    echo -e "${Green}10. 配置文件路径"
-    echo -e "${Green}11. 查看配置链接"
-    echo -e "${Green}100. 开启bbr"
-    echo -e "${Green}q. 退出"
+    echo -e "——————————————— 脚本信息 ———————————————"
+    echo -e "\t\t${Yellow}Xray 脚本${Font}"
+    echo -e "\t${Yellow}---authored by uerax---${Font}"
+    echo -e "\t${Yellow}https://github.com/uerax${Font}"
+    echo -e "\t\t${Yellow}版本：${version}${Font}"
+    echo -e "——————————————— 安装向导 ———————————————"
+    echo -e "${Green}1.${Font} 安装"
+    echo -e "${Green}9.${Font} 卸载"
+    echo -e "${Green}10.${Font} 配置文件路径"
+    echo -e "${Green}11.${Font} 查看配置链接"
+    echo -e "${Green}100.${Font} 开启bbr"
+    echo -e "${Green}q.${Font} 退出"
 
     read -rp "输入数字：" menu_num
     case $menu_num in
