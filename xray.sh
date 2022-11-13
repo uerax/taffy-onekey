@@ -18,6 +18,7 @@ Error="${Red}[错误]${Font}"
 
 version="1.0"
 xray_cfg="/usr/local/etc/xray/config.json"
+xray_info="/usr/local/etc/xray/info"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
 web_path="/home/xray/webpage/blog-main"
 ca_crt="/home/xray/xray_cert/xray.crt"
@@ -370,6 +371,16 @@ EOF
 systemctl restart nginx
 
 link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="trojan"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_OBFS="grpc"
+OBFS_PATH="${ws_path}"
+XRAY_LINK="${link}"
+EOF
 }
 
 trojan_tcp_xtls() {
@@ -442,7 +453,18 @@ server {
 EOF
 
 systemctl restart nginx
+
 link="trojan://${password}@${domain}:${port}?flow=xtls-rprx-direct&security=tls&type=tcp&headerType=none#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="trojan"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_OBFS=""
+OBFS_PATH=""
+XRAY_LINK="${link}"
+EOF
 }
 
 vmess_ws_tls() {
@@ -534,6 +556,17 @@ EOF
 systemctl restart nginx
 
 link="vmess://${password}@${domain}:${port}?encryption=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="vmess"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_OBFS="websocket"
+OBFS_PATH="${ws_path}"
+XRAY_LINK="${link}"
+EOF
+
 }
 
 vless_ws_tls() {
@@ -630,8 +663,17 @@ server {
 EOF
 
 systemctl restart nginx
-
 link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="vless"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_OBFS="websocket"
+OBFS_PATH="${ws_path}"
+XRAY_LINK="${link}"
+EOF
 }
 
 info() {
@@ -692,6 +734,17 @@ show_path() {
     echo -e "nginx配置文件地址: ${nginx_cfg}"
 }
 
+show_info() {
+    source ${xray_info}
+    echo -e "协议: ${XRAY_TYPE}"
+    echo -e "地址: ${XRAY_ADDR}"
+    echo -e "密码: ${XRAY_PWORD}"
+    echo -e "端口: ${XRAY_PORT}"
+    echo -e "混淆: ${XRAY_OBFS}"
+    echo -e "混淆路径: ${OBFS_PATH}"
+    echo -e "分享链接: ${XRAY_LINK}"
+}
+
 uninstall() {
     info "Xray 卸载"
     bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge
@@ -723,6 +776,9 @@ menu() {
     ;;
     10)
     show_path
+    ;;
+    11)
+    show_info
     ;;
     101)
     open_bbr
