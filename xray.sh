@@ -763,7 +763,10 @@ menu() {
     echo -e "\thttps://github.com/uerax\n"
     echo -e "当前版本：${version}"
     echo -e "—————————————— 安装向导 ——————————————"""
-    echo -e "1. 一键安装xray"
+    echo -e "1. 安装"
+    echo -e "9. 卸载"
+    echo -e "10. 配置文件路径"
+    echo -e "11. 查看配置链接"
     echo -e "101. 开启bbr"
 
     read -rp "输入数字：" menu_num
