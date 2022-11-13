@@ -749,6 +749,7 @@ uninstall() {
     info "Xray 卸载"
     bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge
     rm -rf /home/xray
+    rm ${xray_info}
     info "Nginx 卸载"
     apt purge nginx nginx-common nginx-core
     apt autoremove
