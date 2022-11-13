@@ -13,6 +13,7 @@ Font="\033[0m"
 
 #notification information
 Info="${Green}[信息]${Font}"
+Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
@@ -242,10 +243,10 @@ xray_configure() {
 }
 
 info_return() {
-    echo -e "安装成功!"
-    echo -e "链接: ${link}"
-    echo -e "密码为: ${password}"
-    echo -e "端口为: ${port}"
+    echo -e "${Green}安装成功!"
+    echo -e "${Green}链接: ${link}"
+    echo -e "${Green}密码为: ${password}"
+    echo -e "${Green}端口为: ${port}"
 }
 
 # 暂时懒得加 TODO
@@ -255,7 +256,7 @@ select_type() {
     echo -e "${Green} 2:Trojan-gRpc ${Font}"
     echo -e "${Green} 2:Vmess-ws-tls ${Font}"
     echo -e "${Green} 2:Vless-ws-tls ${Font}"
-    read -rp "请输入数字: " menu_num
+    read -rp "输入数字: " menu_num
     case $menu_num in
     1)
         trojan_tcp_xtls
@@ -685,6 +686,9 @@ ok() {
 error() {
     echo -e "${Error} ${RedBG} $1 ${Font}"
 }
+warn() {
+    echo -e "${Warn} ${Yellow} $1 ${Font}"
+}
 
 judge() {
     # $? 上一次命令成功为0 失败为随机值
@@ -730,19 +734,20 @@ open_bbr() {
 }
 
 show_path() {
-    echo -e "xray配置文件地址: ${xray_cfg}"
-    echo -e "nginx配置文件地址: ${nginx_cfg}"
+    echo -e "${Green}xray配置文件地址: ${xray_cfg}"
+    echo -e "${Green}nginx配置文件地址: ${nginx_cfg}"
 }
 
 show_info() {
     source '/usr/local/etc/xray/info'
-    echo -e "协议: ${XRAY_TYPE}"
-    echo -e "地址: ${XRAY_ADDR}"
-    echo -e "密码: ${XRAY_PWORD}"
-    echo -e "端口: ${XRAY_PORT}"
-    echo -e "混淆: ${XRAY_OBFS}"
-    echo -e "混淆路径: ${OBFS_PATH}"
-    echo -e "分享链接: ${XRAY_LINK}"
+    judge "查看配置"
+    echo -e "${Green}协议: ${XRAY_TYPE}"
+    echo -e "${Green}地址: ${XRAY_ADDR}"
+    echo -e "${Green}密码: ${XRAY_PWORD}"
+    echo -e "${Green}端口: ${XRAY_PORT}"
+    echo -e "${Green}混淆: ${XRAY_OBFS}"
+    echo -e "${Green}混淆路径: ${OBFS_PATH}"
+    echo -e "${Green}分享链接: ${XRAY_LINK}"
 }
 
 uninstall() {
@@ -759,16 +764,17 @@ uninstall() {
 
 }
 menu() {
-    echo -e "\t Xray 脚本"
-    echo -e "\t---authored by uerax---"
-    echo -e "\thttps://github.com/uerax\n"
-    echo -e "当前版本：${version}"
+    echo -e "\t${Green}Xray 脚本"
+    echo -e "\t${Green}---authored by uerax---"
+    echo -e "\t${Green}https://github.com/uerax\n"
+    echo -e "\t${Green}当前版本：${version}"
     echo -e "—————————————— 安装向导 ——————————————"""
-    echo -e "1. 安装"
-    echo -e "9. 卸载"
-    echo -e "10. 配置文件路径"
-    echo -e "11. 查看配置链接"
-    echo -e "101. 开启bbr"
+    echo -e "${Green}1. 安装"
+    echo -e "${Green}9. 卸载"
+    echo -e "${Green}10. 配置文件路径"
+    echo -e "${Green}11. 查看配置链接"
+    echo -e "${Green}100. 开启bbr"
+    echo -e "${Green}q. 退出"
 
     read -rp "输入数字：" menu_num
     case $menu_num in
@@ -784,11 +790,13 @@ menu() {
     11)
     show_info
     ;;
-    101)
+    100)
     open_bbr
     ;;
+    q)
+    ;;
     *)
-    print_error "请输入正确的数字"
+    error "请输入正确的数字"
     ;;
     esac
 }
