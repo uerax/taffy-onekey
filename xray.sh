@@ -22,7 +22,7 @@ nginx_cfg="/etc/nginx/conf.d/xray.conf"
 web_path="/home/xray/webpage/blog-main"
 ca_crt="/home/xray/xray_cert/xray.crt"
 ca_key="/home/xray/xray_cert/xray.key"
-ws_path="/crayfish"
+ws_path="crayfish"
 
 INS="apt install -y"
 password=""
@@ -369,7 +369,7 @@ EOF
 
 systemctl restart nginx
 
-link="trojan://${password}@${domain}:443?security=tls&type=grpc&path=crayfish&headerType=none#${domain}"
+link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 }
 
 trojan_tcp_xtls() {
@@ -442,8 +442,7 @@ server {
 EOF
 
 systemctl restart nginx
-
-link="trojan://${password}@${domain}:443?security=tls&type=tcp&headerType=none#${domain}"
+link="trojan://${password}@${domain}:${port}?flow=xtls-rprx-direct&security=tls&type=tcp&headerType=none#${domain}"
 }
 
 vmess_ws_tls() {
@@ -469,7 +468,7 @@ vmess_ws_tls() {
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "${ws_path}"
+          "path": "/${ws_path}"
         }
       }
     }
@@ -534,7 +533,7 @@ EOF
 
 systemctl restart nginx
 
-link="vmess://${password}@${domain}:${port}?security=tls&type=ws&path=${ws_path}&headerType=none#${domain}"
+link="vmess://${password}@${domain}:${port}?encryption=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 }
 
 vless_ws_tls() {
@@ -559,7 +558,7 @@ vless_ws_tls() {
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "${ws_path}" // 填写你的 path
+          "path": "/${ws_path}" // 填写你的 path
         }
       }
     }
@@ -612,12 +611,12 @@ server {
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
 	# 在 location 后填写 /你的 path
-	location ${ws_path} {
-	if (\$http_upgrade != "websocket") {
-		return 404;
-	}
+	location /${ws_path} {
+        if (\$http_upgrade != "websocket") {
+            return 404;
+        }
         proxy_pass http://unix:/dev/shm/Xray-VLESS-WSS-Nginx.socket;
-	proxy_redirect off;
+        proxy_redirect off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -631,7 +630,8 @@ server {
 EOF
 
 systemctl restart nginx
-link="vless://${password}@${domain}:${port}?security=tls&type=ws&path=${ws_path}&headerType=none#${domain}"
+
+link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 }
 
 info() {
