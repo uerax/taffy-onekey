@@ -61,14 +61,14 @@ is_root() {
 }
 
 get_system() {
-    source /etc/os-release
-    if [[ "${ID}"=="debian" && ${VERSION_ID} -ge 9 ]]; then
+    source '/etc/os-release'
+    if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
         apt update
     elif [[ "${ID}"=="ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
         apt update
-    elif ["${ID}"=="centos"]; then
+    elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
     #    INS = "yum install -y"
@@ -699,21 +699,21 @@ judge() {
 
 open_bbr() {
     is_root
-    source /etc/os-release
+    source '/etc/os-release'
     info "过于老的系统版本会导致开启失败"
-    if [[ "${ID}"=="debian" ]]; then
+    if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
         echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
         apt update && apt -t buster-backports install linux-image-amd64
         echo net.core.default_qdisc=fq >> /etc/sysctl.conf
         echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
         sysctl -p
-    elif [[ "${ID}"=="ubuntu" ]]; then
+    elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
         echo net.core.default_qdisc=fq >> /etc/sysctl.conf
         echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
         sysctl -p
-    elif ["${ID}"=="centos"]; then
+    elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
     #    INS = "yum install -y"
@@ -735,7 +735,7 @@ show_path() {
 }
 
 show_info() {
-    source ${xray_info}
+    source '/usr/local/etc/xray/info'
     echo -e "协议: ${XRAY_TYPE}"
     echo -e "地址: ${XRAY_ADDR}"
     echo -e "密码: ${XRAY_PWORD}"
