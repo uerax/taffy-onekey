@@ -805,7 +805,7 @@ server_check() {
     nginx_active=`systemctl is-active nginx`
 
     # result: active or inactive
-    if [[ $xray_active = "nginx" ]]; then
+    if [[ $nginx_active = "active" ]]; then
         ok "Nginx 服务正常"
     else
         error "Nginx 服务异常"
