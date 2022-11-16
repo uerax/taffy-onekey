@@ -17,7 +17,10 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-version="1.1"
+xray_install_url="https://github.com/XTLS/Xray-install/raw/main/install-release.sh"
+
+version="1.2"
+
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/usr/local/etc/xray/info"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
@@ -227,7 +230,7 @@ EOF
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        wget --no-check-certificate https://github.com/XTLS/Xray-install/raw/main/install-release.sh
+        wget --no-check-certificate ${xray_install_url}
         judge "Xray安装脚本 下载"
         bash install-release.sh
         judge "Xray 安装"
@@ -760,7 +763,7 @@ show_info() {
 
 uninstall() {
     info "Xray 卸载"
-    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge
+    bash -c "$(curl -L ${xray_install_url})" @ remove --purge
     rm -rf /home/xray
     rm ${xray_info}
     info "Nginx 卸载"
@@ -778,6 +781,11 @@ update_script() {
   judge "脚本更新"
 }
 
+xray_upgrade() {
+  bash -c "$(curl -L ${xray_install_url})" @ install
+  judge "Xray 更新"
+}
+
 menu() {
     echo -e "——————————————— 脚本信息 ———————————————"
     echo -e "\t\t${Yellow}Xray 脚本${Font}"
@@ -787,7 +795,8 @@ menu() {
     echo -e "——————————————— 安装向导 ———————————————"
     echo -e "${Green}1.${Font} 安装"
     echo -e "${Green}2.${Font} 更新脚本"
-    echo -e "${Green}9.${Font} 卸载"
+    echo -e "${Green}3.${Font} 更新 Xray"
+    echo -e "${Green}9.${Font} 完全卸载"
     echo -e "${Green}10.${Font} 配置文件路径"
     echo -e "${Green}11.${Font} 查看配置链接"
     echo -e "${Green}100.${Font} 开启bbr"
@@ -800,6 +809,9 @@ menu() {
     ;;
     2)
     update_script
+    ;;
+    3)
+    xray_upgrade
     ;;
     9)
     uninstall
