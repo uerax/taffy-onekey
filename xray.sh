@@ -786,6 +786,35 @@ xray_upgrade() {
   judge "Xray 更新"
 }
 
+server_check() {
+
+    info "开始检测 Xray 服务"
+
+    xray_active=`systemctl is-active xray`
+
+    # result: active or inactive
+    if [[ $xray_active = "active" ]]; then
+        ok "Xray 服务正常"
+    else
+        error "Xray 服务异常"
+    fi
+
+
+    info "开始检测 Nginx 服务"
+
+    nginx_active=`systemctl is-active nginx`
+
+    # result: active or inactive
+    if [[ $xray_active = "nginx" ]]; then
+        ok "Nginx 服务正常"
+    else
+        error "Nginx 服务异常"
+    fi
+
+}
+
+
+
 menu() {
     echo -e "——————————————— 脚本信息 ———————————————"
     echo -e "\t\t${Yellow}Xray 脚本${Font}"
@@ -796,6 +825,7 @@ menu() {
     echo -e "${Green}1.${Font} 安装"
     echo -e "${Green}2.${Font} 更新脚本"
     echo -e "${Green}3.${Font} 更新 Xray"
+    echo -e "${Green}4.${Font} 检测服务状态"
     echo -e "${Green}9.${Font} 完全卸载"
     echo -e "${Green}10.${Font} 配置文件路径"
     echo -e "${Green}11.${Font} 查看配置链接"
@@ -812,6 +842,9 @@ menu() {
     ;;
     3)
     xray_upgrade
+    ;;
+    4)
+    server_check
     ;;
     9)
     uninstall
