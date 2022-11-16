@@ -250,11 +250,11 @@ info_return() {
 }
 
 select_type() {
-    echo -e "${Green} 选择安装的模式 ${Font}"
-    echo -e "${Green} 1:Trojan-TCP-XTLS ${Font}"
-    echo -e "${Green} 2:Trojan-gRpc ${Font}"
-    echo -e "${Green} 2:Vmess-ws-tls ${Font}"
-    echo -e "${Green} 2:Vless-ws-tls ${Font}"
+    echo -e "${Green}选择安装的模式 ${Font}"
+    echo -e "${Green}1:${Font} Trojan-TCP-XTLS"
+    echo -e "${Green}2:${Font} Trojan-gRpc"
+    echo -e "${Green}3:${Font} Vmess-ws-tls"
+    echo -e "${Green}4:${Font} Vless-ws-tls"
     read -rp "输入数字: " menu_num
     case $menu_num in
     1)
@@ -329,7 +329,8 @@ trojan_grpc() {
   }
 }
 EOF
-    systemctl start xray && systemctl enable xray
+    systemctl restart xray 
+    systemctl enable xray
     sleep 3
 
     cat >/etc/nginx/conf.d/xray.conf <<EOF
@@ -435,7 +436,10 @@ trojan_tcp_xtls() {
     ]
 }
 EOF
-    systemctl start xray && systemctl enable xray
+    systemctl restart xray
+
+    systemctl enable xray
+
     sleep 3
 
     cat >/etc/nginx/conf.d/xray.conf <<EOF
@@ -518,7 +522,10 @@ vmess_ws_tls() {
   }
 }
 EOF
-    systemctl start xray && systemctl enable xray
+    systemctl restart xray
+    
+    systemctl enable xray
+
     sleep 3
 
     cat >/etc/nginx/conf.d/xray.conf <<EOF
@@ -622,7 +629,8 @@ vless_ws_tls() {
   }
 }
 EOF
-    systemctl start xray && systemctl enable xray
+    systemctl restart xray && systemctl enable xray
+
     sleep 3
 
     cat >/etc/nginx/conf.d/xray.conf <<EOF
@@ -663,6 +671,7 @@ server {
 EOF
 
 systemctl restart nginx
+
 link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
 cat>${xray_info}<<EOF
