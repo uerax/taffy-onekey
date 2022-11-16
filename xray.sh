@@ -771,6 +771,13 @@ uninstall() {
     rm -r  ~/.acme.sh
 
 }
+
+update_script() {
+  script_path=$(cd `dirname $0`; pwd)
+  wget -N --no-check-certificate -q -O ${script_path}/$0 "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+  judge "脚本更新"
+}
+
 menu() {
     echo -e "——————————————— 脚本信息 ———————————————"
     echo -e "\t\t${Yellow}Xray 脚本${Font}"
@@ -779,6 +786,7 @@ menu() {
     echo -e "\t\t${Yellow}版本：${version}${Font}"
     echo -e "——————————————— 安装向导 ———————————————"
     echo -e "${Green}1.${Font} 安装"
+    echo -e "${Green}2.${Font} 更新脚本"
     echo -e "${Green}9.${Font} 卸载"
     echo -e "${Green}10.${Font} 配置文件路径"
     echo -e "${Green}11.${Font} 查看配置链接"
@@ -789,6 +797,9 @@ menu() {
     case $menu_num in
     1)
     install
+    ;;
+    2)
+    update_script
     ;;
     9)
     uninstall
