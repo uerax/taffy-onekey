@@ -17,7 +17,7 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-version="1.0"
+version="1.1"
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/usr/local/etc/xray/info"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
@@ -774,7 +774,7 @@ uninstall() {
 
 update_script() {
   script_path=$(cd `dirname $0`; pwd)
-  wget -N --no-check-certificate -q -O ${script_path}/$0 "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+  wget -N --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
   judge "脚本更新"
 }
 
