@@ -777,7 +777,7 @@ uninstall() {
 
 update_script() {
   script_path=$(cd `dirname $0`; pwd)
-  wget -N --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+  wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
   judge "脚本更新"
 }
 
