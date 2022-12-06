@@ -767,8 +767,8 @@ uninstall() {
     rm -rf /home/xray
     rm ${xray_info}
     info "Nginx 卸载"
-    apt purge nginx nginx-common nginx-core
-    apt autoremove
+    apt purge -y nginx nginx-common nginx-core
+    apt autoremove -y
     info "Acme 卸载"
     /root/.acme.sh/acme.sh --uninstall
     rm -r  ~/.acme.sh
