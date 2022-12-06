@@ -154,13 +154,12 @@ domain_handle() {
     read -rp "输入你的域名(eg: www.example.com):" domain
     ok "正在获取 IP 地址信息"
     parse_ipv4=$(curl -sm8 ipget.net/?"${domain}")
-    local_ipv4=$(curl -s4m8 https://ip.gs)
+    local_ipv4=$(curl -s4m8 https://ifconfig.co)
     if [[ ${parse_ipv4} == "${local_ipv4}" ]]; then
         ok "域名ip解析通过"
         sleep 2
     else
-        error "域名解析ip: ${parse_ipv4} 与本机不符"
-        exit 2
+        error "域名解析ip: ${parse_ipv4} 与本机不符, 请检测是否有误"
     fi
 
     sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
