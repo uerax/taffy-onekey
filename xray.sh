@@ -253,10 +253,10 @@ info_return() {
 
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
-    echo -e "${Green}1:${Font} Trojan-TCP-XTLS"
+    echo -e "${Green}1:${Font} Trojan-TCP-XTLS(推荐)"
     echo -e "${Green}2:${Font} Trojan-gRpc"
     echo -e "${Green}3:${Font} Vmess-ws-tls"
-    echo -e "${Green}4:${Font} Vless-ws-tls"
+    echo -e "${Green}4:${Font} Vless-ws-tls(已弃用)"
     read -rp "输入数字: " menu_num
     case $menu_num in
     1)
@@ -268,9 +268,9 @@ select_type() {
     3)
         vmess_ws_tls
         ;;
-    4)
-        vless_ws_tls
-        ;;
+    # 4)
+    #     vless_ws_tls
+    #     ;;
     *)
         error "请输入正确的数字"
         select_type
