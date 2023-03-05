@@ -17,7 +17,7 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-xray_install_url="https://github.com/XTLS/Xray-install/raw/main/install-release.sh"
+xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
 version="1.2"
 
@@ -253,11 +253,12 @@ info_return() {
 
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
-    echo -e "${Green}1:${Font} Trojan-TCP-XTLS(推荐)"
-    echo -e "${Green}2:${Font} Trojan-gRpc"
-    echo -e "${Green}3:${Font} Vmess-ws-tls"
-    echo -e "${Green}4:${Font} Vless-ws-tls(已弃用)"
-    read -rp "输入数字: " menu_num
+    echo -e "${Green}1) ${Font} trojan-tcp-xtls(推荐)"
+    echo -e "${Green}2) ${Font} trojan-grpc"
+    echo -e "${Green}3) ${Font} vmess-ws-tls"
+    echo -e "${Green}4) ${Font} vless-ws-tls"
+    echo -e "${Green}5) ${Font} vless-grpc"
+    read -rp "输入数字(回车确认): " menu_num
     case $menu_num in
     1)
         trojan_tcp_xtls
@@ -268,9 +269,12 @@ select_type() {
     3)
         vmess_ws_tls
         ;;
-    # 4)
-    #     vless_ws_tls
-    #     ;;
+    4)
+        vless_ws_tls
+        ;;
+    5)
+        vless_grpc
+        ;;
     *)
         error "请输入正确的数字"
         select_type
@@ -687,6 +691,115 @@ XRAY_LINK="${link}"
 EOF
 }
 
+vless_grpc() {
+    password=$(xray uuid)
+    cat >/usr/local/etc/xray/config.json <<EOF
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "/dev/shm/Xray-VLESS-gRPC.socket,0666",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${password}" // 填写你的 UUID
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "wsSettings": {
+          "path": "/${ws_path}" // 填写你的 path
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "blocked",
+      "protocol": "blackhole",
+      "settings": {}
+    }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "blocked"
+      }
+    ]
+  }
+}
+EOF
+    systemctl restart xray && systemctl enable xray
+
+    sleep 3
+
+    cat >/etc/nginx/conf.d/xray.conf <<EOF
+server {
+    listen 80;
+    server_name ${domain};
+    return 301 https://\$http_host\$request_uri;
+}
+server {
+	listen 443 ssl http2 so_keepalive=on;
+	server_name ${domain};
+
+	index index.html;
+	root ${web_path};
+
+	ssl_certificate /home/xray/xray_cert/xray.crt
+	ssl_certificate_key /home/xray/xray_cert/xray.key;
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+	
+    client_header_timeout 52w;
+    keepalive_timeout 52w;
+
+	# 在 location 后填写 /你的 path
+	location /${ws_path} {
+        if (\$content_type !~ "application/grpc") {
+			return 404;
+		}
+        client_max_body_size 0;
+		client_body_buffer_size 512k;
+		grpc_set_header X-Real-IP \$remote_addr;
+		client_body_timeout 52w;
+		grpc_read_timeout 52w;
+		grpc_pass unix:/dev/shm/Xray-VLESS-gRPC.socket;
+    }
+}
+
+EOF
+
+systemctl restart nginx
+
+link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="vless"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_OBFS="grpc"
+OBFS_PATH="${ws_path}"
+XRAY_LINK="${link}"
+EOF
+}
+
 info() {
     echo -e "${Info} ${Green} $1 ${Font}"
 }
@@ -821,17 +934,17 @@ menu() {
     echo -e "\t${Yellow}https://github.com/uerax${Font}"
     echo -e "\t\t${Yellow}版本：${version}${Font}"
     echo -e "——————————————— 安装向导 ———————————————"
-    echo -e "${Green}1.${Font} 安装"
-    echo -e "${Green}2.${Font} 更新脚本"
-    echo -e "${Green}3.${Font} 更新 Xray"
-    echo -e "${Green}4.${Font} 检测服务状态"
-    echo -e "${Green}9.${Font} 完全卸载"
-    echo -e "${Green}10.${Font} 配置文件路径"
-    echo -e "${Green}11.${Font} 查看配置链接"
-    echo -e "${Green}100.${Font} 开启bbr"
-    echo -e "${Green}q.${Font} 退出"
+    echo -e "${Green}1)${Font} 安装"
+    echo -e "${Green}2)${Font} 更新脚本"
+    echo -e "${Green}3)${Font} 更新 Xray"
+    echo -e "${Green}4)${Font} 检测服务状态"
+    echo -e "${Green}9)${Font} 完全卸载"
+    echo -e "${Green}10)${Font} 配置文件路径"
+    echo -e "${Green}11)${Font} 查看配置链接"
+    echo -e "${Green}100)${Font} 开启bbr"
+    echo -e "${Green}q)${Font} 退出"
 
-    read -rp "输入数字：" menu_num
+    read -rp "输入数字(回车确认)：" menu_num
     case $menu_num in
     1)
     install
