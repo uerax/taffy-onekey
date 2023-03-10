@@ -383,7 +383,7 @@ cat>${xray_info}<<EOF
 XRAY_TYPE="trojan"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
@@ -470,7 +470,7 @@ cat>${xray_info}<<EOF
 XRAY_TYPE="trojan"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+XRAY_PORT="443"
 XRAY_OBFS=""
 OBFS_PATH=""
 XRAY_LINK="${link}"
@@ -574,7 +574,7 @@ cat>${xray_info}<<EOF
 XRAY_TYPE="vmess"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
@@ -678,13 +678,13 @@ EOF
 
 systemctl restart nginx
 
-link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
 cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
@@ -787,13 +787,13 @@ EOF
 
 systemctl restart nginx
 
-link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
 cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
