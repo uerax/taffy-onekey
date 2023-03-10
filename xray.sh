@@ -652,7 +652,7 @@ server {
 	index index.html;
 	root ${web_path};
 
-	ssl_certificate /home/xray/xray_cert/xray.crt
+	ssl_certificate /home/xray/xray_cert/xray.crt;
 	ssl_certificate_key /home/xray/xray_cert/xray.key;
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
@@ -761,7 +761,7 @@ server {
 	index index.html;
 	root ${web_path};
 
-	ssl_certificate /home/xray/xray_cert/xray.crt
+	ssl_certificate /home/xray/xray_cert/xray.crt;
 	ssl_certificate_key /home/xray/xray_cert/xray.key;
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
