@@ -149,6 +149,16 @@ nginx_install() {
     unzip web.zip && mv -f hentai121.github.io-master blog-main && rm web.zip
 }
 
+update_web() {
+    cd /home/xray/webpage/
+    wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
+    judge "伪装站 下载"
+    unzip web.zip
+    rm -rf ./blog-main
+    mv -f hentai121.github.io-master blog-main
+    rm web.zip
+}
+
 domain_handle() {
     echo -e "------------------------------------------"
     read -rp "输入你的域名(eg: www.example.com):" domain
@@ -941,6 +951,7 @@ menu() {
     echo -e "${Green}9)${Font} 完全卸载"
     echo -e "${Green}10)${Font} 配置文件路径"
     echo -e "${Green}11)${Font} 查看配置链接"
+    echo -e "${Green}20)${Font} 更新伪装站"
     echo -e "${Green}100)${Font} 开启bbr"
     echo -e "${Green}q)${Font} 退出"
 
@@ -966,6 +977,9 @@ menu() {
     ;;
     11)
     show_info
+    ;;
+    20)
+    update_web
     ;;
     100)
     open_bbr
