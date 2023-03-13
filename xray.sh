@@ -931,6 +931,60 @@ uninstall() {
     uninstall_acme
 }
 
+restart_nginx() {
+  info "开始启动 Nginx 服务"
+  service nginx restart
+  judge "Nginx 启动"
+}
+
+close_nginx() {
+  info "开始关闭 Nginx 服务"
+  service nginx stop
+  judge "Nginx 关闭"
+}
+
+restart_xray() {
+  info "开始启动 Xray 服务"
+  systemctl restart xray
+  judge "Xray 启动"
+}
+
+close_xray() {
+  info "开始关闭 Xray 服务"
+  systemctl stop xray
+  judge "Xray 关闭"
+}
+
+server_operation() {
+  echo -e "${Green}1)${Font} 重启/启动 Nginx"
+  echo -e "${Green}2)${Font} 关闭 Nginx"
+  echo -e "${Green}3)${Font} 重启/启动 Xray"
+  echo -e "${Green}4)${Font} 关闭 Xray"
+  echo -e "${Green}99)${Font} 结束操作"
+  read -rp "输入数字(回车确认): " opt_num
+    case $opt_num in
+    1)
+        restart_nginx
+        ;;
+    2)
+        close_nginx
+        ;;
+    3)
+        restart_xray
+        ;;
+    4)
+        close_xray
+        ;;
+    99)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        ;;
+    esac
+    server_operation
+}
+
 update_script() {
   script_path=$(cd `dirname $0`; pwd)
   wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
@@ -973,7 +1027,9 @@ question_answer() {
     echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
     echo -e "${Red}2.Nginx 启动失败${Font}"
     echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
-    echo -e "${Red}3.一键安装失败${Font}"
+    echo -e "${Red}3.Xray 启动失败${Font}"
+    echo -e "${Green}执行\"systemctl status xray\"查看日志${Font}"
+    echo -e "${Red}4.一键安装失败${Font}"
     echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
 }
 
@@ -988,11 +1044,12 @@ menu() {
     echo -e "${Green}1)${Font} 一键安装"
     echo -e "${Green}2)${Font} 更新脚本"
     echo -e "${Green}3)${Font} 安装/更新 Xray"
-    echo -e "${Green}4)${Font} 卸载 Xray"
+    echo -e "${Yellow}4)${Font} 卸载 Xray"
     echo -e "${Green}5)${Font} 安装 Nginx"
-    echo -e "${Green}6)${Font} 卸载 Nginx"
+    echo -e "${Yellow}6)${Font} 卸载 Nginx"
+    echo -e "${Green}7)${Font} 启动 / 关闭 / 重启服务"
     echo -e "${Green}8)${Font} Xray 协议更换"
-    echo -e "${Green}9)${Font} 完全卸载"
+    echo -e "${Yellow}9)${Font} 完全卸载"
     echo -e "${Green}10)${Font} 配置文件路径"
     echo -e "${Green}11)${Font} 查看配置链接"
     echo -e "${Green}12)${Font} 检测服务状态"
@@ -1020,6 +1077,9 @@ menu() {
     ;;
     6)
     uninstall_nginx
+    ;;
+    7)
+    server_operation
     ;;
     8)
     select_type
