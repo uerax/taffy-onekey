@@ -969,12 +969,12 @@ server_check() {
 }
 
 question_answer() {
-    echo -e "${Red}我啥都不懂${Font}"
-    echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问{Font}"
-    echo -e "${Red}Nginx 启动失败${Font}"
-    echo -e "${Green}执行"service nginx status"查看日志{Font}"
-    echo -e "${Red}一键安装失败${Font}"
-    echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP {Font}"
+    echo -e "${Red}1.我啥都不懂${Font}"
+    echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
+    echo -e "${Red}2.Nginx 启动失败${Font}"
+    echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
+    echo -e "${Red}3.一键安装失败${Font}"
+    echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
 }
 
 
