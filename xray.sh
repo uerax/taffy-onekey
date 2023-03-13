@@ -19,7 +19,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="1.2"
+version="1.3"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/usr/local/etc/xray/info"
@@ -268,6 +268,7 @@ select_type() {
     echo -e "${Green}3) ${Font} vmess-ws-tls"
     echo -e "${Green}4) ${Font} vless-ws-tls"
     echo -e "${Green}5) ${Font} vless-grpc"
+    echo -e "${Green}99) ${Font} 不进行操作"
     read -rp "输入数字(回车确认): " menu_num
     case $menu_num in
     1)
@@ -284,6 +285,8 @@ select_type() {
         ;;
     5)
         vless_grpc
+        ;;
+    99)
         ;;
     *)
         error "请输入正确的数字"
@@ -883,18 +886,29 @@ show_info() {
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
 }
 
-uninstall() {
+uninstall_nginx() {
+    info "Nginx 卸载"
+    apt purge -y nginx nginx-common nginx-core
+    apt autoremove -y
+}
+
+uninstall_xray() {
     info "Xray 卸载"
     bash -c "$(curl -L ${xray_install_url})" @ remove --purge
     rm -rf /home/xray
     rm ${xray_info}
-    info "Nginx 卸载"
-    apt purge -y nginx nginx-common nginx-core
-    apt autoremove -y
+}
+
+uninstall_acme() {
     info "Acme 卸载"
     /root/.acme.sh/acme.sh --uninstall
     rm -r  ~/.acme.sh
+}
 
+uninstall() {
+    uninstall_xray
+    uninstall_nginx
+    uninstall_acme
 }
 
 update_script() {
@@ -943,13 +957,17 @@ menu() {
     echo -e "\t${Yellow}https://github.com/uerax${Font}"
     echo -e "\t\t${Yellow}版本：${version}${Font}"
     echo -e "——————————————— 安装向导 ———————————————"
-    echo -e "${Green}1)${Font} 安装"
+    echo -e "${Green}1)${Font} 一键安装"
     echo -e "${Green}2)${Font} 更新脚本"
-    echo -e "${Green}3)${Font} 更新 Xray"
-    echo -e "${Green}4)${Font} 检测服务状态"
+    echo -e "${Green}3)${Font} 安装/更新 Xray"
+    echo -e "${Green}4)${Font} 卸载 Xray"
+    echo -e "${Green}5)${Font} 安装 Nginx"
+    echo -e "${Green}6)${Font} 卸载 Nginx"
+    echo -e "${Green}8)${Font} Xray 协议更换"
     echo -e "${Green}9)${Font} 完全卸载"
     echo -e "${Green}10)${Font} 配置文件路径"
     echo -e "${Green}11)${Font} 查看配置链接"
+    echo -e "${Green}12)${Font} 检测服务状态"
     echo -e "${Green}20)${Font} 更新伪装站"
     echo -e "${Green}100)${Font} 开启bbr"
     echo -e "${Green}q)${Font} 退出"
@@ -966,7 +984,16 @@ menu() {
     xray_upgrade
     ;;
     4)
-    server_check
+    uninstall_xray
+    ;;
+    5)
+    nginx_install
+    ;;
+    6)
+    uninstall_nginx
+    ;;
+    6)
+    select_type
     ;;
     9)
     uninstall
@@ -976,6 +1003,9 @@ menu() {
     ;;
     11)
     show_info
+    ;;
+    12)
+    server_check
     ;;
     20)
     update_web
@@ -992,5 +1022,3 @@ menu() {
 }
 
 menu
-
-
