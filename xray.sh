@@ -992,7 +992,7 @@ menu() {
     6)
     uninstall_nginx
     ;;
-    6)
+    8)
     select_type
     ;;
     9)
