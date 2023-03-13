@@ -19,7 +19,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="1.3"
+version="1.4"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/usr/local/etc/xray/info"
@@ -296,6 +296,10 @@ select_type() {
 }
 
 trojan_grpc() {
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
     password=$(xray uuid)
     port="443"
     cat >/usr/local/etc/xray/config.json <<EOF
@@ -404,6 +408,10 @@ EOF
 }
 
 trojan_tcp_xtls() {
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
     password=$(xray uuid)
     port="443"
     cat >/usr/local/etc/xray/config.json <<EOF
@@ -491,6 +499,10 @@ EOF
 }
 
 vmess_ws_tls() {
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
     password=$(xray uuid)
     cat >/usr/local/etc/xray/config.json <<EOF
 {
@@ -596,6 +608,10 @@ EOF
 }
 
 vless_ws_tls() {
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
     password=$(xray uuid)
     cat >/usr/local/etc/xray/config.json <<EOF
 {
@@ -705,6 +721,10 @@ EOF
 }
 
 vless_grpc() {
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
     password=$(xray uuid)
     cat >/usr/local/etc/xray/config.json <<EOF
 {
@@ -948,6 +968,14 @@ server_check() {
 
 }
 
+question_answer() {
+    echo -e "${Red}我啥都不懂${Font}"
+    echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问{Font}"
+    echo -e "${Red}Nginx 启动失败${Font}"
+    echo -e "${Green}执行"service nginx status"查看日志{Font}"
+    echo -e "${Red}一键安装失败${Font}"
+    echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP {Font}"
+}
 
 
 menu() {
@@ -969,6 +997,7 @@ menu() {
     echo -e "${Green}11)${Font} 查看配置链接"
     echo -e "${Green}12)${Font} 检测服务状态"
     echo -e "${Green}20)${Font} 更新伪装站"
+    echo -e "${Green}99)${Font} 常见问题"
     echo -e "${Green}100)${Font} 开启bbr"
     echo -e "${Green}q)${Font} 退出"
 
@@ -1009,6 +1038,9 @@ menu() {
     ;;
     20)
     update_web
+    ;;
+    99)
+    question_answer
     ;;
     100)
     open_bbr
