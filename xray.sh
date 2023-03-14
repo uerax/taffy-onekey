@@ -960,7 +960,7 @@ server_operation() {
   echo -e "${Green}2)${Font} 关闭 Nginx"
   echo -e "${Green}3)${Font} 重启/启动 Xray"
   echo -e "${Green}4)${Font} 关闭 Xray"
-  echo -e "${Green}99)${Font} 结束操作"
+  echo -e "${Green}q)${Font} 结束操作"
   read -rp "输入数字(回车确认): " opt_num
     case $opt_num in
     1)
@@ -975,7 +975,7 @@ server_operation() {
     4)
         close_xray
         ;;
-    99)
+    q)
         exit
         ;;
     *)
