@@ -988,6 +988,7 @@ server_operation() {
 update_script() {
   script_path=$(cd `dirname $0`; pwd)
   wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+  exit
 }
 
 xray_upgrade() {
