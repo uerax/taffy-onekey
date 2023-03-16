@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.6.4"
+version="v1.7.0"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -828,15 +828,15 @@ EOF
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
-  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/nginx/vless_tcp_xtls_vision.conf -O /etc/nginx/nginx.conf
+  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf -O /etc/nginx/nginx.conf
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
-  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/xray/vless_tcp_xtls_vision.json -O tmp.conf
-  sed -i "s/\${password}/$password/" tmp.conf
-  sed -i "s~\${ca_crt}~$ca_crt~" tmp.conf
-  sed -i "s~\${ca_key}~$ca_key~" tmp.conf
-  mv tmp.conf ${xray_cfg}
+  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json -O config.json
+  sed -i "s/\${password}/$password/" config.json
+  sed -i "s~\${ca_crt}~$ca_crt~" config.json
+  sed -i "s~\${ca_key}~$ca_key~" config.json
+  mv config.json ${xray_cfg}
 }
 
 # XRAY END
@@ -926,7 +926,6 @@ server_check() {
     else
         error "Xray 服务异常"
     fi
-
 
     info "开始检测 Nginx 服务"
 
