@@ -22,9 +22,12 @@ xray_install_url="https://github.com/uerax/xray-script/raw/master/install-releas
 version="1.4"
 
 xray_cfg="/usr/local/etc/xray/config.json"
-xray_info="/usr/local/etc/xray/info"
+xray_info="/home/xray/xray_info"
+xray_log="/home/xray/xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
-web_path="/home/xray/webpage/blog-main"
+web_path="/home/xray/webpage"
+web_dir="blog-main"
+ca_path="/home/xray/xray_cert"
 ca_crt="/home/xray/xray_cert/xray.crt"
 ca_key="/home/xray/xray_cert/xray.key"
 ws_path="crayfish"
@@ -142,20 +145,20 @@ nginx_install() {
         ok "Nginx 已存在"
     fi
 
-    mkdir -p /home/xray/webpage/ && cd /home/xray/webpage/
+    mkdir -p ${web_path} && cd ${web_path}
 
     wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
-    unzip web.zip && mv -f hentai121.github.io-master blog-main && rm web.zip
+    unzip web.zip && mv -f hentai121.github.io-master ${web_dir} && rm web.zip
 }
 
 update_web() {
-    cd /home/xray/webpage/
+    cd ${web_path}
     wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
     unzip web.zip
-    rm -rf ./blog-main
-    mv -f hentai121.github.io-master blog-main
+    rm -rf ./${web_dir}
+    mv -f hentai121.github.io-master ${web_dir}
     rm web.zip
 }
 
@@ -174,11 +177,11 @@ domain_handle() {
 
     sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat > ${nginx_cfg} << EOF
 server {
     listen 80;
     server_name ${domain};
-    root /home/xray/webpage/blog-main;
+    root ${web_path}/${web_dir};
     index index.html;
 }
 EOF
@@ -198,12 +201,12 @@ apply_certificate() {
     /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
     echo ${domain}
 
-    if /root/.acme.sh/acme.sh --issue -d ${domain} -w /home/xray/webpage/blog-main --keylength ec-256 --force; then
+    if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
         ok "SSL 证书生成成功"
         sleep 2
-        mkdir -p /home/xray/xray_cert
-        if /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file /home/xray/xray_cert/xray.crt --key-file /home/xray/xray_cert/xray.key; then
-            chmod +r /home/xray/xray_cert/xray.key
+        mkdir -p ${ca_path}
+        if /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}; then
+            chmod +r ${ca_key}
             ok "SSL 证书配置成功"
             sleep 2
         fi
@@ -214,24 +217,24 @@ apply_certificate() {
 }
 
 flush_certificate() {
-    cat >/home/xray/xray_cert/xray-cert-renew.sh <<EOF
+    cat > ${ca_path}/xray-cert-renew.sh <<EOF
 #!/bin/bash
 
-/root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file /home/xray/xray_cert/xray.crt --key-file /home/xray/xray_cert/xray.key
+/root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
 echo "Xray Certificates Renewed"
 
-chmod +r /home/xray/xray_cert/xray.key
+chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
 sudo systemctl restart xray
 echo "Xray Restarted"
 EOF
 
-    chmod +x /home/xray/xray_cert/xray-cert-renew.sh
+    chmod +x ${ca_path}/xray-cert-renew.sh
 
     (
-        crontab -l | grep -v "0 1 1 * *   bash /home/xray/xray_cert/xray-cert-renew.sh"
-        echo "0 1 1 * *   bash /home/xray/xray_cert/xray-cert-renew.sh"
+        crontab -l | grep -v "0 1 1 * *   bash ${ca_path}/xray-cert-renew.sh"
+        echo "0 1 1 * *   bash ${ca_path}/xray-cert-renew.sh"
     ) | crontab -
 
 }
@@ -251,7 +254,7 @@ xray_install() {
 }
 
 xray_configure() {
-    mkdir -p /home/xray/xray_log && touch /home/xray/xray_log/access.log && touch /home/xray/xray_log/error.log && chmod a+w /home/xray/xray_log/*.log
+    mkdir -p ${xray_log} && touch ${xray_log}/access.log && touch ${xray_log}/error.log && chmod a+w ${xray_log}/*.log
 }
 
 info_return() {
@@ -261,48 +264,15 @@ info_return() {
     echo -e "${Green}端口为:${Font} ${port}"
 }
 
-select_type() {
-    echo -e "${Green}选择安装的模式 ${Font}"
-    echo -e "${Green}1) ${Font} trojan-tcp-xtls(推荐)"
-    echo -e "${Green}2) ${Font} trojan-grpc"
-    echo -e "${Green}3) ${Font} vmess-ws-tls"
-    echo -e "${Green}4) ${Font} vless-ws-tls"
-    echo -e "${Green}5) ${Font} vless-grpc"
-    echo -e "${Green}99) ${Font} 不进行操作"
-    read -rp "输入数字(回车确认): " menu_num
-    case $menu_num in
-    1)
-        trojan_tcp_xtls
-        ;;
-    2)
-        trojan_grpc
-        ;;
-    3)
-        vmess_ws_tls
-        ;;
-    4)
-        vless_ws_tls
-        ;;
-    5)
-        vless_grpc
-        ;;
-    99)
-        ;;
-    *)
-        error "请输入正确的数字"
-        select_type
-        ;;
-    esac
-}
-
 trojan_grpc() {
     if [ "$domain" = "" ]
     then
+      echo -e ""
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
     port="443"
-    cat >/usr/local/etc/xray/config.json <<EOF
+    cat >${xray_cfg} <<EOF
 {
   "log": {
     "loglevel": "warning"
@@ -321,7 +291,7 @@ trojan_grpc() {
       "streamSettings": {
         "network": "grpc",
         "grpcSettings": {
-          "serviceName": "crayfish" // 填写你的 ServiceName
+          "serviceName": "${ws_path}" // 填写你的 ServiceName
         }
       }
     }
@@ -356,7 +326,7 @@ EOF
     systemctl enable xray
     sleep 3
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat >${nginx_cfg} <<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -368,17 +338,17 @@ server {
 	server_name ${domain};
 
 	index index.html;
-	root /home/xray/webpage/blog-main;
+	root ${web_path}/${web_dir};
 
-	ssl_certificate /home/xray/xray_cert/xray.crt;
-	ssl_certificate_key /home/xray/xray_cert/xray.key;
+	ssl_certificate ${ca_crt};
+	ssl_certificate_key ${ca_key};
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
 	client_header_timeout 52w;
     keepalive_timeout 52w;
 	# 在 location 后填写 /你的 ServiceName
-	location /crayfish {
+	location /${ws_path} {
 		if (\$content_type !~ "application/grpc") {
 			return 404;
 		}
@@ -407,14 +377,14 @@ XRAY_LINK="${link}"
 EOF
 }
 
-trojan_tcp_xtls() {
+trojan_tcp_tls() {
     if [ "$domain" = "" ]
     then
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
     port="443"
-    cat >/usr/local/etc/xray/config.json <<EOF
+    cat >${xray_cfg} <<EOF
 {
     "log": {
         "loglevel": "debug"
@@ -426,32 +396,27 @@ trojan_tcp_xtls() {
             "settings": {
                 "clients": [
                     {
-                        "password":"${password}",  // 密码
-                        "flow": "xtls-rprx-direct"
+                        "password":"${password}"  // 密码
                     }
                 ],
                 "fallbacks": [
                     {
-                        "dest": 8080
+                        "dest": ${port}
                     }
                 ]
             },
             "streamSettings": {
                 "network": "tcp",
-                "security": "xtls",
-                "xtlsSettings": {
+                "tlsSettings": {
                     "alpn": [
-                        "http/1.1",
-                        "h2"
+                        "http/1.1"
                     ],
                     "certificates": [
                         {
-                            "certificateFile": "/home/xray/xray_cert/xray.crt",  // 证书文件绝对目录
-                            "keyFile": "/home/xray/xray_cert/xray.key",  // 密钥文件绝对目录
-                            "ocspStapling": 3600  // 验证周期 3600 秒
+                            "certificateFile": "${ca_crt}",
+                            "keyFile": "${ca_key}"
                         }
-                    ],
-                    "minVersion": "1.2"  // 如果是ecc证书则最低使用 TLSv1.2 ，如果你不清楚证书类型或者不是 ecc 证书，删掉这行
+                    ]
                 }
             }
         }
@@ -469,15 +434,15 @@ EOF
 
     sleep 3
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat >${nginx_cfg} <<EOF
 server {
     listen 80;
     server_name ${domain};
     return 301 https://\$http_host\$request_uri;
 }
 server {
-   listen 127.0.0.1:8080;
-   root /home/xray/webpage/blog-main;
+   listen 127.0.0.1:${port};
+   root ${web_path}/${web_dir};
    index index.html;
    add_header Strict-Transport-Security "max-age=63072000" always;
 }
@@ -504,7 +469,7 @@ vmess_ws_tls() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat >/usr/local/etc/xray/config.json <<EOF
+    cat >${xray_cfg} <<EOF
 {
   "log":{
     "access": "/var/log/xray/access.log",
@@ -559,7 +524,7 @@ EOF
 
     sleep 3
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat >${nginx_cfg} <<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -570,16 +535,16 @@ server {
     server_name ${domain};
 
     index index.html;
-    root ${web_path};
+    root ${web_path}/${web_dir};
 
-    ssl_certificate /home/xray/xray_cert/xray.crt;
-    ssl_certificate_key /home/xray/xray_cert/xray.key;
+    ssl_certificate ${ca_crt};
+    ssl_certificate_key ${ca_key};
     ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers           HIGH:!aNULL:!MD5;
 
     # 在 location 
-    location /crayfish {
-    proxy_pass http://127.0.0.1:1919;
+    location /${ws_path} {
+    proxy_pass http://127.0.0.1:${port};
     proxy_redirect off;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
@@ -613,7 +578,7 @@ vless_ws_tls() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat >/usr/local/etc/xray/config.json <<EOF
+    cat >${xray_cfg} <<EOF
 {
   "log": {
     "loglevel": "warning"
@@ -668,7 +633,7 @@ EOF
 
     sleep 3
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat > ${nginx_cfg} <<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -679,10 +644,10 @@ server {
 	server_name ${domain};
 
 	index index.html;
-	root ${web_path};
+	root ${web_path}/${web_dir};
 
-	ssl_certificate /home/xray/xray_cert/xray.crt;
-	ssl_certificate_key /home/xray/xray_cert/xray.key;
+	ssl_certificate ${ca_crt};
+	ssl_certificate_key ${ca_key};
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
@@ -726,7 +691,7 @@ vless_grpc() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat >/usr/local/etc/xray/config.json <<EOF
+    cat > ${xray_cfg} <<EOF
 {
   "log": {
     "loglevel": "warning"
@@ -781,7 +746,7 @@ EOF
 
     sleep 3
 
-    cat >/etc/nginx/conf.d/xray.conf <<EOF
+    cat >${nginx_cfg} <<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -792,22 +757,22 @@ server {
 	server_name ${domain};
 
 	index index.html;
-	root ${web_path};
+	root ${web_path}/${web_dir};
 
-	ssl_certificate /home/xray/xray_cert/xray.crt;
-	ssl_certificate_key /home/xray/xray_cert/xray.key;
+	ssl_certificate ${ca_crt};
+	ssl_certificate_key ${ca_key};
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
-    client_header_timeout 52w;
-    keepalive_timeout 52w;
+  client_header_timeout 52w;
+  keepalive_timeout 52w;
 
 	# 在 location 后填写 /你的 path
 	location /${ws_path} {
-        if (\$content_type !~ "application/grpc") {
+    if (\$content_type !~ "application/grpc") {
 			return 404;
 		}
-        client_max_body_size 0;
+    client_max_body_size 0;
 		client_body_buffer_size 512k;
 		grpc_set_header X-Real-IP \$remote_addr;
 		client_body_timeout 52w;
@@ -832,6 +797,174 @@ OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 EOF
 }
+
+vless_tcp_xtls_vision() {
+  if [ "$domain" = "" ]
+  then
+    read -rp "输入你的域名(回车确认)：" domain
+  fi
+  password=$(xray uuid)
+  vless_tcp_xtls_vision_xray_cfg()
+  systemctl restart xray && systemctl enable xray
+  sleep 3
+  vless_tcp_xtls_vision_nginx_cfg()
+  systemctl restart nginx
+}
+
+vless_tcp_xtls_vision_nginx_cfg() {
+  cat>${nginx_cfg}<<EOF
+http {
+    log_format main '[$time_local] $proxy_protocol_addr "$http_referer" "$http_user_agent"';
+    access_log /var/log/nginx/access.log main;
+
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ""      close;
+    }
+
+    map $proxy_protocol_addr $proxy_forwarded_elem {
+        ~^[0-9.]+$        "for=$proxy_protocol_addr";
+        ~^[0-9A-Fa-f:.]+$ "for=\"[$proxy_protocol_addr]\"";
+        default           "for=unknown";
+    }
+
+    map $http_forwarded $proxy_add_forwarded {
+        "~^(,[ \\t]*)*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*([ \\t]*,([ \\t]*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*)?)*$" "$http_forwarded, $proxy_forwarded_elem";
+        default "$proxy_forwarded_elem";
+    }
+
+    server {
+        listen 80;
+        return 301 https://$host$request_uri;
+    }
+
+    server {
+        listen 127.0.0.1:8001 proxy_protocol;
+        listen 127.0.0.1:8002 http2 proxy_protocol;
+        set_real_ip_from 127.0.0.1;
+
+        location / {
+            sub_filter                         $proxy_host $host;
+            sub_filter_once                    off;
+
+            proxy_pass                         https://www.lovelive-anime.jp;
+            proxy_set_header Host              $proxy_host;
+
+            proxy_http_version                 1.1;
+            proxy_cache_bypass                 $http_upgrade;
+
+            proxy_ssl_server_name on;
+
+            proxy_set_header Upgrade           $http_upgrade;
+            proxy_set_header Connection        $connection_upgrade;
+            proxy_set_header X-Real-IP         $proxy_protocol_addr;
+            proxy_set_header Forwarded         $proxy_add_forwarded;
+            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host  $host;
+            proxy_set_header X-Forwarded-Port  $server_port;
+
+            proxy_connect_timeout              60s;
+            proxy_send_timeout                 60s;
+            proxy_read_timeout                 60s;
+
+            resolver 1.1.1.1;
+        }
+    }
+}
+EOF
+}
+
+vless_tcp_xtls_vision_xray_cfg() {
+  cat > ${xray_cfg} << EOF
+{
+    "log": {
+        "loglevel": "warning"
+    },
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+            {
+                "type": "field",
+                "ip": [
+                    "geoip:cn"
+                ],
+                "outboundTag": "block"
+            }
+        ]
+    },
+    "inbounds": [
+        {
+            "listen": "0.0.0.0", // "0.0.0.0" Indicates listening to both IPv4 and IPv6
+            "port": 443, // The port on which the server listens
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "${password}", // User ID, perform xray uuid generation, or a string of 1-30 bytes
+                        "flow": "xtls-rprx-vision"
+                    }
+                ],
+                "decryption": "none",
+                "fallbacks": [
+                    {
+                        "dest": "8001",
+                        "xver": 1
+                    },
+                    {
+                        "alpn": "h2",
+                        "dest": "8002",
+                        "xver": 1
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "tls",
+                "tlsSettings": {
+                    "rejectUnknownSni": true,
+                    "minVersion": "1.2",
+                    "certificates": [
+                        {
+                            "ocspStapling": 3600,
+                            "certificateFile": "${ca_crt}", // For the certificate file, it is recommended to use fullchain (full SSL certificate chain). If there is only a website certificate, v2rayN can be used but v2rayNG cannot be used. Usually, the extension is not distinguished
+                            "keyFile": "${ca_key}" // private key file
+                        }
+                    ]
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "freedom",
+            "tag": "direct"
+        },
+        {
+            "protocol": "blackhole",
+            "tag": "block"
+        }
+    ],
+    "policy": {
+        "levels": {
+            "0": {
+                "handshake": 2, // The handshake time limit when the connection is established, in seconds, the default value is 4, it is recommended to be different from the default value
+                "connIdle": 120 // Connection idle time limit in seconds, the default value is 300, it is recommended to be different from the default value
+            }
+        }
+    }
+} 
+EOF
+}
+
+# XRAY END
 
 info() {
     echo -e "${Info} ${Green} $1 ${Font}"
@@ -895,7 +1028,7 @@ show_path() {
 }
 
 show_info() {
-    source '/usr/local/etc/xray/info'
+    source ${xray_info}
     judge "查看配置"
     echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
     echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
@@ -904,6 +1037,44 @@ show_info() {
     echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
+}
+
+server_check() {
+
+    info "开始检测 Xray 服务"
+
+    xray_active=`systemctl is-active xray`
+
+    # result: active or inactive
+    if [[ $xray_active = "active" ]]; then
+        ok "Xray 服务正常"
+    else
+        error "Xray 服务异常"
+    fi
+
+
+    info "开始检测 Nginx 服务"
+
+    nginx_active=`systemctl is-active nginx`
+
+    # result: active or inactive
+    if [[ $nginx_active = "active" ]]; then
+        ok "Nginx 服务正常"
+    else
+        error "Nginx 服务异常"
+    fi
+
+}
+
+update_script() {
+  script_path=$(cd `dirname $0`; pwd)
+  wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+  exit
+}
+
+xray_upgrade() {
+  bash -c "$(curl -L ${xray_install_url})" @ install
+  judge "Xray 更新"
 }
 
 uninstall_nginx() {
@@ -956,12 +1127,15 @@ close_xray() {
 }
 
 server_operation() {
-  echo -e "${Green}1)${Font} 重启/启动 Nginx"
-  echo -e "${Green}2)${Font} 关闭 Nginx"
-  echo -e "${Green}3)${Font} 重启/启动 Xray"
-  echo -e "${Green}4)${Font} 关闭 Xray"
-  echo -e "${Green}q)${Font} 结束操作"
+  echo -e "${Green} -------------------------------- ${Font}"
+  echo -e "\t${Green}1)${Font} 重启/启动 Nginx"
+  echo -e "\t${Green}2)${Font} 关闭 Nginx"
+  echo -e "\t${Green}3)${Font} 重启/启动 Xray"
+  echo -e "\t${Green}4)${Font} 关闭 Xray"
+  echo -e "\t${Green}q)${Font} 结束操作\n"
+  echo -e "${Green} -------------------------------- ${Font}"
   read -rp "输入数字(回车确认): " opt_num
+  echo -e ""
     case $opt_num in
     1)
         restart_nginx
@@ -985,55 +1159,55 @@ server_operation() {
     server_operation
 }
 
-update_script() {
-  script_path=$(cd `dirname $0`; pwd)
-  wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
-  exit
-}
-
-xray_upgrade() {
-  bash -c "$(curl -L ${xray_install_url})" @ install
-  judge "Xray 更新"
-}
-
-server_check() {
-
-    info "开始检测 Xray 服务"
-
-    xray_active=`systemctl is-active xray`
-
-    # result: active or inactive
-    if [[ $xray_active = "active" ]]; then
-        ok "Xray 服务正常"
-    else
-        error "Xray 服务异常"
-    fi
-
-
-    info "开始检测 Nginx 服务"
-
-    nginx_active=`systemctl is-active nginx`
-
-    # result: active or inactive
-    if [[ $nginx_active = "active" ]]; then
-        ok "Nginx 服务正常"
-    else
-        error "Nginx 服务异常"
-    fi
-
-}
-
 question_answer() {
     echo -e "${Red}1.我啥都不懂${Font}"
     echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
+    echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}2.Nginx 启动失败${Font}"
     echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
+    echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}3.Xray 启动失败${Font}"
     echo -e "${Green}执行\"systemctl status xray\"查看日志${Font}"
+    echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}4.一键安装失败${Font}"
     echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
 }
 
+select_type() {
+    echo -e "\t${Green}选择安装的模式 ${Font}"
+    echo -e "\t${Green}1) ${Font} trojan-tcp-tls(推荐)"
+    echo -e "\t${Green}2) ${Font} trojan-grpc"
+    echo -e "\t${Green}3) ${Font} vmess-ws-tls"
+    echo -e "\t${Green}4) ${Font} vless-ws-tls"
+    echo -e "\t${Green}5) ${Font} vless-grpc"
+    echo -e "\t${Green}6) ${Font} vless-tcp-xtls-vision"
+    echo -e "\t${Green}99) ${Font} 不进行操作\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+        trojan_tcp_tls
+        ;;
+    2)
+        trojan_grpc
+        ;;
+    3)
+        vmess_ws_tls
+        ;;
+    4)
+        vless_ws_tls
+        ;;
+    5)
+        vless_grpc
+        ;;
+    99)
+        ;;
+    *)
+        error "请输入正确的数字"
+        select_type
+        ;;
+    esac
+}
 
 menu() {
     echo -e "——————————————— 脚本信息 ———————————————"
@@ -1042,24 +1216,26 @@ menu() {
     echo -e "\t${Yellow}https://github.com/uerax${Font}"
     echo -e "\t\t${Yellow}版本：${version}${Font}"
     echo -e "——————————————— 安装向导 ———————————————"
-    echo -e "${Green}1)${Font} 一键安装"
-    echo -e "${Green}2)${Font} 更新脚本"
-    echo -e "${Green}3)${Font} 安装/更新 Xray"
-    echo -e "${Yellow}4)${Font} 卸载 Xray"
-    echo -e "${Green}5)${Font} 安装 Nginx"
-    echo -e "${Yellow}6)${Font} 卸载 Nginx"
-    echo -e "${Green}7)${Font} 启动 / 关闭 / 重启服务"
-    echo -e "${Green}8)${Font} Xray 协议更换"
-    echo -e "${Yellow}9)${Font} 完全卸载"
-    echo -e "${Green}10)${Font} 配置文件路径"
-    echo -e "${Green}11)${Font} 查看配置链接"
-    echo -e "${Green}12)${Font} 检测服务状态"
-    echo -e "${Green}20)${Font} 更新伪装站"
-    echo -e "${Green}99)${Font} 常见问题"
-    echo -e "${Green}100)${Font} 开启bbr"
-    echo -e "${Green}q)${Font} 退出"
+    echo -e "\t${Green}1)${Font} 一键安装"
+    echo -e "\t${Green}2)${Font} 更新脚本"
+    echo -e "\t${Green}3)${Font} 安装/更新 Xray"
+    echo -e "\t${Yellow}4)${Font} 卸载 Xray"
+    echo -e "\t${Green}5)${Font} 安装 Nginx"
+    echo -e "\t${Yellow}6)${Font} 卸载 Nginx"
+    echo -e "\t${Green}7)${Font} 启动 / 关闭 / 重启服务"
+    echo -e "\t${Green}8)${Font} Xray 协议更换"
+    echo -e "\t${Yellow}9)${Font} 完全卸载"
+    echo -e "\t${Green}10)${Font} 配置文件路径"
+    echo -e "\t${Green}11)${Font} 查看配置链接"
+    echo -e "\t${Green}12)${Font} 检测服务状态"
+    echo -e "\t${Green}20)${Font} 更新伪装站"
+    echo -e "\t${Green}99)${Font} 常见问题"
+    echo -e "\t${Green}100)${Font} 开启bbr"
+    echo -e "\t${Green}q)${Font} 退出"
+    echo -e "————————————————————————————————————————\n"
 
     read -rp "输入数字(回车确认)：" menu_num
+    echo -e ""
     case $menu_num in
     1)
     install
