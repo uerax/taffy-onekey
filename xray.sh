@@ -823,8 +823,8 @@ vless_tcp_xtls_vision_nginx_cfg() {
 vless_tcp_xtls_vision_xray_cfg() {
   wget -N https://raw.githubusercontent.com/uerax/xray-script/master/xray/vless_tcp_xtls_vision.json -O tmp.conf
   sed -i "s/\${password}/$password/" tmp.conf
-  sed -i "s/\${ca_crt}/$ca_crt/" tmp.conf
-  sed -i "s/\${ca_key}/$ca_key/" tmp.conf
+  sed -i "s~\${ca_crt}~$ca_crt~" tmp.conf
+  sed -i "s~\${ca_key}~$ca_key~" tmp.conf
   mv tmp.conf ${xray_cfg}
 }
 
