@@ -19,7 +19,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="1.4"
+version="1.5"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -804,38 +804,38 @@ vless_tcp_xtls_vision() {
     read -rp "输入你的域名(回车确认)：" domain
   fi
   password=$(xray uuid)
-  vless_tcp_xtls_vision_xray_cfg()
+  vless_tcp_xtls_vision_xray_cfg
   systemctl restart xray && systemctl enable xray
   sleep 3
-  vless_tcp_xtls_vision_nginx_cfg()
+  vless_tcp_xtls_vision_nginx_cfg
   systemctl restart nginx
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
   cat>${nginx_cfg}<<EOF
 http {
-    log_format main '[$time_local] $proxy_protocol_addr "$http_referer" "$http_user_agent"';
+    log_format main '[\$time_local] \$proxy_protocol_addr "\$http_referer" "\$http_user_agent"';
     access_log /var/log/nginx/access.log main;
 
-    map $http_upgrade $connection_upgrade {
+    map \$http_upgrade \$connection_upgrade {
         default upgrade;
         ""      close;
     }
 
-    map $proxy_protocol_addr $proxy_forwarded_elem {
-        ~^[0-9.]+$        "for=$proxy_protocol_addr";
-        ~^[0-9A-Fa-f:.]+$ "for=\"[$proxy_protocol_addr]\"";
+    map \$proxy_protocol_addr \$proxy_forwarded_elem {
+        ~^[0-9.]+\$        "for=\$proxy_protocol_addr";
+        ~^[0-9A-Fa-f:.]+\$ "for=\"[\$proxy_protocol_addr]\"";
         default           "for=unknown";
     }
 
-    map $http_forwarded $proxy_add_forwarded {
-        "~^(,[ \\t]*)*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*([ \\t]*,([ \\t]*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*)?)*$" "$http_forwarded, $proxy_forwarded_elem";
-        default "$proxy_forwarded_elem";
+    map \$http_forwarded \$proxy_add_forwarded {
+        "~^(,[ \\t]*)*([!#\$%&'*+.^_`|~0-9A-Za-z-]+=([!#\$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#\$%&'*+.^_`|~0-9A-Za-z-]+=([!#\$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*([ \\t]*,([ \\t]*([!#\$%&'*+.^_`|~0-9A-Za-z-]+=([!#\$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#\$%&'*+.^_`|~0-9A-Za-z-]+=([!#\$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*)?)*\$" "\$http_forwarded, \$proxy_forwarded_elem";
+        default "\$proxy_forwarded_elem";
     }
 
     server {
         listen 80;
-        return 301 https://$host$request_uri;
+        return 301 https://\$host\$request_uri;
     }
 
     server {
@@ -844,25 +844,25 @@ http {
         set_real_ip_from 127.0.0.1;
 
         location / {
-            sub_filter                         $proxy_host $host;
+            sub_filter                         \$proxy_host \$host;
             sub_filter_once                    off;
 
             proxy_pass                         https://www.lovelive-anime.jp;
-            proxy_set_header Host              $proxy_host;
+            proxy_set_header Host              \$proxy_host;
 
             proxy_http_version                 1.1;
-            proxy_cache_bypass                 $http_upgrade;
+            proxy_cache_bypass                 \$http_upgrade;
 
             proxy_ssl_server_name on;
 
-            proxy_set_header Upgrade           $http_upgrade;
-            proxy_set_header Connection        $connection_upgrade;
-            proxy_set_header X-Real-IP         $proxy_protocol_addr;
-            proxy_set_header Forwarded         $proxy_add_forwarded;
-            proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host  $host;
-            proxy_set_header X-Forwarded-Port  $server_port;
+            proxy_set_header Upgrade           \$http_upgrade;
+            proxy_set_header Connection        \$connection_upgrade;
+            proxy_set_header X-Real-IP         \$proxy_protocol_addr;
+            proxy_set_header Forwarded         \$proxy_add_forwarded;
+            proxy_set_header X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+            proxy_set_header X-Forwarded-Host  \$host;
+            proxy_set_header X-Forwarded-Port  \$server_port;
 
             proxy_connect_timeout              60s;
             proxy_send_timeout                 60s;
@@ -873,6 +873,7 @@ http {
     }
 }
 EOF
+
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
@@ -1181,7 +1182,7 @@ select_type() {
     echo -e "\t${Green}4) ${Font} vless-ws-tls"
     echo -e "\t${Green}5) ${Font} vless-grpc"
     echo -e "\t${Green}6) ${Font} vless-tcp-xtls-vision"
-    echo -e "\t${Green}99) ${Font} 不进行操作\n"
+    echo -e "\t${Green}q) ${Font} 不进行操作\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
     case $menu_num in
@@ -1200,7 +1201,10 @@ select_type() {
     5)
         vless_grpc
         ;;
-    99)
+    6)
+        vless_tcp_xtls_vision
+        ;;
+    q)
         ;;
     *)
         error "请输入正确的数字"
