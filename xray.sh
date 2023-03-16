@@ -814,6 +814,17 @@ vless_tcp_xtls_vision() {
   sleep 3
   vless_tcp_xtls_vision_nginx_cfg
   systemctl restart nginx
+
+  link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="vless"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="443"
+XRAY_FLOW="xtls-rprx-vision"
+XRAY_LINK="${link}"
+EOF
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
@@ -1046,7 +1057,7 @@ select_type() {
     echo -e "${Cyan}4)  vless-ws-tls${Font}"
     echo -e "${Cyan}5)  vless-grpc${Font}"
     echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
-    echo -e "${Red}q)  不进行操作${Font}"
+    echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
@@ -1070,6 +1081,7 @@ select_type() {
         vless_tcp_xtls_vision
         ;;
     q)
+        exit
         ;;
     *)
         error "请输入正确的数字"
@@ -1129,6 +1141,7 @@ menu() {
     ;;
     8)
     select_type
+    info_return
     ;;
     9)
     uninstall
