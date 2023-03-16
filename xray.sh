@@ -812,11 +812,11 @@ vless_tcp_xtls_vision() {
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
-  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/nginx/vless_tcp_xtls_vision.conf -O /etc/nginx/nginc.conf
+  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/nginx/vless_tcp_xtls_vision.conf -O /etc/nginx/nginx.conf
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
-  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/xray/vless_tcp_xtls_vision.json -O xray.conf && mv xray.conf ${xray_cfg}
+  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/xray/vless_tcp_xtls_vision.json -O config.conf && mv config.conf ${xray_cfg}
 }
 
 # XRAY END
