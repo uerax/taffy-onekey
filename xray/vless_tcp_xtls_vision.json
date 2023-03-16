@@ -48,7 +48,8 @@
                     "certificates": [
                         {
                             "ocspStapling": 3600,
-                            "certificateFile": "${ca_crt}"
+                            "certificateFile": "${ca_crt}",
+                            "keyFile": "${ca_key}"
                         }
                     ]
                 }
