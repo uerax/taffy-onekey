@@ -7,6 +7,11 @@ stty erase ^?
 Green="\033[32m"
 Red="\033[31m"
 Yellow="\033[33m"
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'
+
 GreenBG="\033[42;37m"
 RedBG="\033[41;37m"
 Font="\033[0m"
@@ -982,13 +987,13 @@ close_xray() {
 }
 
 server_operation() {
-  echo -e "${Green} -------------------------------- ${Font}"
-  echo -e "${Green}1)${Font} 重启/启动 Nginx"
-  echo -e "${Green}2)${Font} 关闭 Nginx"
-  echo -e "${Green}3)${Font} 重启/启动 Xray"
-  echo -e "${Green}4)${Font} 关闭 Xray"
-  echo -e "${Green}q)${Font} 结束操作\n"
-  echo -e "${Green} -------------------------------- ${Font}"
+  echo -e "${Purple}-------------------------------- ${Font}"
+  echo -e "${Green}1)  重启/启动 Nginx${Font}"
+  echo -e "${Yellow}2)  关闭 Nginx${Font}"
+  echo -e "${Green}3)  重启/启动 Xray${Font}"
+  echo -e "${Yellow}4)  关闭 Xray${Font}"
+  echo -e "${Red}q)  结束操作${Font}\n"
+  echo -e "${Purple}-------------------------------- ${Font}"
   read -rp "输入数字(回车确认): " opt_num
   echo -e ""
     case $opt_num in
@@ -1030,13 +1035,15 @@ question_answer() {
 
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
-    echo -e "${Green}1) ${Font} trojan-tcp-tls(推荐)"
-    echo -e "${Green}2) ${Font} trojan-grpc"
-    echo -e "${Green}3) ${Font} vmess-ws-tls"
-    echo -e "${Green}4) ${Font} vless-ws-tls"
-    echo -e "${Green}5) ${Font} vless-grpc"
-    echo -e "${Green}6) ${Font} vless-tcp-xtls-vision"
-    echo -e "${Green}q) ${Font} 不进行操作\n"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  trojan-tcp-tls(推荐)${Font}"
+    echo -e "${Cyan}2)  trojan-grpc${Font}"
+    echo -e "${Cyan}3)  vmess-ws-tls${Font}"
+    echo -e "${Cyan}4)  vless-ws-tls${Font}"
+    echo -e "${Cyan}5)  vless-grpc${Font}"
+    echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
+    echo -e "${Red}q)  不进行操作${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
     case $menu_num in
@@ -1068,29 +1075,29 @@ select_type() {
 }
 
 menu() {
-    echo -e "——————————————— 脚本信息 ———————————————"
+    echo -e "${Cyan}——————————————— 脚本信息 ———————————————${Font}"
     echo -e "\t\t${Yellow}Xray 脚本${Font}"
     echo -e "\t${Yellow}---authored by uerax---${Font}"
     echo -e "\t${Yellow}https://github.com/uerax${Font}"
-    echo -e "\t\t${Yellow}版本：${version}${Font}"
-    echo -e "——————————————— 安装向导 ———————————————"
-    echo -e "${Green}1)${Font} 一键安装"
-    echo -e "${Green}2)${Font} 更新脚本"
-    echo -e "${Green}3)${Font} 安装/更新 Xray"
-    echo -e "${Yellow}4)${Font} 卸载 Xray"
-    echo -e "${Green}5)${Font} 安装 Nginx"
-    echo -e "${Yellow}6)${Font} 卸载 Nginx"
-    echo -e "${Green}7)${Font} 启动 / 关闭 / 重启服务"
-    echo -e "${Green}8)${Font} Xray 协议更换"
-    echo -e "${Yellow}9)${Font} 完全卸载"
-    echo -e "${Green}10)${Font} 配置文件路径"
-    echo -e "${Green}11)${Font} 查看配置链接"
-    echo -e "${Green}12)${Font} 检测服务状态"
-    echo -e "${Green}20)${Font} 更新伪装站"
-    echo -e "${Green}99)${Font} 常见问题"
-    echo -e "${Green}100)${Font} 开启bbr"
-    echo -e "${Green}q)${Font} 退出"
-    echo -e "————————————————————————————————————————\n"
+    echo -e "\t\t${Yellow}版本号：${version}${Font}"
+    echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
+    echo -e "${Green}1)   一键安装${Font}"
+    echo -e "${Blue}2)   更新脚本${Font}"
+    echo -e "${Green}3)   安装/更新 Xray${Font}"
+    echo -e "${Yellow}4)   卸载 Xray${Font}"
+    echo -e "${Green}5)   安装 Nginx${Font}"
+    echo -e "${Yellow}6)   卸载 Nginx${Font}"
+    echo -e "${Purple}7)   启动 / 关闭 / 重启服务${Font}"
+    echo -e "${Cyan}8)   Xray 协议更换${Font}"
+    echo -e "${Yellow}9)   完全卸载${Font}"
+    echo -e "${Purple}10)  配置文件路径${Font}"
+    echo -e "${Purple}11)  查看配置链接${Font}"
+    echo -e "${Green}12)  检测服务状态${Font}"
+    echo -e "${Blue}20)  更新伪装站${Font}"
+    echo -e "${Red}99)  常见问题${Font}"
+    echo -e "${Green}100) 开启bbr${Font}"
+    echo -e "${Red}q)   退出${Font}"
+    echo -e "${Cyan}————————————————————————————————————————${Font}\n"
 
     read -rp "输入数字(回车确认)：" menu_num
     echo -e ""
