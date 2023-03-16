@@ -19,7 +19,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="1.6"
+version="v1.6.1"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -812,11 +812,11 @@ vless_tcp_xtls_vision() {
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
-  cd /etc/nginx/ && wget -N https://github.com/uerax/xray-script/blob/master/nginx/vless_tcp_xtls_vision.conf -O /etc/nginx/nginc.conf
+  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/nginx/vless_tcp_xtls_vision.conf -O /etc/nginx/nginc.conf
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
-  wget -N https://github.com/uerax/xray-script/blob/master/nginx/vless_tcp_xtls_vision.conf -O xray.conf && mv xray.conf ${xray_cfg}
+  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/xray/vless_tcp_xtls_vision.json -O xray.conf && mv xray.conf ${xray_cfg}
 }
 
 # XRAY END
