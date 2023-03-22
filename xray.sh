@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.7.0"
+version="v1.7.2"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -46,6 +46,7 @@ port="1919"
 install() {
     is_root
     get_system
+    adjust_date
     env_install
     # increase_max_handle
     port_check 80
@@ -96,6 +97,13 @@ get_system() {
     fi
 }
 
+adjust_date() {
+  info "正在调整时区"
+  rm -rf /etc/localtime
+  ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+  judge "时区调整"
+}
+
 function env_install() {
 
     ${INS} wget
@@ -104,6 +112,8 @@ function env_install() {
     judge "unzip 安装"
     ${INS} lsof
     judge "lsof 安装"
+    ${INS} curl
+    judge "curl 安装"
 }
 
 increase_max_handle() {
@@ -563,7 +573,9 @@ EOF
 
 systemctl restart nginx
 
-link="vmess://${password}@${domain}:${port}?encryption=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+tmp="${password}@${domain}:443?encryption\=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+encode_link=$( base64 <<< $tmp)
+link="vmess://$encode_link"
 
 cat>${xray_info}<<EOF
 XRAY_TYPE="vmess"
@@ -790,7 +802,7 @@ EOF
 
 systemctl restart nginx
 
-link="vless://${password}@${domain}:${port}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
+link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
 cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
