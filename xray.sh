@@ -152,18 +152,18 @@ nginx_install() {
 
     mkdir -p ${web_path} && cd ${web_path}
 
-    wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate https://github.com/bakahentailolicon/bakahentailolicon.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
-    unzip web.zip && mv -f hentai121.github.io-master ${web_dir} && rm web.zip
+    unzip web.zip && mv -f bakahentailolicon.github.io-master ${web_dir} && rm web.zip
 }
 
 update_web() {
     cd ${web_path}
-    wget -O web.zip --no-check-certificate https://github.com/hentai121/hentai121.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate https://github.com/bakahentailolicon/bakahentailolicon.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
     unzip web.zip
     rm -rf ./${web_dir}
-    mv -f hentai121.github.io-master ${web_dir}
+    mv -f bakahentailolicon.github.io-master ${web_dir}
     rm web.zip
 }
 
@@ -396,7 +396,7 @@ trojan_tcp_tls() {
     },
     "inbounds": [
         {
-            "port": 443,
+            "port": ${port},
             "protocol": "trojan",
             "settings": {
                 "clients": [
@@ -406,7 +406,7 @@ trojan_tcp_tls() {
                 ],
                 "fallbacks": [
                     {
-                        "dest": ${port}
+                        "dest": 1919
                     }
                 ]
             },
@@ -446,7 +446,7 @@ server {
     return 301 https://\$http_host\$request_uri;
 }
 server {
-   listen 127.0.0.1:${port};
+   listen 127.0.0.1:1919;
    root ${web_path}/${web_dir};
    index index.html;
    add_header Strict-Transport-Security "max-age=63072000" always;
@@ -455,7 +455,7 @@ EOF
 
 systemctl restart nginx
 
-link="trojan://${password}@${domain}:${port}?flow=xtls-rprx-direct&security=tls&type=tcp&headerType=none#${domain}"
+link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
 cat>${xray_info}<<EOF
 XRAY_TYPE="trojan"
