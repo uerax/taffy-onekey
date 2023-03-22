@@ -960,7 +960,7 @@ uninstall_nginx() {
 uninstall_xray() {
     info "Xray 卸载"
     bash -c "$(curl -L ${xray_install_url})" @ remove --purge
-    rm -rf /home/xray
+    # rm -rf /home/xray
     rm ${xray_info}
 }
 
