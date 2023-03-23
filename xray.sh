@@ -931,7 +931,7 @@ shadowsocket-2022-config() {
 outbound_choose() {
   transfer_type=1
   echo -e "选择你的落地协议"
-  echo -e "${Cyan}1) Trojab ${Font}"
+  echo -e "${Cyan}1) Trojan ${Font}"
   echo -e ""
   read -rp "请输入输字" transfer
   case $transfer in
@@ -946,12 +946,15 @@ outbound_choose() {
 }
 
 outbound_trojan() {
-  trojan=$(wget -qO- https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json)
-  read -rp "请输入trojan域名" address
-  trojan=$(echo $trojan | sed -i "s~\${address}~$address~")
-  read -rp "请输入trojan密码" trojan_pw
-  trojan=$(echo $trojan | sed -i "s~\${password}~$trojan_pw~")
-  read -rp "请输入trojan传输协议(tcp/grpc)" trojan_net
+  wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json -O trojan.tmp
+  read -rp "请输入trojan域名: " address
+  sed -i "s~\${address}~$address~" trojan.tmp
+  read -rp "请输入trojan密码: " trojan_pw
+  sed -i "s~\${password}~$trojan_pw~" trojan.tmp
+  read -rp "请输入trojan传输协议(tcp/grpc): " trojan_net
+  sed -i "s~\${network}~$trojan_net~" trojan.tmp
+  outbound=$(cat trojan.tmp)
+  rm trojan.tmp
 }
 
 # XRAY END
