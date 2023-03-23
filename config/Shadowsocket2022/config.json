@@ -1,0 +1,25 @@
+{
+    "inbounds": [
+        {
+            "port": 19191,
+            "protocol": "shadowsocks",
+            "settings": {
+                "method": "${method}",
+                "password": "${password}",
+                "level": 0,
+                "email": "crayfish@gmail.com",
+                "network": "udp,tcp"
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        }
+    ],
+    "outbounds": [
+        "OutboundsPlaceholder"
+    ]
+}

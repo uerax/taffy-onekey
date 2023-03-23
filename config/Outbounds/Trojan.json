@@ -1,0 +1,20 @@
+{
+    "sendThrough": "0.0.0.0",
+    "protocol": "trojan",
+    "settings": {
+        "servers": [
+            {
+                "address": "${address}",
+                "password": "${password}",
+                "port": 443
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "${network}",
+        "security": "tls",
+        "tlsSettings": {
+            "serverName": "${address}"
+        }
+    }
+}

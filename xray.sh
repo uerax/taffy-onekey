@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.7.2"
+version="v1.7.5"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -36,6 +36,8 @@ ca_path="/home/xray/xray_cert"
 ca_crt="/home/xray/xray_cert/xray.crt"
 ca_key="/home/xray/xray_cert/xray.key"
 ws_path="crayfish"
+ss_method=""
+outbound='{"protocol": "freedom"}\n'
 
 INS="apt install -y"
 password=""
@@ -851,6 +853,107 @@ vless_tcp_xtls_vision_xray_cfg() {
   mv config.json ${xray_cfg}
 }
 
+shadowsocket-2022() {
+  info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
+  close_nginx()
+  if ! command -v openssl >/dev/null 2>&1; then
+        ${INS} openssl
+        judge "openssl 安装"
+  fi
+  encrypt=1
+  ss_method="2022-blake3-aes-128-gcm"
+  port=19191
+  echo -e "选择加密方法"
+  echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+  echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+  echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+  echo -e ""
+  read -rp "选择加密方法(默认为1)：" encrypt
+  case $encrypt in
+  1)
+    password=$(openssl rand -base64 16)
+    ;;
+  2)
+    password=$(openssl rand -base64 32)
+    ss_method="2022-blake3-aes-256-gcm"
+    ;;
+  3)
+    password=$(openssl rand -base64 32)
+    ss_method="2022-blake3-chacha20-poly1305"
+    ;;
+  *)
+    password=$(openssl rand -base64 16)
+    ;;
+  esac
+  shadowsocket-2022-config
+  systemctl restart xray && systemctl enable xray
+
+  tmp="${ss_method}:${password}"
+  tmp=$( base64 <<< $tmp)
+  domain=`curl ipinfo.io/ip`
+  link="ss://$tmp@${domain}:${port}"
+
+cat>${xray_info}<<EOF
+XRAY_TYPE="shadowsocket2022"
+XRAY_ADDR="${domain}"
+XRAT_METHOD="${ss_method}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_LINK="${link}"
+EOF
+}
+
+shadowsocket-2022-config() {
+  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json -O config.json
+  sed -i "s~\${method}~$ss_method~" config.json
+  sed -i "s~\${password}~$password~" config.json
+  transfer="N"
+  read -rp "是否作为中转添加落地(Y/N)" transfer
+  case $transfer in
+  "Y")
+    outbound_choose
+    ;;
+  "y")
+    outbound_choose
+    ;;
+  "n")
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+    ;;
+  "N")
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+    ;;
+  *)
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+    ;;
+  esac
+}
+
+outbound_choose() {
+  transfer_type=1
+  echo -e "选择你的落地协议"
+  echo -e "${Cyan}1) Trojab ${Font}"
+  echo -e ""
+  read -rp "请输入输字" transfer
+  case $transfer in
+  1)
+    outbound_trojan
+    ;;
+  *)
+    ;;
+  esac
+
+  sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+}
+
+outbound_trojan() {
+  trojan=$(wget -qO- https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json)
+  read -rp "请输入trojan域名" address
+  trojan=$(echo $trojan | sed -i "s~\${address}~$address~")
+  read -rp "请输入trojan密码" trojan_pw
+  trojan=$(echo $trojan | sed -i "s~\${password}~$trojan_pw~")
+  read -rp "请输入trojan传输协议(tcp/grpc)" trojan_net
+}
+
 # XRAY END
 
 info() {
@@ -1068,6 +1171,7 @@ select_type() {
     echo -e "${Cyan}4)  vless-ws-tls${Font}"
     echo -e "${Cyan}5)  vless-grpc${Font}"
     echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
+    echo -e "${Cyan}7)  shadowsocket-2022${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -1090,6 +1194,9 @@ select_type() {
         ;;
     6)
         vless_tcp_xtls_vision
+        ;;
+    7)
+        shadowsocket-2022
         ;;
     q)
         exit
