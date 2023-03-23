@@ -926,6 +926,7 @@ shadowsocket-2022-config() {
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
     ;;
   esac
+  mv config.json ${xray_cfg}
 }
 
 outbound_choose() {
