@@ -164,18 +164,18 @@ nginx_install() {
 
     mkdir -p ${web_path} && cd ${web_path}
 
-    wget -O web.zip --no-check-certificate https://github.com/bakahentailolicon/bakahentailolicon.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
-    unzip web.zip && mv -f bakahentailolicon.github.io-master ${web_dir} && rm web.zip
+    unzip web.zip && mv -f bakasine.github.io-master ${web_dir} && rm web.zip
 }
 
 update_web() {
     cd ${web_path}
-    wget -O web.zip --no-check-certificate https://github.com/bakahentailolicon/bakahentailolicon.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip
     judge "伪装站 下载"
     unzip web.zip
     rm -rf ./${web_dir}
-    mv -f bakahentailolicon.github.io-master ${web_dir}
+    mv -f bakasine.github.io-master ${web_dir}
     rm web.zip
 }
 
