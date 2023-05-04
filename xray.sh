@@ -347,7 +347,8 @@ EOF
 server {
     listen 80;
     server_name ${domain};
-    return 301 https://\$http_host\$request_uri;
+    root ${web_path}/${web_dir};
+    index index.html;
 }
 server {
 	listen 443 ssl http2 so_keepalive=on;
@@ -455,7 +456,8 @@ EOF
 server {
     listen 80;
     server_name ${domain};
-    return 301 https://\$http_host\$request_uri;
+    root ${web_path}/${web_dir};
+    index index.html;
 }
 server {
    listen 127.0.0.1:1919;
@@ -545,7 +547,8 @@ EOF
 server {
     listen 80;
     server_name ${domain};
-    return 301 https://\$http_host\$request_uri;
+    root ${web_path}/${web_dir};
+    index index.html;
 }
 server {
     listen 443 ssl;
@@ -656,7 +659,8 @@ EOF
 server {
     listen 80;
     server_name ${domain};
-    return 301 https://\$http_host\$request_uri;
+    root ${web_path}/${web_dir};
+    index index.html;
 }
 server {
 	listen 443 ssl http2;
@@ -769,7 +773,8 @@ EOF
 server {
     listen 80;
     server_name ${domain};
-    return 301 https://\$http_host\$request_uri;
+    root ${web_path}/${web_dir};
+    index index.html;
 }
 server {
 	listen 443 ssl http2 so_keepalive=on;
