@@ -352,7 +352,7 @@ server {
 }
 server {
 	listen 443 ssl http2 so_keepalive=on;
-    listen [::]:443 ssl http2 so_keepalive=on;
+  listen [::]:443 ssl http2 so_keepalive=on;
 	server_name ${domain};
 
 	index index.html;
@@ -364,7 +364,7 @@ server {
 	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 	
 	client_header_timeout 52w;
-    keepalive_timeout 52w;
+  keepalive_timeout 52w;
 	# 在 location 后填写 /你的 ServiceName
 	location /${ws_path} {
 		if (\$content_type !~ "application/grpc") {
@@ -414,27 +414,38 @@ trojan_tcp_tls() {
             "settings": {
                 "clients": [
                     {
-                        "password":"${password}"  // 密码
+                        "password":"${password}",  // password
+                        "flow": "xtls-rprx-direct"
                     }
                 ],
                 "fallbacks": [
                     {
-                        "dest": 1919
+                        "dest": "/dev/shm/default.sock",
+                        "xver": 1
+                    },
+                    {
+                        "alpn": "h2",
+                        "dest": "/dev/shm/h2c.sock",
+                        "xver": 1
                     }
                 ]
             },
             "streamSettings": {
                 "network": "tcp",
-                "tlsSettings": {
+                "security": "xtls",
+                "xtlsSettings": {
                     "alpn": [
-                        "http/1.1"
+                        "http/1.1",
+                        "h2"
                     ],
                     "certificates": [
                         {
-                            "certificateFile": "${ca_crt}",
-                            "keyFile": "${ca_key}"
+                            "certificateFile": "${ca_crt}",  // Certificate file absolute directory
+                            "keyFile": "${ca_key}",  // Key file absolute directory
+                            "ocspStapling": 3600  // Verification cycle 3600 Second
                         }
-                    ]
+                    ],
+                    "minVersion": "1.2"  // If it is an ecc certificate, use TLSv1.2 at least. If you don't know the certificate type or it is not an ecc certificate, delete this line
                 }
             }
         }
@@ -454,16 +465,33 @@ EOF
 
     cat >${nginx_cfg} <<EOF
 server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
+    listen       [::]:80 default ipv6only=off;
+    server_name  ${domain};
+    root        ${web_path}/${web_dir};
+    # return       301 https://\$http_host\$request_uri;
 }
+
 server {
-   listen 127.0.0.1:1919;
-   root ${web_path}/${web_dir};
-   index index.html;
-   add_header Strict-Transport-Security "max-age=63072000" always;
+    listen       unix:/dev/shm/default.sock proxy_protocol;
+    listen       unix:/dev/shm/h2c.sock http2 proxy_protocol;
+
+    # 把example.com换成你的域名
+    server_name  ${domain};
+
+    root        ${web_path}/${web_dir};
+
+    set_real_ip_from 127.0.0.1;
+
+    # 开启 HSTS ，混 sslab 的 A+
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
 }
 EOF
 
