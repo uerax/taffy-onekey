@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.7.5"
+version="v1.7.6"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -1152,6 +1152,12 @@ close_xray() {
   judge "Xray 关闭"
 }
 
+renew_ca() {
+  read -rp "输入新的域名: " domain
+  apply_certificate
+  flush_certificate
+}
+
 server_operation() {
   echo -e "${Purple}-------------------------------- ${Font}"
   echo -e "${Green}1)  重启/启动 Nginx${Font}"
@@ -1265,6 +1271,7 @@ menu() {
     echo -e "${Purple}11)  查看配置链接${Font}"
     echo -e "${Green}12)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
+    echo -e "${Blue}21)  更换域名证书${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -1296,7 +1303,7 @@ menu() {
     ;;
     8)
     select_type
-    info_return
+    info_return 
     ;;
     9)
     uninstall
@@ -1312,6 +1319,9 @@ menu() {
     ;;
     20)
     update_web
+    ;;
+    21)
+    renew_ca
     ;;
     99)
     question_answer
