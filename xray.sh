@@ -279,6 +279,8 @@ info_return() {
     echo -e "${Green}链接:${Font} ${link}"
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
+
+    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full "
 }
 
 trojan_grpc() {
@@ -606,7 +608,7 @@ EOF
 
 systemctl restart nginx
 
-tmp="${password}@${domain}:443?encryption\=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+tmp="${password}@${domain}:443?encryption=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 encode_link=$( base64 <<< $tmp)
 link="vmess://$encode_link"
 
