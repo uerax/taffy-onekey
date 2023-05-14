@@ -608,8 +608,8 @@ EOF
 
 systemctl restart nginx
 
-tmp="${password}@${domain}:443?encryption=none&security=tls&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
-encode_link=$( base64 <<< $tmp)
+tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
+encode_link=$(base64 <<< $tmp)
 link="vmess://$encode_link"
 
 cat>${xray_info}<<EOF
