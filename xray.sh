@@ -280,7 +280,7 @@ info_return() {
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
 
-    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full "
+    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
 
 trojan_grpc() {
@@ -1273,7 +1273,7 @@ menu() {
     echo -e "${Purple}11)  查看配置链接${Font}"
     echo -e "${Green}12)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
-    echo -e "${Blue}21)  更换域名证书${Font}"
+    echo -e "${Cyan}21)  更换域名证书${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
