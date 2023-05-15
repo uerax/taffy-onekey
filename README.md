@@ -8,7 +8,7 @@
 - vless-ws-tls
 - vless-grpc
 - vless-tcp-xtls-vision
-- shadowsocket-2022(支持中转功能,写的比较糙建议不使用)
+- shadowsocket-2022
 
 直接复制下面命令执行
 ```
