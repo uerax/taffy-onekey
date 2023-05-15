@@ -1,0 +1,29 @@
+{
+    "sendThrough": "0.0.0.0",
+    "protocol": "vmess",
+    "settings": {
+        "vnext": [
+            {
+                "address": "${domain}",
+                "port": 443,
+                "users": [
+                    {
+                        "id": "${password}",
+                        "alterId": 0,
+                        "security": "auto",
+                        "level": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+            "path": "/${ws_path}",
+            "headers": {
+                "Host": "${domain}"
+            }
+        }
+    }
+}

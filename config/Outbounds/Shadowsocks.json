@@ -1,0 +1,16 @@
+{
+    "sendThrough": "0.0.0.0",
+    "protocol": "shadowsocks",
+    "settings": {
+        "servers": [
+            {
+                "email": "love@xray.com",
+                "address": "${address}",
+                "port": 19191,
+                "method": "${method}",
+                "password": "${password}",
+                "level": 0
+            }
+        ]
+    }
+}

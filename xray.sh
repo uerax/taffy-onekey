@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.7.6"
+version="v1.7.7"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -290,103 +290,33 @@ trojan_grpc() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    port="443"
-    cat >${xray_cfg} <<EOF
-{
-  "log": {
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "listen": "/dev/shm/Xray-Trojan-gRPC.socket,0666",
-      "protocol": "trojan",
-      "settings": {
-        "clients": [
-          {
-            "password": "${password}" // 填写你的 password
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "grpc",
-        "grpcSettings": {
-          "serviceName": "${ws_path}" // 填写你的 ServiceName
-        }
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "tag": "direct",
-      "protocol": "freedom",
-      "settings": {}
-    },
-    {
-      "tag": "blocked",
-      "protocol": "blackhole",
-      "settings": {}
-    }
-  ],
-  "routing": {
-    "domainStrategy": "AsIs",
-    "rules": [
-      {
-        "type": "field",
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "blocked"
-      }
-    ]
-  }
-}
-EOF
+    port=443
+    
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json -O ${xray_cfg}
+
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
     systemctl restart xray 
+
     systemctl enable xray
+
     sleep 3
 
-    cat >${nginx_cfg} <<EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-server {
-	listen 443 ssl http2 so_keepalive=on;
-  listen [::]:443 ssl http2 so_keepalive=on;
-	server_name ${domain};
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf -O ${nginx_cfg}
 
-	index index.html;
-	root ${web_path}/${web_dir};
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ca_key~" ${nginx_cfg}
 
-	ssl_certificate ${ca_crt};
-	ssl_certificate_key ${ca_key};
-	ssl_protocols TLSv1.2 TLSv1.3;
-	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-	
-	client_header_timeout 52w;
-  keepalive_timeout 52w;
-	# 在 location 后填写 /你的 ServiceName
-	location /${ws_path} {
-		if (\$content_type !~ "application/grpc") {
-			return 404;
-		}
-		client_max_body_size 0;
-		client_body_buffer_size 512k;
-		grpc_set_header X-Real-IP \$remote_addr;
-		client_body_timeout 52w;
-		grpc_read_timeout 52w;
-		grpc_pass unix:/dev/shm/Xray-Trojan-gRPC.socket;
-	}
-}
-EOF
+    systemctl restart nginx
 
-systemctl restart nginx
+    link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 
-link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
-
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="trojan"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -403,105 +333,32 @@ trojan_tcp_tls() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    port="443"
-    cat >${xray_cfg} <<EOF
-{
-    "log": {
-        "loglevel": "debug"
-    },
-    "inbounds": [
-        {
-            "port": ${port},
-            "protocol": "trojan",
-            "settings": {
-                "clients": [
-                    {
-                        "password":"${password}",  // password
-                        "flow": "xtls-rprx-direct"
-                    }
-                ],
-                "fallbacks": [
-                    {
-                        "dest": "/dev/shm/default.sock",
-                        "xver": 1
-                    },
-                    {
-                        "alpn": "h2",
-                        "dest": "/dev/shm/h2c.sock",
-                        "xver": 1
-                    }
-                ]
-            },
-            "streamSettings": {
-                "network": "tcp",
-                "security": "xtls",
-                "xtlsSettings": {
-                    "alpn": [
-                        "http/1.1",
-                        "h2"
-                    ],
-                    "certificates": [
-                        {
-                            "certificateFile": "${ca_crt}",  // Certificate file absolute directory
-                            "keyFile": "${ca_key}",  // Key file absolute directory
-                            "ocspStapling": 3600  // Verification cycle 3600 Second
-                        }
-                    ],
-                    "minVersion": "1.2"  // If it is an ecc certificate, use TLSv1.2 at least. If you don't know the certificate type or it is not an ecc certificate, delete this line
-                }
-            }
-        }
-    ],
-    "outbounds": [
-        {
-            "protocol": "freedom"
-        }
-    ]
-}
-EOF
+    port=443
+    
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json -O ${xray_cfg}
+
+    sed -i "s~19191~$port~" ${xray_cfg}
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${xray_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
+
     systemctl restart xray
 
     systemctl enable xray
 
     sleep 3
 
-    cat >${nginx_cfg} <<EOF
-server {
-    listen       [::]:80 default ipv6only=off;
-    server_name  ${domain};
-    root        ${web_path}/${web_dir};
-    # return       301 https://\$http_host\$request_uri;
-}
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf -O ${nginx_cfg}
 
-server {
-    listen       unix:/dev/shm/default.sock proxy_protocol;
-    listen       unix:/dev/shm/h2c.sock http2 proxy_protocol;
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
 
-    # 把example.com换成你的域名
-    server_name  ${domain};
+    systemctl restart nginx
 
-    root        ${web_path}/${web_dir};
+    link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
-    set_real_ip_from 127.0.0.1;
-
-    # 开启 HSTS ，混 sslab 的 A+
-    add_header Strict-Transport-Security "max-age=63072000" always;
-
-    error_page 404 /404.html;
-        location = /40x.html {
-    }
-
-    error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-    }
-}
-EOF
-
-systemctl restart nginx
-
-link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
-
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="trojan"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -518,101 +375,36 @@ vmess_ws_tls() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat >${xray_cfg} <<EOF
-{
-  "log":{
-    "access": "/var/log/xray/access.log",
-    "error": "/var/log/xray/error.log",
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "port": ${port},
-      "listen": "127.0.0.1",
-      "protocol": "vmess",
-      "settings": {
-        "clients": [{
-          "id": "${password}",
-          "alterID": 0
-        }]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-          "path": "/${ws_path}"
-        }
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "protocol": "freedom",
-      "settings": {}
-    },
-    {
-      "protocol": "blackhole",
-      "settings": {},
-      "tag": "blocked"
-    }
-  ],
-  "routing": {
-    "domainStrategy": "IPOnDemand",
-    "rules": [
-      {
-        "type": "field",
-        "protocol": ["bittorrent"],
-        "outboundTag": "blocked"
-      }
-    ]
-  }
-}
-EOF
+
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json -O ${xray_cfg}
+
+    sed -i "s~19191~$port~" ${xray_cfg}
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
     systemctl restart xray
     
     systemctl enable xray
 
     sleep 3
 
-    cat >${nginx_cfg} <<EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-server {
-    listen 443 ssl;
-    server_name ${domain};
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/nginx.conf -O ${nginx_cfg}
 
-    index index.html;
-    root ${web_path}/${web_dir};
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
+    sed -i "s~\${port}~$port~" ${nginx_cfg}
 
-    ssl_certificate ${ca_crt};
-    ssl_certificate_key ${ca_key};
-    ssl_protocols         TLSv1 TLSv1.1 TLSv1.2;
-    ssl_ciphers           HIGH:!aNULL:!MD5;
+    systemctl restart nginx
 
-    # 在 location 
-    location /${ws_path} {
-    proxy_pass http://127.0.0.1:${port};
-    proxy_redirect off;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host \$http_host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-}
-EOF
+    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
+    encode_link=$(base64 <<< $tmp)
+    link="vmess://$encode_link"
 
-systemctl restart nginx
-
-tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
-encode_link=$(base64 <<< $tmp)
-link="vmess://$encode_link"
-
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="vmess"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -630,104 +422,30 @@ vless_ws_tls() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat >${xray_cfg} <<EOF
-{
-  "log": {
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "listen": "/dev/shm/Xray-VLESS-WSS-Nginx.socket,0666",
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "${password}" // 填写你的 UUID
-          }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-          "path": "/${ws_path}" // 填写你的 path
-        }
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "tag": "direct",
-      "protocol": "freedom",
-      "settings": {}
-    },
-    {
-      "tag": "blocked",
-      "protocol": "blackhole",
-      "settings": {}
-    }
-  ],
-  "routing": {
-    "domainStrategy": "AsIs",
-    "rules": [
-      {
-        "type": "field",
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "blocked"
-      }
-    ]
-  }
-}
-EOF
+
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/config.json -O ${xray_cfg}
+
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+
     systemctl restart xray && systemctl enable xray
 
     sleep 3
 
-    cat > ${nginx_cfg} <<EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-server {
-	listen 443 ssl http2;
-	server_name ${domain};
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/nginx.conf -O ${nginx_cfg}
 
-	index index.html;
-	root ${web_path}/${web_dir};
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
 
-	ssl_certificate ${ca_crt};
-	ssl_certificate_key ${ca_key};
-	ssl_protocols TLSv1.2 TLSv1.3;
-	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-	
-	# 在 location 后填写 /你的 path
-	location /${ws_path} {
-        if (\$http_upgrade != "websocket") {
-            return 404;
-        }
-        proxy_pass http://unix:/dev/shm/Xray-VLESS-WSS-Nginx.socket;
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_read_timeout 52w;
-    }
-}
+    systemctl restart nginx
 
-EOF
+    link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
-systemctl restart nginx
-
-link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
-
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -744,104 +462,28 @@ vless_grpc() {
       read -rp "输入你的域名(回车确认)：" domain
     fi
     password=$(xray uuid)
-    cat > ${xray_cfg} <<EOF
-{
-  "log": {
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "listen": "/dev/shm/Xray-VLESS-gRPC.socket,0666",
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "${password}" // 填写你的 UUID
-          }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "grpc",
-        "wsSettings": {
-          "path": "/${ws_path}" // 填写你的 path
-        }
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "tag": "direct",
-      "protocol": "freedom",
-      "settings": {}
-    },
-    {
-      "tag": "blocked",
-      "protocol": "blackhole",
-      "settings": {}
-    }
-  ],
-  "routing": {
-    "domainStrategy": "AsIs",
-    "rules": [
-      {
-        "type": "field",
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "blocked"
-      }
-    ]
-  }
-}
-EOF
+
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json -O ${xray_cfg}
+    sed -i "s/\${password}/$password/" ${xray_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
     systemctl restart xray && systemctl enable xray
 
     sleep 3
 
-    cat >${nginx_cfg} <<EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-server {
-	listen 443 ssl http2 so_keepalive=on;
-	server_name ${domain};
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/nginx.conf -O ${nginx_cfg}
 
-	index index.html;
-	root ${web_path}/${web_dir};
+    sed -i "s/\${domain}/$domain/" ${nginx_cfg}
+    sed -i "s/\${web_path}/$web_path/" ${nginx_cfg}
+    sed -i "s/\${web_dir}/$web_dir/" ${nginx_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
 
-	ssl_certificate ${ca_crt};
-	ssl_certificate_key ${ca_key};
-	ssl_protocols TLSv1.2 TLSv1.3;
-	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-	
-  client_header_timeout 52w;
-  keepalive_timeout 52w;
+    systemctl restart nginx
 
-	# 在 location 后填写 /你的 path
-	location /${ws_path} {
-    if (\$content_type !~ "application/grpc") {
-			return 404;
-		}
-    client_max_body_size 0;
-		client_body_buffer_size 512k;
-		grpc_set_header X-Real-IP \$remote_addr;
-		client_body_timeout 52w;
-		grpc_read_timeout 52w;
-		grpc_pass unix:/dev/shm/Xray-VLESS-gRPC.socket;
-    }
-}
+    link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
-EOF
-
-systemctl restart nginx
-
-link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
-
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -853,20 +495,20 @@ EOF
 }
 
 vless_tcp_xtls_vision() {
-  if [ "$domain" = "" ]
-  then
-    read -rp "输入你的域名(回车确认)：" domain
-  fi
-  password=$(xray uuid)
-  vless_tcp_xtls_vision_xray_cfg
-  systemctl restart xray && systemctl enable xray
-  sleep 3
-  vless_tcp_xtls_vision_nginx_cfg
-  systemctl restart nginx
+    if [ "$domain" = "" ]
+    then
+      read -rp "输入你的域名(回车确认)：" domain
+    fi
+    password=$(xray uuid)
+    vless_tcp_xtls_vision_xray_cfg
+    systemctl restart xray && systemctl enable xray
+    sleep 3
+    vless_tcp_xtls_vision_nginx_cfg
+    systemctl restart nginx
 
-  link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
+    link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="vless"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
@@ -877,58 +519,58 @@ EOF
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
-  cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf -O /etc/nginx/nginx.conf
+    cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf -O /etc/nginx/nginx.conf
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
-  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json -O config.json
-  sed -i "s/\${password}/$password/" config.json
-  sed -i "s~\${ca_crt}~$ca_crt~" config.json
-  sed -i "s~\${ca_key}~$ca_key~" config.json
-  mv config.json ${xray_cfg}
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json -O config.json
+    sed -i "s/\${password}/$password/" config.json
+    sed -i "s~\${ca_crt}~$ca_crt~" config.json
+    sed -i "s~\${ca_key}~$ca_key~" config.json
+    mv config.json ${xray_cfg}
 }
 
 shadowsocket-2022() {
-  info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
-  close_nginx()
-  if ! command -v openssl >/dev/null 2>&1; then
-        ${INS} openssl
-        judge "openssl 安装"
-  fi
-  encrypt=1
-  ss_method="2022-blake3-aes-128-gcm"
-  port=19191
-  echo -e "选择加密方法"
-  echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-  echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-  echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-  echo -e ""
-  read -rp "选择加密方法(默认为1)：" encrypt
-  case $encrypt in
-  1)
-    password=$(openssl rand -base64 16)
-    ;;
-  2)
-    password=$(openssl rand -base64 32)
-    ss_method="2022-blake3-aes-256-gcm"
-    ;;
-  3)
-    password=$(openssl rand -base64 32)
-    ss_method="2022-blake3-chacha20-poly1305"
-    ;;
-  *)
-    password=$(openssl rand -base64 16)
-    ;;
-  esac
-  shadowsocket-2022-config
-  systemctl restart xray && systemctl enable xray
+    info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
+    close_nginx()
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    encrypt=1
+    ss_method="2022-blake3-aes-128-gcm"
+    port=19191
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(openssl rand -base64 16)
+      ;;
+    2)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    *)
+      password=$(openssl rand -base64 16)
+      ;;
+    esac
+    shadowsocket-2022-config
+    systemctl restart xray && systemctl enable xray
 
-  tmp="${ss_method}:${password}"
-  tmp=$( base64 <<< $tmp)
-  domain=`curl ipinfo.io/ip`
-  link="ss://$tmp@${domain}:${port}"
+    tmp="${ss_method}:${password}"
+    tmp=$( base64 <<< $tmp)
+    domain=`curl ipinfo.io/ip`
+    link="ss://$tmp@${domain}:${port}"
 
-cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="shadowsocket2022"
 XRAY_ADDR="${domain}"
 XRAT_METHOD="${ss_method}"
@@ -939,58 +581,58 @@ EOF
 }
 
 shadowsocket-2022-config() {
-  wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json -O config.json
-  sed -i "s~\${method}~$ss_method~" config.json
-  sed -i "s~\${password}~$password~" config.json
-  transfer="N"
-  read -rp "是否作为中转添加落地(Y/N)" transfer
-  case $transfer in
-  "Y")
-    outbound_choose
-    ;;
-  "y")
-    outbound_choose
-    ;;
-  "n")
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-    ;;
-  "N")
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-    ;;
-  *)
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-    ;;
-  esac
-  mv config.json ${xray_cfg}
+    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json -O config.json
+    sed -i "s~\${method}~$ss_method~" config.json
+    sed -i "s~\${password}~$password~" config.json
+    transfer="N"
+    read -rp "是否作为中转添加落地(Y/N)" transfer
+    case $transfer in
+    "Y")
+      outbound_choose
+      ;;
+    "y")
+      outbound_choose
+      ;;
+    "n")
+      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+      ;;
+    "N")
+      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+      ;;
+    *)
+      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+      ;;
+    esac
+    mv config.json ${xray_cfg}
 }
 
 outbound_choose() {
-  transfer_type=1
-  echo -e "选择你的落地协议"
-  echo -e "${Cyan}1) Trojan ${Font}"
-  echo -e ""
-  read -rp "请输入输字" transfer
-  case $transfer in
-  1)
-    outbound_trojan
-    ;;
-  *)
-    ;;
-  esac
+    transfer_type=1
+    echo -e "选择你的落地协议"
+    echo -e "${Cyan}1) Trojan ${Font}"
+    echo -e ""
+    read -rp "请输入输字" transfer
+    case $transfer in
+    1)
+      outbound_trojan
+      ;;
+    *)
+      ;;
+    esac
 
-  sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
 }
 
 outbound_trojan() {
-  wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json -O trojan.tmp
-  read -rp "请输入trojan域名: " address
-  sed -i "s~\${address}~$address~" trojan.tmp
-  read -rp "请输入trojan密码: " trojan_pw
-  sed -i "s~\${password}~$trojan_pw~" trojan.tmp
-  read -rp "请输入trojan传输协议(tcp/grpc): " trojan_net
-  sed -i "s~\${network}~$trojan_net~" trojan.tmp
-  outbound=$(cat trojan.tmp)
-  rm trojan.tmp
+    wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json -O trojan.tmp
+    read -rp "请输入trojan域名: " address
+    sed -i "s~\${address}~$address~" trojan.tmp
+    read -rp "请输入trojan密码: " trojan_pw
+    sed -i "s~\${password}~$trojan_pw~" trojan.tmp
+    read -rp "请输入trojan传输协议(tcp/grpc): " trojan_net
+    sed -i "s~\${network}~$trojan_net~" trojan.tmp
+    outbound=$(cat trojan.tmp)
+    rm trojan.tmp
 }
 
 # XRAY END
@@ -1095,14 +737,14 @@ server_check() {
 }
 
 update_script() {
-  script_path=$(cd `dirname $0`; pwd)
-  wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
-  exit
+    script_path=$(cd `dirname $0`; pwd)
+    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
+    exit
 }
 
 xray_upgrade() {
-  bash -c "$(curl -L ${xray_install_url})" @ install
-  judge "Xray 更新"
+    bash -c "$(curl -L ${xray_install_url})" @ install
+    judge "Xray 更新"
 }
 
 uninstall_nginx() {
@@ -1131,66 +773,66 @@ uninstall() {
 }
 
 restart_nginx() {
-  info "开始启动 Nginx 服务"
-  service nginx restart
-  judge "Nginx 启动"
+    info "开始启动 Nginx 服务"
+    service nginx restart
+    judge "Nginx 启动"
 }
 
 close_nginx() {
-  info "开始关闭 Nginx 服务"
-  service nginx stop
-  judge "Nginx 关闭"
+    info "开始关闭 Nginx 服务"
+    service nginx stop
+    judge "Nginx 关闭"
 }
 
 restart_xray() {
-  info "开始启动 Xray 服务"
-  systemctl restart xray
-  judge "Xray 启动"
+    info "开始启动 Xray 服务"
+    systemctl restart xray
+    judge "Xray 启动"
 }
 
 close_xray() {
-  info "开始关闭 Xray 服务"
-  systemctl stop xray
-  judge "Xray 关闭"
+    info "开始关闭 Xray 服务"
+    systemctl stop xray
+    judge "Xray 关闭"
 }
 
 renew_ca() {
-  read -rp "输入新的域名: " domain
-  apply_certificate
-  flush_certificate
+    read -rp "输入新的域名: " domain
+    apply_certificate
+    flush_certificate
 }
 
 server_operation() {
-  echo -e "${Purple}-------------------------------- ${Font}"
-  echo -e "${Green}1)  重启/启动 Nginx${Font}"
-  echo -e "${Yellow}2)  关闭 Nginx${Font}"
-  echo -e "${Green}3)  重启/启动 Xray${Font}"
-  echo -e "${Yellow}4)  关闭 Xray${Font}"
-  echo -e "${Red}q)  结束操作${Font}\n"
-  echo -e "${Purple}-------------------------------- ${Font}"
-  read -rp "输入数字(回车确认): " opt_num
-  echo -e ""
-    case $opt_num in
-    1)
-        restart_nginx
-        ;;
-    2)
-        close_nginx
-        ;;
-    3)
-        restart_xray
-        ;;
-    4)
-        close_xray
-        ;;
-    q)
-        exit
-        ;;
-    *)
-        error "请输入正确的数字"
-        ;;
-    esac
-    server_operation
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  重启/启动 Nginx${Font}"
+    echo -e "${Yellow}2)  关闭 Nginx${Font}"
+    echo -e "${Green}3)  重启/启动 Xray${Font}"
+    echo -e "${Yellow}4)  关闭 Xray${Font}"
+    echo -e "${Red}q)  结束操作${Font}\n"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    read -rp "输入数字(回车确认): " opt_num
+    echo -e ""
+      case $opt_num in
+      1)
+          restart_nginx
+          ;;
+      2)
+          close_nginx
+          ;;
+      3)
+          restart_xray
+          ;;
+      4)
+          close_xray
+          ;;
+      q)
+          exit
+          ;;
+      *)
+          error "请输入正确的数字"
+          ;;
+      esac
+      server_operation
 }
 
 question_answer() {

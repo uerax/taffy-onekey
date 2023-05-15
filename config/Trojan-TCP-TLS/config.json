@@ -1,0 +1,53 @@
+{
+    "log": {
+        "loglevel": "debug"
+    },
+    "inbounds": [
+        {
+            "port": 19191,
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password":"${password}",
+                        "flow": "xtls-rprx-direct"
+                    }
+                ],
+                "fallbacks": [
+                    {
+                        "dest": "/dev/shm/default.sock",
+                        "xver": 1
+                    },
+                    {
+                        "alpn": "h2",
+                        "dest": "/dev/shm/h2c.sock",
+                        "xver": 1
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "xtls",
+                "xtlsSettings": {
+                    "alpn": [
+                        "http/1.1",
+                        "h2"
+                    ],
+                    "certificates": [
+                        {
+                            "certificateFile": "${ca_crt}",
+                            "keyFile": "${ca_key}",
+                            "ocspStapling": 3600
+                        }
+                    ],
+                    "minVersion": "1.2"
+                }
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "freedom"
+        }
+    ]
+}
