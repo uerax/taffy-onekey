@@ -55,9 +55,6 @@ install() {
     port_check 443
     close_firewall
     nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
     xray_install
     xray_configure
     select_type
@@ -181,7 +178,7 @@ update_web() {
 
 domain_handle() {
     echo -e "------------------------------------------"
-    read -rp "输入你的域名(eg: www.example.com):" domain
+    read -rp "输入你的域名(eg: example.com):" domain
     ok "正在获取 IP 地址信息"
     parse_ipv4=$(curl -sm8 ipget.net/?"${domain}")
     local_ipv4=$(curl -s4m8 https://ifconfig.co)
@@ -191,7 +188,9 @@ domain_handle() {
     else
         error "域名解析ip: ${parse_ipv4} 与本机不符, 请检测是否有误"
     fi
+}
 
+apply_certificate() {
     sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
 
     cat > ${nginx_cfg} << EOF
@@ -204,9 +203,7 @@ server {
 EOF
 
     systemctl restart nginx
-}
 
-apply_certificate() {
     if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
         wget -O - https://get.acme.sh | sh
         judge "安装 Acme"
@@ -274,21 +271,67 @@ xray_configure() {
     mkdir -p ${xray_log} && touch ${xray_log}/access.log && touch ${xray_log}/error.log && chmod a+w ${xray_log}/*.log
 }
 
+clash_config() {
+    case $XRAY_TYPE in
+      "reality")
+        clash_cfg="- name: $ip
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  network: tcp
+  tls: true
+  udp: true
+  xudp: true
+  flow: xtls-rprx-vision
+  servername: ${domain}
+  reality-opts:
+    public-key: \"$key\"
+    short-id: \"$short_id\"
+  client-fingerprint: chrome"
+      ;;
+      esac
+    
+}
+
 info_return() {
     echo -e "${Green}安装成功!${Font}"
     echo -e "${Green}链接:${Font} ${link}"
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
+    
+    echo -e "${Green}Clash配置:"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
 
+reality() {
+    domain_handle
+    password=$(xray uuid)
+    port=443
+
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
+    short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="reality"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="443"
+XRAY_OBFS="tcp"
+XRAY_KEY="${public_key}"
+XRAY_SHORT_ID="${short_id}"
+XRAY_LINK="${link}"
+EOF
+}
+
 trojan_grpc() {
-    if [ "$domain" = "" ]
-    then
-      echo -e ""
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+    
     password=$(xray uuid)
     port=443
     
@@ -328,10 +371,10 @@ EOF
 }
 
 trojan_tcp_tls() {
-    if [ "$domain" = "" ]
-    then
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+    
     password=$(xray uuid)
     port=443
     
@@ -370,10 +413,10 @@ EOF
 }
 
 vmess_ws_tls() {
-    if [ "$domain" = "" ]
-    then
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+
     password=$(xray uuid)
 
     wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json -O ${xray_cfg}
@@ -417,10 +460,10 @@ EOF
 }
 
 vless_ws_tls() {
-    if [ "$domain" = "" ]
-    then
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+
     password=$(xray uuid)
 
     wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/config.json -O ${xray_cfg}
@@ -457,10 +500,10 @@ EOF
 }
 
 vless_grpc() {
-    if [ "$domain" = "" ]
-    then
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+
     password=$(xray uuid)
 
     wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json -O ${xray_cfg}
@@ -495,10 +538,10 @@ EOF
 }
 
 vless_tcp_xtls_vision() {
-    if [ "$domain" = "" ]
-    then
-      read -rp "输入你的域名(回车确认)：" domain
-    fi
+    domain_handle
+    apply_certificate
+    flush_certificate
+
     password=$(xray uuid)
     vless_tcp_xtls_vision_xray_cfg
     systemctl restart xray && systemctl enable xray
@@ -531,6 +574,7 @@ vless_tcp_xtls_vision_xray_cfg() {
 }
 
 shadowsocket-2022() {
+    
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
     close_nginx()
     if ! command -v openssl >/dev/null 2>&1; then
