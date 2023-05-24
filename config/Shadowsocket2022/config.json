@@ -20,6 +20,9 @@
         }
     ],
     "outbounds": [
-        "OutboundsPlaceholder"
-    ]
+      "OutboundsPlaceholder"
+    ],
+    "routing": {
+      "RoutingPlaceholder":0
+    }
 }

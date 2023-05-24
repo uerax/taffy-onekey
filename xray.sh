@@ -24,7 +24,7 @@ Error="${Red}[错误]${Font}"
 
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
 
-version="v1.7.7"
+version="v1.7.8"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -37,7 +37,9 @@ ca_crt="/home/xray/xray_cert/xray.crt"
 ca_key="/home/xray/xray_cert/xray.key"
 ws_path="crayfish"
 ss_method=""
+
 outbound='{"protocol": "freedom"}\n'
+routing=""
 
 INS="apt install -y"
 password=""
@@ -315,6 +317,9 @@ reality() {
     short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="reality"
 XRAY_ADDR="${ip}"
@@ -339,6 +344,9 @@ trojan_grpc() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
 
     systemctl restart xray 
 
@@ -385,6 +393,9 @@ trojan_tcp_tls() {
     sed -i "s~\${ca_crt}~$ca_crt~" ${xray_cfg}
     sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
 
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+
     systemctl restart xray
 
     systemctl enable xray
@@ -424,6 +435,9 @@ vmess_ws_tls() {
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
 
     systemctl restart xray
     
@@ -471,6 +485,9 @@ vless_ws_tls() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
 
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+
     systemctl restart xray && systemctl enable xray
 
     sleep 3
@@ -509,6 +526,9 @@ vless_grpc() {
     wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json -O ${xray_cfg}
     sed -i "s/\${password}/$password/" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
 
     systemctl restart xray && systemctl enable xray
 
@@ -570,6 +590,11 @@ vless_tcp_xtls_vision_xray_cfg() {
     sed -i "s/\${password}/$password/" config.json
     sed -i "s~\${ca_crt}~$ca_crt~" config.json
     sed -i "s~\${ca_key}~$ca_key~" config.json
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" config.json
+
+
     mv config.json ${xray_cfg}
 }
 
@@ -647,6 +672,9 @@ shadowsocket-2022-config() {
       sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
       ;;
     esac
+    
+    sed -i "s~\"RoutingPlaceholder\":0~$routing~" config.json
+
     mv config.json ${xray_cfg}
 }
 

@@ -46,8 +46,9 @@
         }
     ],
     "outbounds": [
-        {
-            "protocol": "freedom"
-        }
-    ]
+      "OutboundsPlaceholder"
+    ],
+    "routing": {
+      "RoutingPlaceholder":0
+    }
 }

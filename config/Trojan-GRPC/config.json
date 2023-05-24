@@ -22,27 +22,9 @@
       }
     ],
     "outbounds": [
-      {
-        "tag": "direct",
-        "protocol": "freedom",
-        "settings": {}
-      },
-      {
-        "tag": "blocked",
-        "protocol": "blackhole",
-        "settings": {}
-      }
+      "OutboundsPlaceholder"
     ],
     "routing": {
-      "domainStrategy": "AsIs",
-      "rules": [
-        {
-          "type": "field",
-          "ip": [
-            "geoip:private"
-          ],
-          "outboundTag": "blocked"
-        }
-      ]
+      "RoutingPlaceholder":0
     }
   }

@@ -1,4 +1,5 @@
 {
+    "tag": "crayfish",
     "sendThrough": "0.0.0.0",
     "protocol": "trojan",
     "settings": {

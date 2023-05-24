@@ -24,24 +24,9 @@
       }
     ],
     "outbounds": [
-      {
-        "protocol": "freedom",
-        "settings": {}
-      },
-      {
-        "protocol": "blackhole",
-        "settings": {},
-        "tag": "blocked"
-      }
+      "OutboundsPlaceholder"
     ],
     "routing": {
-      "domainStrategy": "IPOnDemand",
-      "rules": [
-        {
-          "type": "field",
-          "protocol": ["bittorrent"],
-          "outboundTag": "blocked"
-        }
-      ]
+      "RoutingPlaceholder":0
     }
   }
