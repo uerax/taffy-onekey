@@ -318,7 +318,7 @@ reality() {
     ip=$(curl ipinfo.io/ip)
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="reality"
@@ -346,7 +346,7 @@ trojan_grpc() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     systemctl restart xray 
 
@@ -394,7 +394,7 @@ trojan_tcp_tls() {
     sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     systemctl restart xray
 
@@ -437,7 +437,7 @@ vmess_ws_tls() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     systemctl restart xray
     
@@ -486,7 +486,7 @@ vless_ws_tls() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     systemctl restart xray && systemctl enable xray
 
@@ -528,7 +528,7 @@ vless_grpc() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+    routing_set
 
     systemctl restart xray && systemctl enable xray
 
@@ -677,6 +677,57 @@ shadowsocket-2022-config() {
 
     mv config.json ${xray_cfg}
 }
+
+routing_set() {
+    echo -e "是否配置Routing路由"
+    read -rp "请输入(y/n)" set_routing
+    case $set_routing in
+    y)
+      wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Routing/Routing.txt -O Routing.tmp
+
+      routing=$(cat Routing.tmp)
+
+      rm Routing.tmp
+
+      wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
+  
+      uknow=$(cat uknow.tmp)
+
+      rm uknow.tmp
+
+      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      sed -i "s~\${rules}~$uknow~" ${xray_cfg}
+      ;;
+    Y)
+      wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Routing/Routing.txt -O Routing.tmp
+
+      routing=$(cat Routing.tmp)
+
+      rm Routing.tmp
+
+      wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
+  
+      uknow=$(cat uknow.tmp)
+
+      rm uknow.tmp
+
+      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      sed -i "s~\${rules}~$uknow~" ${xray_cfg}
+      ;;
+    n)
+      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      ;;
+    N)
+      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      ;;
+    *)
+      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      ;;
+    esac
+    
+
+}
+
 
 outbound_choose() {
     transfer_type=1

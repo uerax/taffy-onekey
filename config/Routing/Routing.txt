@@ -1,0 +1,18 @@
+"domainStrategy":"AsIs",
+"rules":[
+    {
+        "type":"field",
+        "domain":[
+            ${rules}
+        ],
+        "outboundTag":"crayfish"
+    },
+    {
+        "type":"field",
+        "domain":[
+            "domain:openai.com",
+            "domain:ai.com"
+        ],
+        "outboundTag":"WARP"
+    }
+]
