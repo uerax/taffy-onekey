@@ -38,6 +38,7 @@ ca_key="/home/xray/xray_cert/xray.key"
 ws_path="crayfish"
 ss_method=""
 
+outbound_method=""
 outbound='{"protocol": "freedom"}\n'
 routing=""
 
@@ -592,8 +593,7 @@ vless_tcp_xtls_vision_xray_cfg() {
     sed -i "s~\${ca_key}~$ca_key~" config.json
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" config.json
-
+    routing_set
 
     mv config.json ${xray_cfg}
 }
@@ -673,7 +673,7 @@ shadowsocket-2022-config() {
       ;;
     esac
     
-    sed -i "s~\"RoutingPlaceholder\":0~$routing~" config.json
+    sed -i "s~\"rules_placeholder\"~$routing~" config.json
 
     mv config.json ${xray_cfg}
 }
@@ -683,56 +683,43 @@ routing_set() {
     read -rp "请输入(y/n)" set_routing
     case $set_routing in
     y)
-      wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Routing/Routing.txt -O Routing.tmp
-
-      routing=$(cat Routing.tmp)
-
-      rm Routing.tmp
-
       wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
   
       uknow=$(cat uknow.tmp)
 
       rm uknow.tmp
 
-      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
-      sed -i "s~\${rules}~$uknow~" ${xray_cfg}
+      sed -i "s~\"rules_placeholder\"~$uknow~" ${xray_cfg}
       ;;
     Y)
-      wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Routing/Routing.txt -O Routing.tmp
-
-      routing=$(cat Routing.tmp)
-
-      rm Routing.tmp
-
       wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
   
       uknow=$(cat uknow.tmp)
 
       rm uknow.tmp
 
-      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
-      sed -i "s~\${rules}~$uknow~" ${xray_cfg}
+      sed -i "s~\"rules_placeholder\"~$uknow~" ${xray_cfg}
       ;;
     n)
-      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     N)
-      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     *)
-      sed -i "s~\"RoutingPlaceholder\":0~$routing~" ${xray_cfg}
+      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     esac
     
 
 }
 
-
 outbound_choose() {
     transfer_type=1
     echo -e "选择你的落地协议"
     echo -e "${Cyan}1) Trojan ${Font}"
+    echo -e "${Cyan}2) Shadowsocket ${Font}"
+    echo -e "${Cyan}3) Vmess ${Font}"
     echo -e ""
     read -rp "请输入输字" transfer
     case $transfer in
@@ -747,15 +734,15 @@ outbound_choose() {
 }
 
 outbound_trojan() {
-    wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.json -O trojan.tmp
+    wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt -O outbound.tmp
     read -rp "请输入trojan域名: " address
-    sed -i "s~\${address}~$address~" trojan.tmp
+    sed -i "s~\${address}~$address~" outbound.tmp
     read -rp "请输入trojan密码: " trojan_pw
-    sed -i "s~\${password}~$trojan_pw~" trojan.tmp
+    sed -i "s~\${password}~$trojan_pw~" outbound.tmp
     read -rp "请输入trojan传输协议(tcp/grpc): " trojan_net
-    sed -i "s~\${network}~$trojan_net~" trojan.tmp
-    outbound=$(cat trojan.tmp)
-    rm trojan.tmp
+    sed -i "s~\${network}~$trojan_net~" outbound.tmp
+    outbound=$(cat outbound.tmp)
+    rm outbound.tmp
 }
 
 # XRAY END

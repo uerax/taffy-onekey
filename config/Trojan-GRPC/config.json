@@ -22,8 +22,6 @@
       }
     ],
     "outbounds": [
-      "OutboundsPlaceholder"
-      ,
       {
           "tag":"WARP",
           "protocol":"wireguard",
@@ -39,9 +37,32 @@
                   }
               ]
           }
-      }
+      },
+      "OutboundsPlaceholder"
     ],
     "routing": {
-      "RoutingPlaceholder":0
+      "domainStrategy":"AsIs",
+      "rules":[
+          {
+              "type": "field",
+              "domain": ["geosite:category-ads-all"],
+              "outboundTag": "block"
+          },
+          {
+              "type":"field",
+              "domain":[
+                  "domain:openai.com",
+                  "domain:ai.com"
+              ],
+              "outboundTag":"WARP"
+          },
+          {
+              "type":"field",
+              "domain":[
+                  "rules_placeholder"
+              ],
+              "outboundTag":"crayfish"
+          }
+      ]
     }
   }
