@@ -22,9 +22,35 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
+website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
 xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
+ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-version="v1.7.8"
+ss_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json"
+
+trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json"
+trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf"
+
+trojan_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json"
+trojan_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf"
+
+vmess_ws_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json"
+vmess_ws_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/nginx.conf"
+
+vless_ws_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/config.json"
+vless_ws_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/nginx.conf"
+
+vless_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json"
+vless_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/nginx.conf"
+
+vless_vision_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
+vless_vision_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json"
+
+outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
+outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
+outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
+
+version="v1.7.9"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -164,14 +190,14 @@ nginx_install() {
 
     mkdir -p ${web_path} && cd ${web_path}
 
-    wget -O web.zip --no-check-certificate https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate ${website_url}
     judge "伪装站 下载"
     unzip web.zip && mv -f bakasine.github.io-master ${web_dir} && rm web.zip
 }
 
 update_web() {
     cd ${web_path}
-    wget -O web.zip --no-check-certificate https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip
+    wget -O web.zip --no-check-certificate ${website_url}
     judge "伪装站 下载"
     unzip web.zip
     rm -rf ./${web_dir}
@@ -341,7 +367,7 @@ trojan_grpc() {
     password=$(xray uuid)
     port=443
     
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json -O ${xray_cfg}
+    wget -N ${trojan_grpc_config_url} -O ${xray_cfg}
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
@@ -355,7 +381,7 @@ trojan_grpc() {
 
     sleep 3
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf -O ${nginx_cfg}
+    wget -N ${trojan_grpc_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -387,7 +413,7 @@ trojan_tcp_tls() {
     password=$(xray uuid)
     port=443
     
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json -O ${xray_cfg}
+    wget -N ${trojan_config_url} -O ${xray_cfg}
 
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -403,7 +429,7 @@ trojan_tcp_tls() {
 
     sleep 3
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf -O ${nginx_cfg}
+    wget -N ${trojan_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -431,7 +457,7 @@ vmess_ws_tls() {
 
     password=$(xray uuid)
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json -O ${xray_cfg}
+    wget -N ${vmess_ws_config_url} -O ${xray_cfg}
 
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -446,7 +472,7 @@ vmess_ws_tls() {
 
     sleep 3
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/nginx.conf -O ${nginx_cfg}
+    wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -481,7 +507,7 @@ vless_ws_tls() {
 
     password=$(xray uuid)
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/config.json -O ${xray_cfg}
+    wget -N ${vless_ws_config_url} -O ${xray_cfg}
 
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -493,7 +519,7 @@ vless_ws_tls() {
 
     sleep 3
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/nginx.conf -O ${nginx_cfg}
+    wget -N ${vless_ws_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -524,7 +550,7 @@ vless_grpc() {
 
     password=$(xray uuid)
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json -O ${xray_cfg}
+    wget -N ${vless_grpc_config_url} -O ${xray_cfg}
     sed -i "s/\${password}/$password/" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
@@ -535,7 +561,7 @@ vless_grpc() {
 
     sleep 3
 
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/nginx.conf -O ${nginx_cfg}
+    wget -N ${vless_grpc_nginx_url} -O ${nginx_cfg}
 
     sed -i "s/\${domain}/$domain/" ${nginx_cfg}
     sed -i "s/\${web_path}/$web_path/" ${nginx_cfg}
@@ -583,11 +609,11 @@ EOF
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
-    cd /etc/nginx/ && wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf -O /etc/nginx/nginx.conf
+    cd /etc/nginx/ && wget -N ${vless_vision_nginx_url} -O /etc/nginx/nginx.conf
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json -O config.json
+    wget -N ${vless_vision_config_url} -O config.json
     sed -i "s/\${password}/$password/" config.json
     sed -i "s~\${ca_crt}~$ca_crt~" config.json
     sed -i "s~\${ca_key}~$ca_key~" config.json
@@ -650,7 +676,7 @@ EOF
 }
 
 shadowsocket-2022-config() {
-    wget -N https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json -O config.json
+    wget -N ${ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     transfer="N"
@@ -683,7 +709,7 @@ routing_set() {
     read -rp "请输入(y/n)" set_routing
     case $set_routing in
     y)
-      wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
+      wget -Nq ${ukonw_url} -O uknow.tmp
   
       uknow=$(cat uknow.tmp)
 
@@ -692,7 +718,7 @@ routing_set() {
       sed -i "s~\"rules_placeholder\"~$uknow~" ${xray_cfg}
       ;;
     Y)
-      wget -Nq https://raw.githubusercontent.com/bakasine/clash-rule/master/uknow.txt -O uknow.tmp
+      wget -Nq ${ukonw_url} -O uknow.tmp
   
       uknow=$(cat uknow.tmp)
 
@@ -734,7 +760,7 @@ outbound_choose() {
 }
 
 outbound_trojan() {
-    wget -Nq https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt -O outbound.tmp
+    wget -Nq ${outbound_trojan_url} -O outbound.tmp
     read -rp "请输入trojan域名: " address
     sed -i "s~\${address}~$address~" outbound.tmp
     read -rp "请输入trojan密码: " trojan_pw
