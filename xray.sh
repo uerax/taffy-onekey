@@ -46,11 +46,14 @@ vless_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master
 vless_vision_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
 vless_vision_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json"
 
+vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-TCP/config.json"
+vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-GRPC/config.json"
+
 outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.9"
+version="v1.7.10"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -983,6 +986,10 @@ question_answer() {
     echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}4.一键安装失败${Font}"
     echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
+    echo -e "${Yellow} ------------------------------------------------ ${Font}"
+    echo -e "${Red}5.ChatGPT访问不了${Font}"
+    echo -e "${Green}可能性1): 你的VPS是大陆、香港或美国LA地区  ${Font}"
+    echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
 }
 
 select_type() {

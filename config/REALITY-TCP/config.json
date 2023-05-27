@@ -18,12 +18,13 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "dest": "${domain}:443",
+                    "dest": "www.mihoyo.com:443",
                     "xver": 0,
                     "serverNames": [
-                        "${domain}"
+                        "www.mihoyo.com",
+                        "ys.mihoyo.com"
                     ],
-                    "privateKey": "",
+                    "privateKey": "${privateKey}",
                     "minClientVer": "",
                     "maxClientVer": "",
                     "maxTimeDiff": 0,
@@ -78,5 +79,13 @@
                 "outboundTag":"crayfish"
             }
         ]
+    },
+    "policy": {
+        "levels": {
+            "0": {
+                "handshake": 2,
+                "connIdle": 120
+            }
+        }
     }
 }
