@@ -29,8 +29,7 @@
                     "maxClientVer": "",
                     "maxTimeDiff": 0,
                     "shortIds": [
-                        "",
-                        "${short_id}"
+                        ""
                     ]
                 }
             }

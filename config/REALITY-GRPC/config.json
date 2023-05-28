@@ -22,7 +22,7 @@
                     "xver": 0,
                     "serverNames": ["www.mihoyo.com", "ys.mihoyo.com"],
                     "privateKey": "${privateKey}",
-                    "shortIds": ["","${short_id}"]
+                    "shortIds": [""]
                 },
                 "grpcSettings": {
                     "serviceName": "${ws_path}"

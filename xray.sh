@@ -337,14 +337,13 @@ info_return() {
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
 
-reality() {
-    domain_handle
+vless_reality_tcp() {
     password=$(xray uuid)
     port=443
 
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
-    short_id=$(openssl rand -hex 8)
+    # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
