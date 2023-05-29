@@ -234,7 +234,7 @@ server {
 }
 EOF
 
-    systemctl restart nginx
+    service nginx restart
 
     if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
         wget -O - https://get.acme.sh | sh
@@ -346,8 +346,55 @@ vless_reality_tcp() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
+    wget -N ${vless_reality_tcp_url} -O ${xray_cfg}
+
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+
     sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
+
+    systemctl restart xray 
+
+    systemctl enable xray
+
+    service nginx stop
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="reality"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="443"
+XRAY_OBFS="tcp"
+XRAY_KEY="${public_key}"
+XRAY_SHORT_ID="${short_id}"
+XRAY_LINK="${link}"
+EOF
+}
+
+vless_reality_grpc() {
+    password=$(xray uuid)
+    port=443
+
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${vless_reality_grpc_url} -O ${xray_cfg}
+
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    routing_set
+
+    systemctl restart xray 
+
+    systemctl enable xray
+
+    service nginx stop
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="reality"
@@ -392,7 +439,7 @@ trojan_grpc() {
     sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
     sed -i "s~\${ws_path}~$ca_key~" ${nginx_cfg}
 
-    systemctl restart nginx
+    service nginx restart
 
     link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 
@@ -437,7 +484,7 @@ trojan_tcp_tls() {
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
     sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
 
-    systemctl restart nginx
+    service nginx restart
 
     link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
@@ -484,7 +531,7 @@ vmess_ws_tls() {
     sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
     sed -i "s~\${port}~$port~" ${nginx_cfg}
 
-    systemctl restart nginx
+    service nginx restart
 
     tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
     encode_link=$(base64 <<< $tmp)
@@ -530,7 +577,7 @@ vless_ws_tls() {
     sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
 
-    systemctl restart nginx
+    service nginx restart
 
     link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
@@ -571,7 +618,7 @@ vless_grpc() {
     sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
     sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
 
-    systemctl restart nginx
+    service nginx restart
 
     link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
@@ -596,7 +643,8 @@ vless_tcp_xtls_vision() {
     systemctl restart xray && systemctl enable xray
     sleep 3
     vless_tcp_xtls_vision_nginx_cfg
-    systemctl restart nginx
+
+    service nginx restart
 
     link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
