@@ -46,6 +46,7 @@
       }
     ],
     "outbounds": [
+      "OutboundsPlaceholder",
       {
           "tag":"WARP",
           "protocol":"wireguard",
@@ -61,7 +62,6 @@
                   }
               ]
           }
-      },
-      "OutboundsPlaceholder"
+      }
     ]
 }
