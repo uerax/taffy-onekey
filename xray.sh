@@ -319,10 +319,10 @@ clash_config() {
   servername: www.mihoyo.com
   reality-opts:
     public-key: $key
-    short-id: 
+    short-id: ""
   client-fingerprint: chrome`
       ;;
-      "")
+      "reality_grpc")
       clash_cfg=`- name: $ip
     type: vless
     server: $ip
@@ -338,7 +338,7 @@ clash_config() {
       grpc-service-name: "crayfish"
     reality-opts:
       public-key: $key
-      short-id: 
+      short-id: ""
       `
       esac
     
