@@ -51,8 +51,6 @@
                         "www.mihoyo.com"
                     ],
                     "privateKey": "${privateKey}",
-                    "minClientVer": "",
-                    "maxClientVer": "",
                     "maxTimeDiff": 0,
                     "shortIds": [
                         ""

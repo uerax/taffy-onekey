@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.15"
+version="v1.7.17"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -318,25 +318,24 @@ clash_config() {
   flow: xtls-rprx-vision
   servername: www.mihoyo.com
   reality-opts:
-    public-key: $key
+    public-key: $public_key
   client-fingerprint: chrome"
       ;;
       "reality_grpc")
       clash_cfg="- name: $ip
-    type: vless
-    server: $ip
-    port: $port
-    uuid: $password
-    network: grpc
-    tls: true
-    udp: true
-    # skip-cert-verify: true
-    servername: www.mihoyo.com
-    grpc-opts:
-      grpc-service-name: "crayfish"
-    reality-opts:
-      public-key: $key
-      "
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  network: grpc
+  tls: true
+  udp: true
+  # skip-cert-verify: true
+  servername: www.mihoyo.com
+  grpc-opts:
+    grpc-service-name: "crayfish"
+  reality-opts:
+    public-key: $public_key"
       esac
     
 }
@@ -347,7 +346,7 @@ info_return() {
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
     
-    echo -e "${Green}Clash配置:"
+    echo -e "${Green}Clash配置: ${clash_cfg}"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
