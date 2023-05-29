@@ -346,7 +346,8 @@ info_return() {
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
     
-    echo -e "${Green}Clash配置: ${clash_cfg}"
+    echo -e "${Green}Clash配置: ${Font}"
+    echo -e "${clash_cfg}"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
