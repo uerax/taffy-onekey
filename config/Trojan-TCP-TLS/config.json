@@ -18,7 +18,6 @@
             {
                 "type":"field",
                 "domain":[
-                    "rules_placeholder"
                 ],
                 "outboundTag":"crayfish"
             }
