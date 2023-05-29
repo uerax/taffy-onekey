@@ -388,7 +388,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=${clash_config}
+CLASH_CONFIG=${clash_cfg}
 EOF
 }
 
@@ -429,7 +429,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=${clash_config}
+CLASH_CONFIG=${clash_cfg}
 EOF
 }
 
