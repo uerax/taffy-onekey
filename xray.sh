@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.13"
+version="v1.7.14"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -316,10 +316,10 @@ clash_config() {
   udp: true
   xudp: true
   flow: xtls-rprx-vision
-  servername: ${domain}
+  servername: www.mihoyo.com
   reality-opts:
     public-key: \"$key\"
-    short-id: \"$short_id\"
+    short-id: ""
   client-fingerprint: chrome"
       ;;
       esac
@@ -341,8 +341,9 @@ vless_reality_tcp() {
     password=$(xray uuid)
     port=443
 
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
@@ -360,6 +361,8 @@ vless_reality_tcp() {
 
     service nginx stop
 
+    clash_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="reality"
 XRAY_ADDR="${ip}"
@@ -369,6 +372,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
+CLASH_CONFIG=$clash_config
 EOF
 }
 
@@ -376,8 +380,9 @@ vless_reality_grpc() {
     password=$(xray uuid)
     port=443
 
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
@@ -396,6 +401,8 @@ vless_reality_grpc() {
 
     service nginx stop
 
+    clash_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="reality"
 XRAY_ADDR="${ip}"
@@ -405,6 +412,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
+CLASH_CONFIG=$clash_config
 EOF
 }
 
@@ -888,6 +896,7 @@ show_info() {
     echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
     echo -e "${Green}端口:${Font} ${XRAY_PORT}"
     echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
+    echo -e "${Green}Key(REALITY):${Font} ${XRAY_OBFS}"
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
 }
