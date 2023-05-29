@@ -45,9 +45,9 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "dest": "www.mihoyo.com:443",
+                    "dest": "www.fate-go.com.tw:443",
                     "xver": 0,
-                    "serverNames": ["www.mihoyo.com"],
+                    "serverNames": ["www.fate-go.com.tw"],
                     "privateKey": "${privateKey}",
                     "shortIds": [""]
                 },
