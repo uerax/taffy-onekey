@@ -61,6 +61,7 @@ xray_log="/home/xray/xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
 web_path="/home/xray/webpage"
 web_dir="blog-main"
+xray_type=""
 ca_path="/home/xray/xray_cert"
 ca_crt="/home/xray/xray_cert/xray.crt"
 ca_key="/home/xray/xray_cert/xray.key"
@@ -305,7 +306,7 @@ xray_configure() {
 
 clash_config() {
     case $XRAY_TYPE in
-      "reality")
+      "reality_tcp")
         clash_cfg="- name: $ip
   type: vless
   server: $ip
@@ -341,6 +342,7 @@ vless_reality_tcp() {
     password=$(xray uuid)
     port=443
 
+    xray_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -364,7 +366,7 @@ vless_reality_tcp() {
     clash_config
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="reality"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -372,7 +374,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=$clash_config
+CLASH_CONFIG=${clash_config}
 EOF
 }
 
@@ -380,6 +382,7 @@ vless_reality_grpc() {
     password=$(xray uuid)
     port=443
 
+    xray_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -404,7 +407,7 @@ vless_reality_grpc() {
     clash_config
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="reality"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -421,6 +424,7 @@ trojan_grpc() {
     apply_certificate
     flush_certificate
     
+    xray_type="trojan_grpc"
     password=$(xray uuid)
     port=443
     
@@ -452,7 +456,7 @@ trojan_grpc() {
     link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="trojan"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -467,6 +471,7 @@ trojan_tcp_tls() {
     apply_certificate
     flush_certificate
     
+    xray_type="trojan_tcp"
     password=$(xray uuid)
     port=443
     
@@ -497,7 +502,7 @@ trojan_tcp_tls() {
     link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="trojan"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -512,6 +517,7 @@ vmess_ws_tls() {
     apply_certificate
     flush_certificate
 
+    xray_type="vmess_ws"
     password=$(xray uuid)
 
     wget -N ${vmess_ws_config_url} -O ${xray_cfg}
@@ -546,7 +552,7 @@ vmess_ws_tls() {
     link="vmess://$encode_link"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="vmess"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -562,6 +568,7 @@ vless_ws_tls() {
     apply_certificate
     flush_certificate
 
+    xray_type="vless_ws"
     password=$(xray uuid)
 
     wget -N ${vless_ws_config_url} -O ${xray_cfg}
@@ -590,7 +597,7 @@ vless_ws_tls() {
     link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="vless"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -605,6 +612,7 @@ vless_grpc() {
     apply_certificate
     flush_certificate
 
+    xray_type="vless_grpc"
     password=$(xray uuid)
 
     wget -N ${vless_grpc_config_url} -O ${xray_cfg}
@@ -631,7 +639,7 @@ vless_grpc() {
     link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="vless"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -646,6 +654,7 @@ vless_tcp_xtls_vision() {
     apply_certificate
     flush_certificate
 
+    xray_type="vless_vison"
     password=$(xray uuid)
     vless_tcp_xtls_vision_xray_cfg
     systemctl restart xray && systemctl enable xray
@@ -657,7 +666,7 @@ vless_tcp_xtls_vision() {
     link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="vless"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
@@ -722,9 +731,10 @@ shadowsocket-2022() {
     tmp=$( base64 <<< $tmp)
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
+    xray_type="shadowsocket2022"
 
     cat>${xray_info}<<EOF
-XRAY_TYPE="shadowsocket2022"
+XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
