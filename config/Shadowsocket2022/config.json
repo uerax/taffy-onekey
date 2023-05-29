@@ -14,12 +14,6 @@
                     "domain:ai.com"
                 ],
                 "outboundTag":"WARP"
-            },
-            {
-                "type":"field",
-                "domain":[
-                ],
-                "outboundTag":"crayfish"
             }
         ]
     },

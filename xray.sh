@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.20"
+version="v1.7.21"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -795,14 +795,14 @@ routing_set() {
     y)
       wget -Nq ${ukonw_url} -O uknow.tmp
 
-      sed -i '20 r uknow.tmp' ${xray_cfg}
+      sed -i '4 r uknow.tmp' ${xray_cfg}
 
       rm uknow.tmp
       ;;
     Y)
       wget -Nq ${ukonw_url} -O uknow.tmp
 
-      sed -i '20 r uknow.tmp' ${xray_cfg}
+      sed -i '4 r uknow.tmp' ${xray_cfg}
 
       rm uknow.tmp
       ;;
