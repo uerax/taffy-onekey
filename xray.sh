@@ -756,25 +756,21 @@ shadowsocket-2022-config() {
 
 routing_set() {
     echo -e "是否配置Routing路由"
-    read -rp "请输入(y/n)" set_routing
+    read -rp "请输入(y/n): " set_routing
     case $set_routing in
     y)
       wget -Nq ${ukonw_url} -O uknow.tmp
-  
-      uknow=$(cat uknow.tmp)
+
+      sed -i '20 r uknow.tmp' ${xray_cfg}
 
       rm uknow.tmp
-
-      sed -i "s~\"rules_placeholder\"~$uknow~" ${xray_cfg}
       ;;
     Y)
       wget -Nq ${ukonw_url} -O uknow.tmp
-  
-      uknow=$(cat uknow.tmp)
+
+      sed -i '20 r uknow.tmp' ${xray_cfg}
 
       rm uknow.tmp
-
-      sed -i "s~\"rules_placeholder\"~$uknow~" ${xray_cfg}
       ;;
     n)
       sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
