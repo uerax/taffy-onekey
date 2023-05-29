@@ -319,7 +319,6 @@ clash_config() {
   servername: www.mihoyo.com
   reality-opts:
     public-key: $key
-    short-id: ""
   client-fingerprint: chrome"
       ;;
       "reality_grpc")
@@ -331,14 +330,12 @@ clash_config() {
     network: grpc
     tls: true
     udp: true
-    flow:
     # skip-cert-verify: true
     servername: www.mihoyo.com
     grpc-opts:
       grpc-service-name: "crayfish"
     reality-opts:
       public-key: $key
-      short-id: ""
       "
       esac
     
@@ -432,7 +429,7 @@ XRAY_OBFS="tcp"
 XRAY_KEY="${public_key}"
 XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=$clash_config
+CLASH_CONFIG=${clash_config}
 EOF
 }
 
