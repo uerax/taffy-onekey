@@ -23,6 +23,9 @@
             }
         ]
     },
+    "log": {
+        "loglevel": "warning"
+    },
     "inbounds": [
         {
             "port": 19191,

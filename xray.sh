@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.14"
+version="v1.7.15"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -305,9 +305,9 @@ xray_configure() {
 }
 
 clash_config() {
-    case $XRAY_TYPE in
+    case $xray_type in
       "reality_tcp")
-        clash_cfg="- name: $ip
+        clash_cfg=`- name: $ip
   type: vless
   server: $ip
   port: $port
@@ -315,14 +315,31 @@ clash_config() {
   network: tcp
   tls: true
   udp: true
-  xudp: true
   flow: xtls-rprx-vision
   servername: www.mihoyo.com
   reality-opts:
-    public-key: \"$key\"
-    short-id: ""
-  client-fingerprint: chrome"
+    public-key: $key
+    short-id: 
+  client-fingerprint: chrome`
       ;;
+      "")
+      clash_cfg=`- name: $ip
+    type: vless
+    server: $ip
+    port: $port
+    uuid: $password
+    network: grpc
+    tls: true
+    udp: true
+    flow:
+    # skip-cert-verify: true
+    servername: www.mihoyo.com
+    grpc-opts:
+      grpc-service-name: "crayfish"
+    reality-opts:
+      public-key: $key
+      short-id: 
+      `
       esac
     
 }
