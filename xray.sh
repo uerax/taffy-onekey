@@ -316,10 +316,10 @@ clash_config() {
   tls: true
   udp: true
   flow: xtls-rprx-vision
-  servername: www.mihoyo.com
+  servername: www.fate-go.com.tw
   reality-opts:
     public-key: $public_key
-    short-id: ""
+    short-id: \"\"
   client-fingerprint: chrome"
       ;;
       "reality_grpc")
@@ -332,12 +332,12 @@ clash_config() {
   tls: true
   udp: true
   # skip-cert-verify: true
-  servername: www.mihoyo.com
+  servername: www.fate-go.com.tw
   grpc-opts:
     grpc-service-name: "crayfish"
   reality-opts:
     public-key: $public_key
-    short-id: """
+    short-id: \"\""
       esac
     
 }
