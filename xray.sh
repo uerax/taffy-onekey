@@ -307,7 +307,7 @@ xray_configure() {
 clash_config() {
     case $xray_type in
       "reality_tcp")
-        clash_cfg=`- name: $ip
+        clash_cfg="- name: $ip
   type: vless
   server: $ip
   port: $port
@@ -320,10 +320,10 @@ clash_config() {
   reality-opts:
     public-key: $key
     short-id: ""
-  client-fingerprint: chrome`
+  client-fingerprint: chrome"
       ;;
       "reality_grpc")
-      clash_cfg=`- name: $ip
+      clash_cfg="- name: $ip
     type: vless
     server: $ip
     port: $port
@@ -339,7 +339,7 @@ clash_config() {
     reality-opts:
       public-key: $key
       short-id: ""
-      `
+      "
       esac
     
 }
