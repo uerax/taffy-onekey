@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.10"
+version="v1.7.12"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -1043,12 +1043,14 @@ select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  trojan-tcp-tls(推荐)${Font}"
-    echo -e "${Cyan}2)  trojan-grpc${Font}"
-    echo -e "${Cyan}3)  vmess-ws-tls${Font}"
-    echo -e "${Cyan}4)  vless-ws-tls${Font}"
-    echo -e "${Cyan}5)  vless-grpc${Font}"
-    echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
-    echo -e "${Cyan}7)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
+    echo -e "${Cyan}3)  vless-reality-tcp${Font}"
+    echo -e "${Cyan}4)  trojan-grpc${Font}"
+    echo -e "${Cyan}5)  vmess-ws-tls${Font}"
+    echo -e "${Cyan}6)  vless-ws-tls${Font}"
+    echo -e "${Cyan}7)  vless-grpc${Font}"
+    echo -e "${Cyan}8)  vless-tcp-xtls-vision${Font}"
+    echo -e "${Cyan}9)  shadowsocket-2022${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -1058,21 +1060,27 @@ select_type() {
         trojan_tcp_tls
         ;;
     2)
-        trojan_grpc
+        vless_reality_grpc
         ;;
     3)
-        vmess_ws_tls
+        vless_reality_tcp
         ;;
     4)
-        vless_ws_tls
+        trojan_grpc
         ;;
     5)
-        vless_grpc
+        vmess_ws_tls
         ;;
     6)
-        vless_tcp_xtls_vision
+        vless_ws_tls
         ;;
     7)
+        vless_grpc
+        ;;
+    8)
+        vless_tcp_xtls_vision
+        ;;
+    9)
         shadowsocket-2022
         ;;
     q)
