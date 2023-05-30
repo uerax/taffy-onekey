@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.23"
+version="v1.7.24"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -1008,6 +1008,7 @@ open_bbr() {
 show_path() {
     echo -e "${Green}xray配置文件地址:${Font} ${xray_cfg}"
     echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
+    echo -e "${Green}分享链接文件地址:${Font} ${xray_info}"
 }
 
 show_info() {
@@ -1021,8 +1022,12 @@ show_info() {
     echo -e "${Green}Key(REALITY):${Font} ${XRAY_OBFS}"
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
-    echo -e "${Green}Clash配置:${Font}:"
+    echo -e "${Green}Clash配置:${Font}"
     echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}QuantumultX配置:${Font}"
+    echo -e "${QX_CONFIG}"
+    echo -e "------------------------------------------------"
 }
 
 server_check() {
