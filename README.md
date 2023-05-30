@@ -14,7 +14,7 @@
 - vless-tcp-xtls-vision
 - shadowsocket-2022
 
-## Basic Usage
+## Usage
 
 __保存脚本执行__
 

@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.24"
+version="v1.7.25"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -440,6 +440,7 @@ vless_reality_tcp() {
     password=$(xray uuid)
     port=443
 
+    domain="www.fate-go.com.tw"
     xray_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -461,6 +462,7 @@ vless_reality_tcp() {
 
     service nginx stop
 
+    link="vless://${password}?remarks=${ip}&obfs=none&tls=1&peer=${domain}&xtls=2&pbk=${public_key}"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -501,6 +503,7 @@ vless_reality_grpc() {
     service nginx stop
 
     clash_config
+    link="vless://${password}?remarks=${ip}&obfsParam=${domain}&path=/${ws_path}&obfs=grpc&tls=1&pbk=${public_key}"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -508,6 +511,7 @@ XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_OBFS="grpc"
+OBFS_PATH="${ws_path}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
@@ -1019,8 +1023,8 @@ show_info() {
     echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
     echo -e "${Green}端口:${Font} ${XRAY_PORT}"
     echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
-    echo -e "${Green}Key(REALITY):${Font} ${XRAY_OBFS}"
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
+    echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
     echo -e "${Green}Clash配置:${Font}"
     echo -e "${CLASH_CONFIG}"
