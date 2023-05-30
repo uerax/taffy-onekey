@@ -53,7 +53,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.21"
+version="v1.7.23"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -70,7 +70,6 @@ ss_method=""
 
 outbound_method=""
 outbound='{"protocol": "freedom"}\n'
-routing=""
 
 INS="apt install -y"
 password=""
@@ -146,6 +145,8 @@ function env_install() {
     judge "lsof 安装"
     ${INS} curl
     judge "curl 安装"
+    ${INS} jq
+    judge "jq 安装"
 }
 
 increase_max_handle() {
@@ -306,8 +307,8 @@ xray_configure() {
 
 clash_config() {
     case $xray_type in
-      "reality_tcp")
-        clash_cfg="- name: $ip
+    "reality_tcp")
+    clash_cfg="- name: $ip
   type: vless
   server: $ip
   port: $port
@@ -321,9 +322,9 @@ clash_config() {
     public-key: $public_key
     short-id: \"\"
   client-fingerprint: chrome"
-      ;;
-      "reality_grpc")
-      clash_cfg="- name: $ip
+    ;;
+    "reality_grpc")
+    clash_cfg="- name: $ip
   type: vless
   server: $ip
   port: $port
@@ -334,12 +335,93 @@ clash_config() {
   # skip-cert-verify: true
   servername: www.fate-go.com.tw
   grpc-opts:
-    grpc-service-name: "crayfish"
+    grpc-service-name: \"${ws_path}\"
   reality-opts:
     public-key: $public_key
     short-id: \"\""
-      esac
+    ;;
+    "trojan_grpc")
+    clash_cfg="- name: $domain
+  server: $domain
+  port: $port
+  type: trojan
+  password: $password
+  network: grpc
+  alpn:
+    - h2
+  sni: $domain
+  skip-cert-verify: false
+  #udp: true
+  grpc-opts:
+    grpc-service-name: \"${ws_path}\""
+    ;;
+    "trojan_tcp")
+    clash_cfg="- name: $domain
+  type: trojan
+  server: $domain
+  port: $port
+  password: $password
+  alpn:
+    - h2
+    - http/1.1"
+    ;;
+    "vmess_ws")
+    clash_cfg="- name: $domain
+  type: vmess
+  server: $domain
+  port: 443
+  uuid: $password
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  network: ws
+  ws-opts:
+    path: \"/${ws_path}\"
+    headers:
+      Host: $domain"
+    ;;
+    "vless_ws")
+    clash_cfg="- name: $domain
+  type: vless
+  server: $domain
+  port: 443
+  uuid: $password
+  udp: true
+  tls: true
+  network: ws
+  servername: $domain
+  # skip-cert-verify: true
+  ws-opts:
+    path: \"/${ws_path}\"
+    headers:
+      Host: $password"
+    ;;
+    "vless_vison")
+    clash_cfg="- name: $domain
+  type: vless
+  server: $domain
+  port: 443
+  uuid: $password
+  network: tcp
+  tls: true
+  udp: true
+  flow: xtls-rprx-vision 
+  client-fingerprint: chrome"
+    ;;
+    esac
     
+}
+
+qx_config() {
+    case $xray_type in
+    "vmess_ws")
+    qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=/${ws_path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+    ;;
+    "trojan_tcp")
+    qx_cfg="trojan=$domain:443, password=$password, over-tls=true, tls-host=$domain, tls-verification=true, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+    ;;
+    esac
 }
 
 info_return() {
@@ -385,12 +467,10 @@ vless_reality_tcp() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="tcp"
+XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
-XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=${clash_cfg}
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -426,12 +506,11 @@ vless_reality_grpc() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="tcp"
+XRAY_PORT="${port}"
+XRAY_OBFS="grpc"
 XRAY_KEY="${public_key}"
-XRAY_SHORT_ID="${short_id}"
 XRAY_LINK="${link}"
-CLASH_CONFIG=${clash_cfg}
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -471,6 +550,8 @@ trojan_grpc() {
 
     link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 
+    clash_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
@@ -479,6 +560,7 @@ XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -517,6 +599,9 @@ trojan_tcp_tls() {
 
     link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
+    clash_config
+    qx_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
@@ -525,6 +610,8 @@ XRAY_PORT="443"
 XRAY_OBFS=""
 OBFS_PATH=""
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 EOF
 }
 
@@ -567,6 +654,9 @@ vmess_ws_tls() {
     encode_link=$(base64 <<< $tmp)
     link="vmess://$encode_link"
 
+    clash_config
+    qx_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
@@ -575,8 +665,9 @@ XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 EOF
-
 }
 
 vless_ws_tls() {
@@ -612,6 +703,8 @@ vless_ws_tls() {
 
     link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
+    clash_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
@@ -620,6 +713,7 @@ XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -662,6 +756,7 @@ XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -681,6 +776,8 @@ vless_tcp_xtls_vision() {
 
     link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
+    clash_config
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
@@ -688,6 +785,7 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_FLOW="xtls-rprx-vision"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -747,6 +845,7 @@ shadowsocket-2022() {
     tmp=$( base64 <<< $tmp)
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
+
     xray_type="shadowsocket2022"
 
     cat>${xray_info}<<EOF
@@ -807,13 +906,10 @@ routing_set() {
       rm uknow.tmp
       ;;
     n)
-      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     N)
-      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     *)
-      sed -i "s~\"rules_placeholder\"~$routing~" ${xray_cfg}
       ;;
     esac
     
@@ -925,6 +1021,8 @@ show_info() {
     echo -e "${Green}Key(REALITY):${Font} ${XRAY_OBFS}"
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
+    echo -e "${Green}Clash配置:${Font}:"
+    echo -e "${CLASH_CONFIG}"
 }
 
 server_check() {
