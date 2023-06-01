@@ -424,18 +424,6 @@ qx_config() {
     esac
 }
 
-info_return() {
-    echo -e "${Green}安装成功!${Font}"
-    echo -e "${Green}链接:${Font} ${link}"
-    echo -e "${Green}密码为:${Font} ${password}"
-    echo -e "${Green}端口为:${Font} ${port}"
-    
-    echo -e "${Green}Clash配置: ${Font}"
-    echo -e "${clash_cfg}"
-
-    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
-}
-
 vless_reality_tcp() {
     password=$(xray uuid)
     port=443
@@ -1013,6 +1001,21 @@ show_path() {
     echo -e "${Green}xray配置文件地址:${Font} ${xray_cfg}"
     echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
     echo -e "${Green}分享链接文件地址:${Font} ${xray_info}"
+}
+
+info_return() {
+    echo -e "${Green}安装成功!${Font}"
+    echo -e "${Green}链接:${Font} ${link}"
+    echo -e "${Green}密码为:${Font} ${password}"
+    echo -e "${Green}端口为:${Font} ${port}"
+    
+    echo -e "${Green}Clash配置: ${Font}"
+    echo -e "${clash_cfg}"
+
+    echo -e "${Green}QuantumultX配置: ${Font}"
+    echo -e "${qx_cfg}"
+
+    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
 
 show_info() {
