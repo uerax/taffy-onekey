@@ -1185,7 +1185,7 @@ select_type() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  trojan-tcp-tls(推荐)${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Cyan}3)  vless-reality-tcp${Font}"
+    echo -e "${Cyan}3)  vless-reality-tcp(推荐)${Font}"
     echo -e "${Cyan}4)  trojan-grpc${Font}"
     echo -e "${Cyan}5)  vmess-ws-tls${Font}"
     echo -e "${Cyan}6)  vless-ws-tls${Font}"
