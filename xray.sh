@@ -48,6 +48,7 @@ vless_vision_config_url="https://raw.githubusercontent.com/uerax/xray-script/mas
 
 vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-TCP/config.json"
 vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-GRPC/config.json"
+vless_reality_h2_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-H2/config.json"
 
 outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
@@ -409,6 +410,8 @@ clash_config() {
   flow: xtls-rprx-vision 
   client-fingerprint: chrome"
     ;;
+    "reality_h2")
+    ;;
     esac
     
 }
@@ -422,6 +425,48 @@ qx_config() {
     qx_cfg="trojan=$domain:443, password=$password, over-tls=true, tls-host=$domain, tls-verification=true, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
     ;;
     esac
+}
+
+vless_reality_h2() {
+    password=$(xray uuid)
+    port=443
+
+    domain="www.fate-go.com.tw"
+    xray_type="reality_h2"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${vless_reality_h2_url} -O ${xray_cfg}
+
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+
+    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
+    routing_set
+    systemctl restart xray 
+
+    systemctl enable xray
+
+    service nginx stop
+
+    parts="auto:${password}@${ip}"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?remarks=${ip}&obfs=h2&tls=1&mux=1&pbk=${public_key}"
+    
+    clash_config
+
+        cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_KEY="${public_key}"
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+EOF
 }
 
 vless_reality_tcp() {
@@ -450,7 +495,9 @@ vless_reality_tcp() {
 
     service nginx stop
 
-    link="vless://${password}?remarks=${ip}&obfs=none&tls=1&peer=${domain}&xtls=2&pbk=${public_key}"
+    parts="auto:${password}@${ip}"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?remarks=${ip}&obfs=none&tls=1&peer=${domain}&xtls=2&pbk=${public_key}"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -491,7 +538,9 @@ vless_reality_grpc() {
     service nginx stop
 
     clash_config
-    link="vless://${password}?remarks=${ip}&obfsParam=${domain}&path=/${ws_path}&obfs=grpc&tls=1&pbk=${public_key}"
+    parts="auto:${password}@${ip}"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?remarks=${ip}&obfsParam=${domain}&path=/${ws_path}&obfs=grpc&tls=1&pbk=${public_key}"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -693,7 +742,9 @@ vless_ws_tls() {
 
     service nginx restart
 
-    link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
+    parts="auto:${password}@${domain}:443"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
     clash_config
 
@@ -738,7 +789,9 @@ vless_grpc() {
 
     service nginx restart
 
-    link="vless://${password}@${domain}:443?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
+    parts="auto:${password}@${domain}:443"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -766,7 +819,9 @@ vless_tcp_xtls_vision() {
 
     service nginx restart
 
-    link="vless://${password}@${domain}:443?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
+    parts="auto:${password}@${domain}:443"
+    encode_parts=$(base64 <<< parts)
+    link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
     clash_config
 
