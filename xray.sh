@@ -1403,4 +1403,14 @@ menu() {
     esac
 }
 
-menu
+case $1 in
+    install)
+        install
+        ;;
+    uninstall)
+        uninstall
+        ;;
+    *)
+        menu
+        ;;
+esac
