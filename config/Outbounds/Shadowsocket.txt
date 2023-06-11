@@ -5,7 +5,7 @@
     "settings": {
         "servers": [
             {
-                "email": "love@xray.com",
+                "email": "crayfish@run.com",
                 "address": "${address}",
                 "port": 19191,
                 "method": "${method}",
