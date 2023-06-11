@@ -54,7 +54,7 @@ outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
-version="v1.7.25"
+version="v1.7.26"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_info="/home/xray/xray_info"
@@ -1028,13 +1028,39 @@ open_bbr() {
         info "检测系统为 debian"
         echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
         apt update && apt -t buster-backports install linux-image-amd64
-        echo net.core.default_qdisc=fq >> /etc/sysctl.conf
-        echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
+        cat > /etc/sysctl.conf << EOF
+net.core.somaxconn = 65535
+net.ipv4.tcp_max_syn_backlog = 65535
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_keepalive_time = 1200
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_keepalive_intvl = 15
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_max_tw_buckets = 50000
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOF
         sysctl -p
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        echo net.core.default_qdisc=fq >> /etc/sysctl.conf
-        echo net.ipv4.tcp_congestion_control=bbr >> /etc/sysctl.conf
+        cat > /etc/sysctl.conf << EOF
+net.core.somaxconn = 65535
+net.ipv4.tcp_max_syn_backlog = 65535
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_keepalive_time = 1200
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_keepalive_intvl = 15
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_max_tw_buckets = 50000
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOF
         sysctl -p
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
