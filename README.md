@@ -12,15 +12,28 @@ __不保存脚本执行__
 bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @
 ```
 
+`一键安装`
+
+```
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @ install
+```
+
+`完全卸载`
+
+```
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @ uninstall
+```
+
 ## Script
 
-自用脚本,实现一键安装的功能,只兼容 ubuntu 和 debian
+实现一键安装的功能,只兼容 ubuntu 和 debian
 
 现在已支持以下协议
 
 - vless-tls-reality(推荐)
-- vless-grpc-reality
 - trojan-tcp-tls(推荐)
+- vless-grpc-reality
+- vless-h2-reality
 - trojan-grpc
 - vmess-ws-tls
 - vless-ws-tls
