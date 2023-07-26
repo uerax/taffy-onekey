@@ -1,65 +1,73 @@
 {
-    "routing": {
-      "domainStrategy":"AsIs",
-      "rules":[
-          {
-              "type": "field",
-              "domain": ["geosite:category-ads-all"],
-              "outboundTag": "block"
-          },
-          {
-              "type":"field",
-              "domain":[
-                "geosite:netflix",
-                "geosite:openai",
-                "geosite:disney",
-                "geosite:spotify"
-              ],
-              "outboundTag":"WARP"
-          }
-      ]
-    },
-    "log":{
-      "access": "/var/log/xray/access.log",
-      "error": "/var/log/xray/error.log",
-      "loglevel": "warning"
-    },
-    "inbounds": [
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
       {
-        "port": 19191,
-        "listen": "127.0.0.1",
-        "protocol": "vmess",
-        "settings": {
-          "clients": [{
-            "id": "${password}",
-            "alterID": 0
-          }]
-        },
-        "streamSettings": {
-          "network": "ws",
-          "wsSettings": {
-            "path": "/${ws_path}"
-          }
-        }
-      }
-    ],
-    "outbounds": [
-      "OutboundsPlaceholder",
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
       {
-          "tag":"WARP",
-          "protocol":"wireguard",
-          "settings":{
-              "secretKey":"QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
-              "address":[
-                  "172.16.0.2/32"
-              ],
-              "peers":[
-                  {
-                      "publicKey":"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-                      "endpoint":"engage.cloudflareclient.com:2408"
-                  }
-              ]
-          }
+        "type": "field",
+        "domain": [
+          "geosite:netflix",
+          "geosite:openai",
+          "geosite:disney",
+          "geosite:spotify"
+        ],
+        "outboundTag": "WARP"
       }
     ]
-  }
+  },
+  "log": {
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "port": 19191,
+      "listen": "127.0.0.1",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "${password}",
+            "alterID": 0
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/${ws_path}"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    "OutboundsPlaceholder",
+    {
+      "tag": "WARP",
+      "protocol": "wireguard",
+      "settings": {
+        "secretKey": "QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
+        "address": [
+          "172.16.0.2/32"
+        ],
+        "peers": [
+          {
+            "publicKey": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+            "endpoint": "engage.cloudflareclient.com:2408"
+          }
+        ]
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}

@@ -1,21 +1,23 @@
 {
     "routing": {
-        "domainStrategy":"AsIs",
-        "rules":[
+        "domainStrategy": "AsIs",
+        "rules": [
             {
                 "type": "field",
-                "domain": ["geosite:category-ads-all"],
+                "domain": [
+                    "geosite:category-ads-all"
+                ],
                 "outboundTag": "block"
             },
             {
-                "type":"field",
-                "domain":[
+                "type": "field",
+                "domain": [
                     "geosite:netflix",
                     "geosite:openai",
                     "geosite:disney",
                     "geosite:spotify"
                 ],
-                "outboundTag":"WARP"
+                "outboundTag": "WARP"
             }
         ]
     },
@@ -43,9 +45,13 @@
                     "show": false,
                     "dest": "www.fate-go.com.tw:443",
                     "xver": 0,
-                    "serverNames": ["www.fate-go.com.tw"],
+                    "serverNames": [
+                        "www.fate-go.com.tw"
+                    ],
                     "privateKey": "${privateKey}",
-                    "shortIds": [""]
+                    "shortIds": [
+                        ""
+                    ]
                 },
                 "grpcSettings": {
                     "serviceName": "${ws_path}"
@@ -53,27 +59,35 @@
             },
             "sniffing": {
                 "enabled": true,
-                "destOverride": ["http", "tls", "quic"]
+                "destOverride": [
+                    "http",
+                    "tls",
+                    "quic"
+                ]
             }
         }
     ],
     "outbounds": [
         "OutboundsPlaceholder",
         {
-          "tag":"WARP",
-          "protocol":"wireguard",
-          "settings":{
-              "secretKey":"QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
-              "address":[
-                  "172.16.0.2/32"
-              ],
-              "peers":[
-                  {
-                      "publicKey":"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-                      "endpoint":"engage.cloudflareclient.com:2408"
-                  }
-              ]
-          }
-      }
+            "tag": "WARP",
+            "protocol": "wireguard",
+            "settings": {
+                "secretKey": "QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
+                "address": [
+                    "172.16.0.2/32"
+                ],
+                "peers": [
+                    {
+                        "publicKey": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+                        "endpoint": "engage.cloudflareclient.com:2408"
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "block",
+            "protocol": "blackhole"
+        }
     ]
 }

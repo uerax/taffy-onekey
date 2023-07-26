@@ -1,63 +1,69 @@
 {
-    "routing": {
-      "domainStrategy":"AsIs",
-      "rules":[
-          {
-              "type": "field",
-              "domain": ["geosite:category-ads-all"],
-              "outboundTag": "block"
-          },
-          {
-              "type":"field",
-              "domain":[
-                "geosite:netflix",
-                "geosite:openai",
-                "geosite:disney",
-                "geosite:spotify"
-              ],
-              "outboundTag":"WARP"
-          }
-      ]
-    },
-    "log": {
-      "loglevel": "warning"
-    },
-    "inbounds": [
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
       {
-        "listen": "/dev/shm/Xray-Trojan-gRPC.socket,0666",
-        "protocol": "trojan",
-        "settings": {
-          "clients": [
-            {
-              "password": "${password}"
-            }
-          ]
-        },
-        "streamSettings": {
-          "network": "grpc",
-          "grpcSettings": {
-            "serviceName": "${ws_path}"
-          }
-        }
-      }
-    ],
-    "outbounds": [
-      "OutboundsPlaceholder",
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
       {
-          "tag":"WARP",
-          "protocol":"wireguard",
-          "settings":{
-              "secretKey":"QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
-              "address":[
-                  "172.16.0.2/32"
-              ],
-              "peers":[
-                  {
-                      "publicKey":"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-                      "endpoint":"engage.cloudflareclient.com:2408"
-                  }
-              ]
-          }
+        "type": "field",
+        "domain": [
+          "geosite:netflix",
+          "geosite:openai",
+          "geosite:disney",
+          "geosite:spotify"
+        ],
+        "outboundTag": "WARP"
       }
     ]
+  },
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "/dev/shm/Xray-Trojan-gRPC.socket,0666",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          {
+            "password": "${password}"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "grpcSettings": {
+          "serviceName": "${ws_path}"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    "OutboundsPlaceholder",
+    {
+      "tag": "WARP",
+      "protocol": "wireguard",
+      "settings": {
+        "secretKey": "QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
+        "address": [
+          "172.16.0.2/32"
+        ],
+        "peers": [
+          {
+            "publicKey": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+            "endpoint": "engage.cloudflareclient.com:2408"
+          }
+        ]
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
 }
