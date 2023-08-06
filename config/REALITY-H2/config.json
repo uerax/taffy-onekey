@@ -42,9 +42,7 @@
                 "network": "h2",
                 "security": "reality",
                 "realitySettings": {
-                    "show": false,
                     "dest": "www.fate-go.com.tw:443",
-                    "xver": 0,
                     "serverNames": [
                         "www.fate-go.com.tw"
                     ],

@@ -452,13 +452,10 @@ vless_reality_h2() {
 
     service nginx stop
 
-    parts="auto:${password}@${ip}"
-    encode_parts=$(base64 <<< $parts)
-    link="vless://${encode_parts}?remarks=${ip}&obfs=h2&tls=1&mux=1&pbk=${public_key}"
-    
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
     clash_config
 
-        cat>${xray_info}<<EOF
+    cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
@@ -1262,45 +1259,49 @@ question_answer() {
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  trojan-tcp-tls(推荐)${Font}"
+    echo -e "${Cyan}1)  vless-reality-tcp(推荐)${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Cyan}3)  vless-reality-tcp(推荐)${Font}"
-    echo -e "${Cyan}4)  trojan-grpc${Font}"
-    echo -e "${Cyan}5)  vmess-ws-tls${Font}"
-    echo -e "${Cyan}6)  vless-ws-tls${Font}"
-    echo -e "${Cyan}7)  vless-grpc${Font}"
-    echo -e "${Cyan}8)  vless-tcp-xtls-vision${Font}"
-    echo -e "${Cyan}9)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}3)  vless-reality-h2(推荐)${Font}"
+    echo -e "${Cyan}4)  vless-ws-tls${Font}"
+    echo -e "${Cyan}5)  vless-grpc${Font}"
+    echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
+    echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
+    echo -e "${Cyan}12)  trojan-grpc${Font}"
+    echo -e "${Cyan}21)  vmess-ws-tls${Font}"
+    echo -e "${Cyan}31)  shadowsocket-2022${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
     case $menu_num in
     1)
-        trojan_tcp_tls
+        vless_reality_tcp
         ;;
     2)
         vless_reality_grpc
         ;;
     3)
-        vless_reality_tcp
+        vless_reality_h2
         ;;
     4)
-        trojan_grpc
-        ;;
-    5)
-        vmess_ws_tls
-        ;;
-    6)
         vless_ws_tls
         ;;
-    7)
+    5)
         vless_grpc
         ;;
-    8)
+    6)
         vless_tcp_xtls_vision
         ;;
-    9)
+    11)
+        trojan_tcp_tls
+        ;;
+    12)
+        trojan_grpc
+        ;;
+    21)
+        vmess_ws_tls
+        ;;
+    31)
         shadowsocket-2022
         ;;
     q)

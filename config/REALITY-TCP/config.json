@@ -44,12 +44,10 @@
                 "realitySettings": {
                     "show": false,
                     "dest": "www.fate-go.com.tw:443",
-                    "xver": 0,
                     "serverNames": [
                         "www.fate-go.com.tw"
                     ],
                     "privateKey": "${privateKey}",
-                    "maxTimeDiff": 0,
                     "shortIds": [
                         ""
                     ]
