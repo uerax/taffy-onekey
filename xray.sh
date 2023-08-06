@@ -1259,9 +1259,9 @@ question_answer() {
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Cyan}1)  vless-reality-tcp(推荐)${Font}"
+    echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Cyan}3)  vless-reality-h2(推荐)${Font}"
+    echo -e "${Green}3)  vless-reality-h2(推荐)${Font}"
     echo -e "${Cyan}4)  vless-ws-tls${Font}"
     echo -e "${Cyan}5)  vless-grpc${Font}"
     echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
