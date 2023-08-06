@@ -453,7 +453,7 @@ vless_reality_h2() {
     service nginx stop
 
     parts="auto:${password}@${ip}"
-    encode_parts=$(base64 <<< parts)
+    encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?remarks=${ip}&obfs=h2&tls=1&mux=1&pbk=${public_key}"
     
     clash_config
@@ -537,7 +537,7 @@ vless_reality_grpc() {
 
     clash_config
     parts="auto:${password}@${ip}"
-    encode_parts=$(base64 <<< parts)
+    encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?remarks=${ip}&obfsParam=${domain}&path=/${ws_path}&obfs=grpc&tls=1&pbk=${public_key}"
 
     cat>${xray_info}<<EOF
