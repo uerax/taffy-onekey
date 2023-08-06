@@ -495,9 +495,7 @@ vless_reality_tcp() {
 
     service nginx stop
 
-    parts="auto:${password}@${ip}"
-    encode_parts=$(base64 <<< parts)
-    link="vless://${encode_parts}?remarks=${ip}&obfs=none&tls=1&peer=${domain}&xtls=2&pbk=${public_key}"
+    link="vless://$password@$ip:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -743,7 +741,7 @@ vless_ws_tls() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< parts)
+    encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
     clash_config
@@ -790,7 +788,7 @@ vless_grpc() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< parts)
+    encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 
     cat>${xray_info}<<EOF
@@ -820,7 +818,7 @@ vless_tcp_xtls_vision() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< parts)
+    encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
     clash_config
