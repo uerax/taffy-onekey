@@ -536,9 +536,7 @@ vless_reality_grpc() {
     service nginx stop
 
     clash_config
-    parts="auto:${password}@${ip}"
-    encode_parts=$(base64 <<< $parts)
-    link="vless://${encode_parts}?remarks=${ip}&obfsParam=${domain}&path=/${ws_path}&obfs=grpc&tls=1&pbk=${public_key}"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
