@@ -293,7 +293,7 @@ xray_install() {
     if ! command -v xray >/dev/null 2>&1; then
         wget --no-check-certificate ${xray_install_url}
         judge "Xray安装脚本 下载"
-        bash install-release.sh install --version v1.8.1 
+        bash install-release.sh install
         judge "Xray 安装"
         rm install-release.sh
     else
