@@ -352,7 +352,7 @@ clash_config() {
     - h2
   sni: $domain
   skip-cert-verify: false
-  #udp: true
+  udp: true
   grpc-opts:
     grpc-service-name: \"${ws_path}\""
     ;;
@@ -411,6 +411,20 @@ clash_config() {
   client-fingerprint: chrome"
     ;;
     "reality_h2")
+    clash_cfg="- name: $ip
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  tls: true
+  udp: true
+  network: h2
+  flow: ''
+  servername: www.fate-go.com.tw
+  reality-opts:
+    public-key: $public_key
+    short-id: \"\"
+  client-fingerprint: chrome"
     ;;
     esac
     
