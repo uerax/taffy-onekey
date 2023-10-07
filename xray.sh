@@ -548,7 +548,7 @@ vless_reality_grpc() {
     service nginx stop
 
     clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
