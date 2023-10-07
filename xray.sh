@@ -1181,6 +1181,9 @@ uninstall_acme() {
     info "Acme 卸载"
     /root/.acme.sh/acme.sh --uninstall
     rm -r  ~/.acme.sh
+    (
+        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
+    ) | crontab -
 }
 
 uninstall() {
