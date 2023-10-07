@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.28"
+version="v1.7.29"
 
 #fonts color
 Green="\033[32m"
@@ -1095,7 +1095,7 @@ show_path() {
 info_return() {
     echo -e "${Green}安装成功!${Font}"
     echo -e "${Green}链接:${Font} ${link}"
-    echo -e "${RED}分享链接可能不可用,建议手动填写客户端参数${Font}"
+    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
     
@@ -1119,7 +1119,7 @@ show_info() {
     echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
     echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
-    echo -e "${RED}分享链接可能不可用,建议手动填写客户端参数${Font}"
+    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "${Green}Clash配置:${Font}"
     echo -e "${CLASH_CONFIG}"
     echo -e "------------------------------------------------"
