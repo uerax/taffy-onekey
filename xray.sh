@@ -321,7 +321,7 @@ clash_config() {
   servername: www.fate-go.com.tw
   reality-opts:
     public-key: $public_key
-    short-id: \"\"
+    short-id: 8eb7bab5a41eb27d
   client-fingerprint: chrome"
     ;;
     "reality_grpc")
@@ -339,7 +339,7 @@ clash_config() {
     grpc-service-name: \"${ws_path}\"
   reality-opts:
     public-key: $public_key
-    short-id: \"\""
+    short-id: 8eb7bab5a41eb27d"
     ;;
     "trojan_grpc")
     clash_cfg="- name: $domain
@@ -423,7 +423,7 @@ clash_config() {
   servername: www.fate-go.com.tw
   reality-opts:
     public-key: $public_key
-    short-id: \"\"
+    short-id: 8eb7bab5a41eb27d
   client-fingerprint: chrome"
     ;;
     esac
@@ -469,14 +469,15 @@ vless_reality_h2() {
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
     clash_config
 
+
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -515,8 +516,8 @@ XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -557,8 +558,8 @@ XRAY_PORT="${port}"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_KEY="${public_key}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -607,8 +608,8 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -657,9 +658,9 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_OBFS=""
 OBFS_PATH=""
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
-QX_CONFIG=\'${qx_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 EOF
 }
 
@@ -712,9 +713,9 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
-QX_CONFIG=\'${qx_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 EOF
 }
 
@@ -762,8 +763,8 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -807,8 +808,8 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -838,8 +839,8 @@ XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
 XRAY_PORT="443"
 XRAY_FLOW="xtls-rprx-vision"
-XRAY_LINK=\'${link}\'
-CLASH_CONFIG=\'${clash_cfg}\'
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
@@ -908,7 +909,7 @@ XRAY_ADDR="${domain}"
 XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
-XRAY_LINK=\'${link}\'
+XRAY_LINK="${link}"
 EOF
 }
 
