@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.27"
+version="v1.7.28"
 
 #fonts color
 Green="\033[32m"
@@ -282,7 +282,7 @@ EOF
     chmod +x ${ca_path}/xray-cert-renew.sh
 
     (
-        crontab -l | grep -v "0 1 1 * *   bash ${ca_path}/xray-cert-renew.sh"
+        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
         echo "0 1 1 * *   bash ${ca_path}/xray-cert-renew.sh"
     ) | crontab -
 
