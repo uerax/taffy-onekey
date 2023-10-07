@@ -57,6 +57,7 @@ outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/conf
 outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
 
 xray_cfg="/usr/local/etc/xray/config.json"
+xray_path="/opt/xray/"
 xray_info="/opt/xray/xray_info"
 xray_log="/opt/xray/xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
@@ -1175,7 +1176,7 @@ uninstall_xray() {
     info "Xray 卸载"
     bash -c "$(curl -L ${xray_install_url})" @ remove --purge
     # rm -rf /home/xray
-    rm ${xray_info}
+    rm -rf ${xray_path}
 }
 
 uninstall_acme() {
