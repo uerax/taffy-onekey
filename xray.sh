@@ -271,12 +271,18 @@ flush_certificate() {
 #!/bin/bash
 
 /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
+if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
+        sleep 2
+        mkdir -p ${ca_path}
+        if /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
+fi
 echo "Xray Certificates Renewed"
 
 chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
 sudo systemctl restart xray
+sudo service nginx restart
 echo "Xray Restarted"
 EOF
 
@@ -284,7 +290,7 @@ EOF
 
     (
         crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
-        echo "0 1 1 * *   bash ${ca_path}/xray-cert-renew.sh"
+        echo "0 7 1 */2 *   bash ${ca_path}/xray-cert-renew.sh"
     ) | crontab -
 
 }
