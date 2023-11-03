@@ -316,122 +316,122 @@ xray_configure() {
 clash_config() {
     case $xray_type in
     "reality_tcp")
-  clash_cfg="- name: $ip
-  type: vless
-  server: $ip
-  port: $port
-  uuid: $password
-  network: tcp
-  tls: true
-  udp: true
-  flow: xtls-rprx-vision
-  servername: www.fate-go.com.tw
-  reality-opts:
-    public-key: $public_key
-    short-id: 8eb7bab5a41eb27d
-  client-fingerprint: chrome"
+  clash_cfg="  - name: $ip
+    type: vless
+    server: $ip
+    port: $port
+    uuid: $password
+    network: tcp
+    tls: true
+    udp: true
+    flow: xtls-rprx-vision
+    servername: www.fate-go.com.tw
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome"
     ;;
     "reality_grpc")
-    clash_cfg="- name: $ip
-  type: vless
-  server: $ip
-  port: $port
-  uuid: $password
-  network: grpc
-  tls: true
-  udp: true
-  # skip-cert-verify: true
-  servername: www.fate-go.com.tw
-  grpc-opts:
-    grpc-service-name: \"${ws_path}\"
-  reality-opts:
-    public-key: $public_key
-    short-id: 8eb7bab5a41eb27d"
+    clash_cfg="  - name: $ip
+    type: vless
+    server: $ip
+    port: $port
+    uuid: $password
+    network: grpc
+    tls: true
+    udp: true
+    # skip-cert-verify: true
+    servername: www.fate-go.com.tw
+    grpc-opts:
+      grpc-service-name: \"${ws_path}\"
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d"
     ;;
     "trojan_grpc")
-    clash_cfg="- name: $domain
-  server: $domain
-  port: $port
-  type: trojan
-  password: $password
-  network: grpc
-  alpn:
-    - h2
-  sni: $domain
-  skip-cert-verify: false
-  udp: true
-  grpc-opts:
-    grpc-service-name: \"${ws_path}\""
+    clash_cfg="  - name: $domain
+    server: $domain
+    port: $port
+    type: trojan
+    password: $password
+    network: grpc
+    alpn:
+      - h2
+    sni: $domain
+    skip-cert-verify: false
+    udp: true
+    grpc-opts:
+      grpc-service-name: \"${ws_path}\""
     ;;
     "trojan_tcp")
-    clash_cfg="- name: $domain
-  type: trojan
-  server: $domain
-  port: $port
-  password: $password
-  alpn:
-    - h2
-    - http/1.1"
+    clash_cfg="  - name: $domain
+    type: trojan
+    server: $domain
+    port: $port
+    password: $password
+    alpn:
+      - h2
+      - http/1.1"
     ;;
     "vmess_ws")
-    clash_cfg="- name: $domain
-  type: vmess
-  server: $domain
-  port: 443
-  uuid: $password
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  network: ws
-  ws-opts:
-    path: \"/${ws_path}\"
-    headers:
-      Host: $domain"
+    clash_cfg="  - name: $domain
+    type: vmess
+    server: $domain
+    port: 443
+    uuid: $password
+    alterId: 0
+    cipher: auto
+    udp: true
+    tls: true
+    network: ws
+    ws-opts:
+      path: \"/${ws_path}\"
+      headers:
+        Host: $domain"
     ;;
     "vless_ws")
-    clash_cfg="- name: $domain
-  type: vless
-  server: $domain
-  port: 443
-  uuid: $password
-  udp: true
-  tls: true
-  network: ws
-  servername: $domain
-  # skip-cert-verify: true
-  ws-opts:
-    path: \"/${ws_path}\"
-    headers:
-     Host: $password"
+    clash_cfg="  - name: $domain
+    type: vless
+    server: $domain
+    port: 443
+    uuid: $password
+    udp: true
+    tls: true
+    network: ws
+    servername: $domain
+    # skip-cert-verify: true
+    ws-opts:
+      path: \"/${ws_path}\"
+      headers:
+       Host: $password"
     ;;
     "vless_vison")
-    clash_cfg="- name: $domain
-  type: vless
-  server: $domain
-  port: 443
-  uuid: $password
-  network: tcp
-  tls: true
-  udp: true
-  flow: xtls-rprx-vision 
-  client-fingerprint: chrome"
+    clash_cfg="  - name: $domain
+    type: vless
+    server: $domain
+    port: 443
+    uuid: $password
+    network: tcp
+    tls: true
+    udp: true
+    flow: xtls-rprx-vision 
+    client-fingerprint: chrome"
     ;;
     "reality_h2")
-    clash_cfg="- name: $ip
-  type: vless
-  server: $ip
-  port: $port
-  uuid: $password
-  tls: true
-  udp: true
-  network: h2
-  flow: ''
-  servername: www.fate-go.com.tw
-  reality-opts:
-    public-key: $public_key
-    short-id: 8eb7bab5a41eb27d
-  client-fingerprint: chrome"
+    clash_cfg="  - name: $ip
+    type: vless
+    server: $ip
+    port: $port
+    uuid: $password
+    tls: true
+    udp: true
+    network: h2
+    flow: ''
+    servername: www.fate-go.com.tw
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome"
     ;;
     esac
     
