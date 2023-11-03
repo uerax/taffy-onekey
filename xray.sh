@@ -276,7 +276,7 @@ if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keyle
   mkdir -p ${ca_path}
   /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
 else
-  return 1
+  exit 1
 fi
 echo "Xray Certificates Renewed"
 
