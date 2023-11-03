@@ -270,7 +270,6 @@ flush_certificate() {
     cat > ${ca_path}/xray-cert-renew.sh <<EOF
 #!/bin/bash
 
-/root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
 if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
   sleep 2
   mkdir -p ${ca_path}
@@ -278,6 +277,7 @@ if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keyle
 else
   exit 1
 fi
+
 echo "Xray Certificates Renewed"
 
 chmod +r ${ca_key}
