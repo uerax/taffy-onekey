@@ -1,0 +1,16 @@
+# listen: :443
+
+acme:
+  domains:
+    - ${domain}
+  email: bakasine@email.com
+
+auth:
+  type: password
+  password: ${password}
+
+masquerade:
+  type: proxy
+  proxy:
+    url: https://news.ycombinator.com/
+    rewriteHost: true

@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.31"
+version="v1.7.32"
 
 #fonts color
 Green="\033[32m"
@@ -51,6 +51,8 @@ vless_vision_config_url="https://raw.githubusercontent.com/uerax/xray-script/mas
 vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-TCP/config.json"
 vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-GRPC/config.json"
 vless_reality_h2_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-H2/config.json"
+
+hysteria2_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config.yaml"
 
 outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
@@ -317,6 +319,15 @@ xray_configure() {
 
 clash_config() {
     case $xray_type in
+    "hysteria2")
+  clash_cfg="- name: $domain
+    type: hysteria2
+    server: $domain
+    port: 443
+    up: 30 Mbps
+    down: 100 Mbps
+    password: $password"
+    ;;
     "reality_tcp")
   clash_cfg="  - name: $ip
     type: vless
@@ -1011,6 +1022,38 @@ outbound_trojan() {
     rm outbound.tmp
 }
 
+hysteria2() {
+    is_root
+    get_system
+    adjust_date
+    ${INS} curl
+    judge "curl 安装"
+
+    bash <(curl -fsSL https://get.hy2.sh/)
+
+    domain_handle
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    wget -N ${hysteria2_config_url} -O config.yaml
+
+    sed -i "s/\${password}/$password/" config.yaml
+    sed -i "s/\${domain}/$domain/" config.yaml
+
+    mv config.yaml /etc/hysteria/config.yaml
+
+    systemctl start hysteria-server.service
+    xray_type="hysteria2"
+
+    clash_config
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="443"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+}
+
 # XRAY END
 
 info() {
@@ -1196,6 +1239,10 @@ uninstall_acme() {
     ) | crontab -
 }
 
+uninstall_hysteria2() {
+    bash <(curl -fsSL https://get.hy2.sh/) --remove
+}
+
 uninstall() {
     uninstall_xray
     uninstall_nginx
@@ -1362,6 +1409,8 @@ menu() {
     echo -e "${Green}12)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
+    echo -e "${Green}30)  安装 Hysteria${Font}"
+    echo -e "${Yellow}31)  卸载 Hysteria${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -1412,6 +1461,12 @@ menu() {
     ;;
     21)
     renew_ca
+    ;;
+    30)
+    hysteria2
+    ;;
+    31)
+    uninstall_hysteria2
     ;;
     99)
     question_answer
