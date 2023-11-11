@@ -1052,6 +1052,7 @@ XRAY_PWORD="${password}"
 XRAY_PORT="443"
 CLASH_CONFIG="${clash_cfg}"
 EOF
+    info_return
 }
 
 # XRAY END
