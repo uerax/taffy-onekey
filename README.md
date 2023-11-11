@@ -31,6 +31,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xr
 现在已支持以下协议
 
 - vless-tls-reality(推荐)
+- hysteria2(推荐)
 - trojan-tcp-tls(推荐)
 - vless-grpc-reality
 - vless-h2-reality
