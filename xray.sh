@@ -216,7 +216,7 @@ update_web() {
 
 domain_handle() {
     echo -e "------------------------------------------"
-    read -rp "输入你的域名(eg: example.com):" domain
+    read -rp "输入你的域名(eg: example.com): " domain
     ok "正在获取 IP 地址信息"
     parse_ipv4=$(curl -sm8 ipget.net/?"${domain}")
     local_ipv4=$(curl -s4m8 https://ifconfig.co)
@@ -320,7 +320,7 @@ xray_configure() {
 clash_config() {
     case $xray_type in
     "hysteria2")
-  clash_cfg="- name: $domain
+  clash_cfg="  - name: $domain
     type: hysteria2
     server: $domain
     port: 443
@@ -938,7 +938,7 @@ shadowsocket-2022-config() {
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     transfer="N"
-    read -rp "是否作为中转添加落地(Y/N)" transfer
+    read -rp "是否作为中转添加落地(Y/N): " transfer
     case $transfer in
     "Y")
       outbound_choose
@@ -998,7 +998,7 @@ outbound_choose() {
     echo -e "${Cyan}2) Shadowsocket ${Font}"
     echo -e "${Cyan}3) Vmess ${Font}"
     echo -e ""
-    read -rp "请输入输字" transfer
+    read -rp "请输入输字: " transfer
     case $transfer in
     1)
       outbound_trojan
@@ -1280,6 +1280,39 @@ renew_ca() {
     flush_certificate
 }
 
+hysteria_operation() {
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  启动 Hysteria${Font}"
+    echo -e "${Yellow}2)  关闭 Hysteria${Font}"
+    echo -e "${Green}3)  重启 Hysteria${Font}"
+    echo -e "${Green}4)  查看 Hysteria 状态${Font}"
+    echo -e "${Red}q)  退出${Font}\n"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    read -rp "输入数字(回车确认): " opt_num
+    echo -e ""
+      case $opt_num in
+      1)
+          systemctl start hysteria-server.service
+          ;;
+      2)
+          systemctl stop hysteria-server.service
+          ;;
+      3)
+          systemctl restart hysteria-server.service
+          ;;
+      4)
+          systemctl status hysteria-server.service
+          ;;
+      q)
+          exit
+          ;;
+      *)
+          error "请输入正确的数字"
+          ;;
+      esac
+      hysteria_operation
+}
+
 server_operation() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  重启/启动 Nginx${Font}"
@@ -1412,6 +1445,7 @@ menu() {
     echo -e "${Cyan}21)  更换域名证书${Font}"
     echo -e "${Green}30)  安装 Hysteria${Font}"
     echo -e "${Yellow}31)  卸载 Hysteria${Font}"
+    echo -e "${Purple}32)  操作 Hysteria${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -1468,6 +1502,9 @@ menu() {
     ;;
     31)
     uninstall_hysteria2
+    ;;
+    32)
+    hysteria_operation
     ;;
     99)
     question_answer
