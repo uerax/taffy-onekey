@@ -1,4 +1,4 @@
-listen: :443
+listen: :${port}
 
 tls:
   cert: /etc/hysteria/server.crt

@@ -1,4 +1,4 @@
-# listen: :443
+listen: :${port}
 
 acme:
   domains:

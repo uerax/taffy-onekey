@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.33"
+version="v1.7.34"
 
 #fonts color
 Green="\033[32m"
@@ -321,142 +321,142 @@ xray_configure() {
 clash_config() {
     case $xray_type in
     "hysteria2_nodomain")
-  clash_cfg="  - name: $domain
-    type: hysteria2
-    server: $domain
-    port: 443
-    up: 30 Mbps
-    down: 100 Mbps
-    password: $password
-    sni: https://live.qq.com
-    skip-cert-verify: true"
+  clash_cfg="- name: $domain
+  type: hysteria2
+  server: $domain
+  port: 443
+  up: 30 Mbps
+  down: 100 Mbps
+  password: $password
+  sni: https://live.qq.com
+  skip-cert-verify: true"
     ;;    
     "hysteria2")
-  clash_cfg="  - name: $domain
-    type: hysteria2
-    server: $domain
-    port: 443
-    up: 30 Mbps
-    down: 100 Mbps
-    password: $password"
+  clash_cfg="- name: $domain
+  type: hysteria2
+  server: $domain
+  port: 443
+  up: 30 Mbps
+  down: 100 Mbps
+  password: $password"
     ;;
     "reality_tcp")
-  clash_cfg="  - name: $ip
-    type: vless
-    server: $ip
-    port: $port
-    uuid: $password
-    network: tcp
-    tls: true
-    udp: true
-    flow: xtls-rprx-vision
-    servername: www.fate-go.com.tw
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome"
+  clash_cfg="- name: $ip
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  network: tcp
+  tls: true
+  udp: true
+  flow: xtls-rprx-vision
+  servername: www.fate-go.com.tw
+  reality-opts:
+    public-key: $public_key
+    short-id: 8eb7bab5a41eb27d
+  client-fingerprint: chrome"
     ;;
     "reality_grpc")
-    clash_cfg="  - name: $ip
-    type: vless
-    server: $ip
-    port: $port
-    uuid: $password
-    network: grpc
-    tls: true
-    udp: true
-    # skip-cert-verify: true
-    servername: www.fate-go.com.tw
-    grpc-opts:
-      grpc-service-name: \"${ws_path}\"
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d"
+    clash_cfg="- name: $ip
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  network: grpc
+  tls: true
+  udp: true
+  # skip-cert-verify: true
+  servername: www.fate-go.com.tw
+  grpc-opts:
+    grpc-service-name: \"${ws_path}\"
+  reality-opts:
+    public-key: $public_key
+    short-id: 8eb7bab5a41eb27d"
     ;;
     "trojan_grpc")
-    clash_cfg="  - name: $domain
-    server: $domain
-    port: $port
-    type: trojan
-    password: $password
-    network: grpc
-    alpn:
-      - h2
-    sni: $domain
-    skip-cert-verify: false
-    udp: true
-    grpc-opts:
-      grpc-service-name: \"${ws_path}\""
+    clash_cfg="- name: $domain
+  server: $domain
+  port: $port
+  type: trojan
+  password: $password
+  network: grpc
+  alpn:
+    - h2
+  sni: $domain
+  skip-cert-verify: false
+  udp: true
+  grpc-opts:
+    grpc-service-name: \"${ws_path}\""
     ;;
     "trojan_tcp")
-    clash_cfg="  - name: $domain
-    type: trojan
-    server: $domain
-    port: $port
-    password: $password
-    alpn:
-      - h2
-      - http/1.1"
+    clash_cfg="- name: $domain
+  type: trojan
+  server: $domain
+  port: $port
+  password: $password
+  alpn:
+    - h2
+    - http/1.1"
     ;;
     "vmess_ws")
-    clash_cfg="  - name: $domain
-    type: vmess
-    server: $domain
-    port: 443
-    uuid: $password
-    alterId: 0
-    cipher: auto
-    udp: true
-    tls: true
-    network: ws
-    ws-opts:
-      path: \"/${ws_path}\"
-      headers:
-        Host: $domain"
+    clash_cfg="- name: $domain
+  type: vmess
+  server: $domain
+  port: 443
+  uuid: $password
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  network: ws
+  ws-opts:
+    path: \"/${ws_path}\"
+    headers:
+      Host: $domain"
     ;;
     "vless_ws")
-    clash_cfg="  - name: $domain
-    type: vless
-    server: $domain
-    port: 443
-    uuid: $password
-    udp: true
-    tls: true
-    network: ws
-    servername: $domain
-    # skip-cert-verify: true
-    ws-opts:
-      path: \"/${ws_path}\"
-      headers:
-       Host: $password"
+    clash_cfg="- name: $domain
+  type: vless
+  server: $domain
+  port: 443
+  uuid: $password
+  udp: true
+  tls: true
+  network: ws
+  servername: $domain
+  # skip-cert-verify: true
+  ws-opts:
+    path: \"/${ws_path}\"
+    headers:
+     Host: $password"
     ;;
     "vless_vison")
-    clash_cfg="  - name: $domain
-    type: vless
-    server: $domain
-    port: 443
-    uuid: $password
-    network: tcp
-    tls: true
-    udp: true
-    flow: xtls-rprx-vision 
-    client-fingerprint: chrome"
+    clash_cfg="- name: $domain
+  type: vless
+  server: $domain
+  port: 443
+  uuid: $password
+  network: tcp
+  tls: true
+  udp: true
+  flow: xtls-rprx-vision 
+  client-fingerprint: chrome"
     ;;
     "reality_h2")
-    clash_cfg="  - name: $ip
-    type: vless
-    server: $ip
-    port: $port
-    uuid: $password
-    tls: true
-    udp: true
-    network: h2
-    flow: ''
-    servername: www.fate-go.com.tw
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome"
+    clash_cfg="- name: $ip
+  type: vless
+  server: $ip
+  port: $port
+  uuid: $password
+  tls: true
+  udp: true
+  network: h2
+  flow: ''
+  servername: www.fate-go.com.tw
+  reality-opts:
+    public-key: $public_key
+    short-id: 8eb7bab5a41eb27d
+  client-fingerprint: chrome"
     ;;
     esac
     
@@ -1060,6 +1060,7 @@ hysteria2() {
 }
 
 hysteria2_without_domain() {
+    set_port
     ${INS} openssl
     openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/hysteria/server.key -out /etc/hysteria/server.crt -subj "/CN=live.qq.com" -days 36500 && chown hysteria /etc/hysteria/server.key &&  chown hysteria /etc/hysteria/server.crt && chmod +775 /etc/hysteria/server*
 
@@ -1070,6 +1071,7 @@ hysteria2_without_domain() {
 
     sed -i "s/\${password}/$password/" config.yaml
     sed -i "s/\${domain}/$domain/" config.yaml
+    sed -i "s/\${port}/$port/" config.yaml
 
     mv config.yaml /etc/hysteria/config.yaml
 
@@ -1083,7 +1085,7 @@ hysteria2_without_domain() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
+XRAY_PORT="${port}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1091,10 +1093,12 @@ EOF
 
 hysteria2_domain() {
     domain_handle
+    set_port
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     wget -N ${hysteria2_config_url} -O config.yaml
 
     sed -i "s/\${password}/$password/" config.yaml
+    sed -i "s/\${port}/$port/" config.yaml
     sed -i "s/\${domain}/$domain/" config.yaml
 
     mv config.yaml /etc/hysteria/config.yaml
@@ -1108,10 +1112,20 @@ hysteria2_domain() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
+XRAY_PORT="${port}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
+}
+
+set_port() {
+    echo -e "------------------------------------------"
+    read -rp "设置你的端口(默认443): " input
+    if [[ $input =~ ^[0-9]+$ && $input -ge 0 && $input -le 65535 ]]; then
+        port=$(echo "$input")
+    else
+        port="443"
+    fi
 }
 
 # XRAY END
