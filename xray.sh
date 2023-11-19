@@ -323,8 +323,8 @@ clash_config() {
     "hysteria2_nodomain")
   clash_cfg="- name: $domain
   type: hysteria2
-  server: $domain
-  port: 443
+  server: '$domain'
+  port: $port
   up: 30 Mbps
   down: 100 Mbps
   password: $password
@@ -334,8 +334,8 @@ clash_config() {
     "hysteria2")
   clash_cfg="- name: $domain
   type: hysteria2
-  server: $domain
-  port: 443
+  server: '$domain'
+  port: $port
   up: 30 Mbps
   down: 100 Mbps
   password: $password"
@@ -343,7 +343,7 @@ clash_config() {
     "reality_tcp")
   clash_cfg="- name: $ip
   type: vless
-  server: $ip
+  server: '$ip'
   port: $port
   uuid: $password
   network: tcp
