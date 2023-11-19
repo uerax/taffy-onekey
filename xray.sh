@@ -359,7 +359,7 @@ clash_config() {
     "reality_grpc")
     clash_cfg="- name: $ip
   type: vless
-  server: $ip
+  server: '$ip'
   port: $port
   uuid: $password
   network: grpc
@@ -375,7 +375,7 @@ clash_config() {
     ;;
     "trojan_grpc")
     clash_cfg="- name: $domain
-  server: $domain
+  server: '$domain'
   port: $port
   type: trojan
   password: $password
@@ -391,7 +391,7 @@ clash_config() {
     "trojan_tcp")
     clash_cfg="- name: $domain
   type: trojan
-  server: $domain
+  server: '$domain'
   port: $port
   password: $password
   alpn:
@@ -401,7 +401,7 @@ clash_config() {
     "vmess_ws")
     clash_cfg="- name: $domain
   type: vmess
-  server: $domain
+  server: '$domain'
   port: 443
   uuid: $password
   alterId: 0
@@ -417,7 +417,7 @@ clash_config() {
     "vless_ws")
     clash_cfg="- name: $domain
   type: vless
-  server: $domain
+  server: '$domain'
   port: 443
   uuid: $password
   udp: true
@@ -433,7 +433,7 @@ clash_config() {
     "vless_vison")
     clash_cfg="- name: $domain
   type: vless
-  server: $domain
+  server: '$domain'
   port: 443
   uuid: $password
   network: tcp
@@ -445,7 +445,7 @@ clash_config() {
     "reality_h2")
     clash_cfg="- name: $ip
   type: vless
-  server: $ip
+  server: '$ip'
   port: $port
   uuid: $password
   tls: true
