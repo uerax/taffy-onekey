@@ -53,6 +53,7 @@ vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/xray-script/mast
 vless_reality_h2_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-H2/config.json"
 
 hysteria2_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config.yaml"
+hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config_nodomain.yaml"
 
 outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
 outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
@@ -319,6 +320,17 @@ xray_configure() {
 
 clash_config() {
     case $xray_type in
+    "hysteria2_nodomain")
+  clash_cfg="  - name: $domain
+    type: hysteria2
+    server: $domain
+    port: 443
+    up: 30 Mbps
+    down: 100 Mbps
+    password: $password
+    sni: https://live.qq.com
+    skip-cert-verify: true"
+    ;;    
     "hysteria2")
   clash_cfg="  - name: $domain
     type: hysteria2
@@ -1031,6 +1043,53 @@ hysteria2() {
 
     bash <(curl -fsSL https://get.hy2.sh/)
 
+    echo -e "------------------------------------------"
+    read -rp "是否使用域名(Y/N): " hasDmain
+    case $hasDmain in
+    [yY])
+      hysteria2_domain
+      ;;
+    [nN])
+      hysteria2_without_domain
+      ;;
+    *)
+      hysteria2_without_domain
+      ;;
+    esac
+    
+}
+
+hysteria2_without_domain() {
+    ${INS} openssl
+    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/hysteria/server.key -out /etc/hysteria/server.crt -subj "/CN=live.qq.com" -days 36500 && chown hysteria /etc/hysteria/server.key &&  chown hysteria /etc/hysteria/server.crt && chmod +775 /etc/hysteria/server*
+
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    domain=$(curl -s https://ip.me)
+
+    wget -N ${hysteria2_nodomain_config_url} -O config.yaml
+
+    sed -i "s/\${password}/$password/" config.yaml
+    sed -i "s/\${domain}/$domain/" config.yaml
+
+    mv config.yaml /etc/hysteria/config.yaml
+
+    systemctl start hysteria-server.service
+    
+    xray_type="hysteria2_nodomain"
+
+    clash_config
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${domain}"
+XRAY_PWORD="${password}"
+XRAY_PORT="443"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+    info_return
+}
+
+hysteria2_domain() {
     domain_handle
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     wget -N ${hysteria2_config_url} -O config.yaml
