@@ -1315,6 +1315,7 @@ uninstall_acme() {
 }
 
 uninstall_hysteria2() {
+
     bash <(curl -fsSL https://get.hy2.sh/) --remove
 }
 
@@ -1322,6 +1323,7 @@ uninstall() {
     uninstall_xray
     uninstall_nginx
     uninstall_acme
+    uninstall_hysteria2
 }
 
 restart_nginx() {
