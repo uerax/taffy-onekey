@@ -391,7 +391,7 @@ clash_config() {
     "trojan_tcp")
     clash_cfg="  - name: $domain
     type: trojan
-    server: $domain
+    server: '$domain'
     port: $port
     password: $password
     alpn:
