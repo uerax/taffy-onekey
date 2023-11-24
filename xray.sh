@@ -1076,6 +1076,7 @@ hysteria2_without_domain() {
     mv config.yaml /etc/hysteria/config.yaml
 
     systemctl start hysteria-server.service
+    systemctl enable hysteria-server.service
     
     xray_type="hysteria2_nodomain"
 
@@ -1104,6 +1105,7 @@ hysteria2_domain() {
     mv config.yaml /etc/hysteria/config.yaml
 
     systemctl start hysteria-server.service
+    systemctl enable hysteria-server.service
     xray_type="hysteria2"
 
     clash_config
