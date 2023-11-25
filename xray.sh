@@ -1140,23 +1140,14 @@ routing_set() {
     echo -e "是否配置Routing路由"
     read -rp "请输入(y/n): " set_routing
     case $set_routing in
-    y)
+    [yY])
       wget -Nq ${ukonw_url} -O uknow.tmp
 
       sed -i '4 r uknow.tmp' ${xray_cfg}
 
       rm uknow.tmp
       ;;
-    Y)
-      wget -Nq ${ukonw_url} -O uknow.tmp
-
-      sed -i '4 r uknow.tmp' ${xray_cfg}
-
-      rm uknow.tmp
-      ;;
-    n)
-      ;;
-    N)
+    [nN])
       ;;
     *)
       ;;
