@@ -30,6 +30,8 @@ ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.tx
 
 ss_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json"
 
+trojan_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan/config.json"
+
 trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json"
 trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf"
 
@@ -388,6 +390,13 @@ clash_config() {
     grpc-opts:
       grpc-service-name: \"${ws_path}\""
     ;;
+    "trojan")
+    clash_cfg="  - name: $ip
+    type: trojan
+    server: '$ip'
+    port: $port
+    password: $password"
+    ;;
     "trojan_tcp")
     clash_cfg="  - name: $domain
     type: trojan
@@ -457,6 +466,15 @@ clash_config() {
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: chrome"
+    ;;
+    "shadowsocket2022")
+    clash_cfg="  - name: $ip
+    type: ss
+    server: '$ip'
+    port: $port
+    cipher: $ss_method
+    password: "$password"
+    udp: true"
     ;;
     esac
     
@@ -892,6 +910,55 @@ vless_tcp_xtls_vision_xray_cfg() {
     mv config.json ${xray_cfg}
 }
 
+trojan() {
+    xray_type="trojan"
+    ip=`curl ipinfo.io/ip`
+    info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
+    close_nginx()
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    set_port
+    password=$(openssl rand -base64 16)
+    trojan-config
+
+    link="trojan://${password}@${ip}:${port}#${domain}"
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_LINK="${link}"
+EOF
+    trojan-outbound-config
+}
+
+trojan-config() {
+    wget -N ${trojan_config_url} -O config.json
+    sed -i "s~\${port}~$port~" config.json
+    sed -i "s~\${password}~$password~" config.json
+    
+    mv config.json ${xray_cfg}
+    systemctl restart xray && systemctl enable xray
+}
+
+trojan-outbound-config() {
+    echo -e "{
+    "protocol": "trojan",
+    "settings": {
+        "servers": [
+            {
+                "address": "${ip}",
+                "port": ${port},
+                "password": "${password}"
+            }
+        ]
+    }
+}"
+}
+
 shadowsocket-2022() {
     
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
@@ -902,7 +969,7 @@ shadowsocket-2022() {
     fi
     encrypt=1
     ss_method="2022-blake3-aes-128-gcm"
-    port=19191
+    set_port
     echo -e "选择加密方法"
     echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
     echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
@@ -943,12 +1010,14 @@ XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
 EOF
+    shadowsocket-2022-outbound-config
 }
 
 shadowsocket-2022-config() {
     wget -N ${ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
+    sed -i "s~\${port}~$port~" config.json
     transfer="N"
     read -rp "是否作为中转添加落地(Y/N): " transfer
     case $transfer in
@@ -972,6 +1041,24 @@ shadowsocket-2022-config() {
     sed -i "s~\"rules_placeholder\"~$routing~" config.json
 
     mv config.json ${xray_cfg}
+}
+
+shadowsocket-2022-outbound-config() {
+    echo -e "{
+    "protocol": "shadowsocks",
+    "settings": {
+        "servers": [
+            {
+                "address": "${domain}",
+                "port": "${port}",
+                "method": "${ss_method}",
+                "level": 0,
+                "email": "crayfish@gmail.com",
+                "password": "${password}"
+            }
+        ]
+    }
+}"
 }
 
 routing_set() {
@@ -1455,6 +1542,7 @@ select_type() {
     echo -e "${Cyan}12)  trojan-grpc${Font}"
     echo -e "${Cyan}21)  vmess-ws-tls${Font}"
     echo -e "${Cyan}31)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}32)  trojan${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num

@@ -1,0 +1,24 @@
+{
+    "log": {
+        "loglevel": "warning"
+    },
+    "inbounds": [
+        {
+            "port": "${port}",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password": "${password}",
+                        "email": "bakasine@email.com"
+                    }
+                ]
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "freedom"
+        }
+    ]
+}
