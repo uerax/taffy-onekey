@@ -41,6 +41,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xr
 - vless-grpc
 - vless-tcp-xtls-vision
 - shadowsocket-2022
+- trojan
 
 
 ## Question
