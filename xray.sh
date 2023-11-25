@@ -1377,8 +1377,24 @@ update_script() {
 }
 
 xray_upgrade() {
-    bash -c "$(curl -L ${xray_install_url})" @ install
-    judge "Xray 更新"
+    echo -e "------------------------------------------"
+    read -rp "是否安装指定版本(Y/N): " input
+    case $input in
+    [yY])
+      read -rp "输入指定版本(eq: 1.7.5): " version
+      bash -c "$(curl -L ${xray_install_url})" @ install --version ${version}
+      judge "Xray 更新"
+      ;;
+    [nN])
+      bash -c "$(curl -L ${xray_install_url})" @ install
+      judge "Xray 更新"
+      ;;
+    *)
+      bash -c "$(curl -L ${xray_install_url})" @ install
+      judge "Xray 更新"
+      ;;
+    esac
+    
 }
 
 uninstall_nginx() {
@@ -1577,6 +1593,9 @@ select_type() {
         ;;
     31)
         shadowsocket-2022
+        ;;
+    32)
+        trojan
         ;;
     q)
         exit
