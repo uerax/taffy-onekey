@@ -26,7 +26,7 @@
     },
     "inbounds": [
         {
-            "port": 19191,
+            "port": "${port}",
             "protocol": "trojan",
             "settings": {
                 "clients": [
@@ -68,7 +68,9 @@
         }
     ],
     "outbounds": [
-        "OutboundsPlaceholder",
+        {
+            "protocol": "freedom"
+        },
         {
             "tag": "WARP",
             "protocol": "wireguard",

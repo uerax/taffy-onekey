@@ -8,16 +8,6 @@
                     "geosite:category-ads-all"
                 ],
                 "outboundTag": "block"
-            },
-            {
-                "type": "field",
-                "domain": [
-                    "geosite:netflix",
-                    "geosite:openai",
-                    "geosite:disney",
-                    "geosite:spotify"
-                ],
-                "outboundTag": "WARP"
             }
         ]
     },
@@ -45,22 +35,8 @@
         }
     ],
     "outbounds": [
-        "OutboundsPlaceholder",
         {
-            "tag": "WARP",
-            "protocol": "wireguard",
-            "settings": {
-                "secretKey": "QAlKTfTa7NYlGAmLUBGToRb7YWBvRfjhLDaZKvYzfHU=",
-                "address": [
-                    "172.16.0.2/32"
-                ],
-                "peers": [
-                    {
-                        "publicKey": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-                        "endpoint": "engage.cloudflareclient.com:2408"
-                    }
-                ]
-            }
+            "protocol": "freedom"
         },
         {
             "tag": "block",

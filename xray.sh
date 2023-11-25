@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.35"
+version="v1.7.36"
 
 #fonts color
 Green="\033[32m"
@@ -488,6 +488,9 @@ qx_config() {
     "trojan_tcp")
     qx_cfg="trojan=$domain:443, password=$password, over-tls=true, tls-host=$domain, tls-verification=true, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
     ;;
+    "trojan")
+    qx_cfg="trojan=$ip:$port, password=$password, tag=$ip"
+    ;;
     esac
 }
 
@@ -508,8 +511,8 @@ vless_reality_h2() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
+    vless-reality-h2-outbound-config
     systemctl restart xray 
 
     systemctl enable xray
@@ -528,6 +531,7 @@ XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -548,8 +552,8 @@ vless_reality_tcp() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
+    vless-reality-tcp-outbound-config
 
     systemctl restart xray 
 
@@ -568,6 +572,7 @@ XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -588,7 +593,6 @@ vless_reality_grpc() {
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
 
     systemctl restart xray 
@@ -610,6 +614,7 @@ OBFS_PATH="${ws_path}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -627,7 +632,6 @@ trojan_grpc() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
 
     systemctl restart xray 
@@ -660,6 +664,7 @@ XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -670,17 +675,17 @@ trojan_tcp_tls() {
     
     xray_type="trojan_tcp"
     password=$(xray uuid)
-    port=443
+    set_port
     
     wget -N ${trojan_tcp_tls_config_url} -O ${xray_cfg}
 
-    sed -i "s~19191~$port~" ${xray_cfg}
+    sed -i "s~${port}~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ca_crt}~$ca_crt~" ${xray_cfg}
     sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
+    trojan-tcp-tls-outbound-config
 
     systemctl restart xray
 
@@ -711,6 +716,7 @@ OBFS_PATH=""
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -728,7 +734,6 @@ vmess_ws_tls() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
 
     systemctl restart xray
@@ -766,6 +771,7 @@ OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -782,7 +788,6 @@ vless_ws_tls() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
 
     systemctl restart xray && systemctl enable xray
@@ -815,6 +820,7 @@ XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -830,7 +836,6 @@ vless_grpc() {
     sed -i "s/\${password}/$password/" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" ${xray_cfg}
     routing_set
 
     systemctl restart xray && systemctl enable xray
@@ -860,6 +865,7 @@ XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -891,6 +897,7 @@ XRAY_PORT="443"
 XRAY_FLOW="xtls-rprx-vision"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+OUTBOUND="${outbound}"
 EOF
 }
 
@@ -904,7 +911,6 @@ vless_tcp_xtls_vision_xray_cfg() {
     sed -i "s~\${ca_crt}~$ca_crt~" config.json
     sed -i "s~\${ca_key}~$ca_key~" config.json
 
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
     routing_set
 
     mv config.json ${xray_cfg}
@@ -942,23 +948,6 @@ trojan-config() {
     
     mv config.json ${xray_cfg}
     systemctl restart xray && systemctl enable xray
-}
-
-trojan-outbound-config() {
-    echo -e "${Green}Outbound配置:${Font}"
-    echo -e "{
-    "protocol": "trojan",
-    "settings": {
-        "servers": [
-            {
-                "address": "${ip}",
-                "port": ${port},
-                "password": "${password}"
-            }
-        ]
-    }
-}"
-    echo -e "=================================================="
 }
 
 shadowsocket-2022() {
@@ -1011,6 +1000,7 @@ XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
+OUTBOUND="${outbound}"
 EOF
     shadowsocket-2022-outbound-config
 }
@@ -1020,34 +1010,116 @@ shadowsocket-2022-config() {
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~\${port}~$port~" config.json
-    transfer="N"
-    read -rp "是否作为中转添加落地(Y/N): " transfer
-    case $transfer in
-    "Y")
-      outbound_choose
-      ;;
-    "y")
-      outbound_choose
-      ;;
-    "n")
-      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-      ;;
-    "N")
-      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-      ;;
-    *)
-      sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-      ;;
-    esac
-    
-    sed -i "s~\"rules_placeholder\"~$routing~" config.json
-
     mv config.json ${xray_cfg}
 }
 
+# outbound start
+vless-reality-tcp-outbound-config() {
+    outbound="{
+    "protocol": "vless",
+    "settings": {
+        "vnext": [
+            {
+                "address": "${ip}",
+                "port": 443,
+                "users": [
+                    {
+                        "id": "${password}",
+                        "flow": "xtls-rprx-vision",
+                        "encryption": "none"
+                    }
+                ]
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+            "show": false,
+            "fingerprint": "chrome",
+            "serverName": "${domain}",
+            "publicKey": "${public_key}",
+            "shortId": "8eb7bab5a41eb27d",
+            "spiderX": "/"
+        }
+    }
+}"
+}
+
+trojan-tcp-tls-outbound-config() {
+    outbound="{
+    "sendThrough": "0.0.0.0",
+    "protocol": "trojan",
+    "settings": {
+        "servers": [
+            {
+                "address": "${domain}",
+                "password": "${password}",
+                "port": "${port}"
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+            "serverName": "${domain}"
+        }
+    }
+}"
+}
+
+vless-reality-h2-outbound-config() {
+    outbound="{
+    "protocol": "vless",
+    "settings": {
+        "vnext": [
+            {
+                "address": "${ip}",
+                "port": 443,
+                "users": [
+                    {
+                        "id": "${password}",
+                        "flow": "xtls-rprx-vision",
+                        "encryption": "none"
+                    }
+                ]
+            }
+        ]
+    },
+    "streamSettings": {
+        "network": "h2",
+        "security": "reality",
+        "realitySettings": {
+            "show": false,
+            "fingerprint": "chrome",
+            "serverName": "${domain}",
+            "publicKey": "${public_key}",
+            "shortId": "8eb7bab5a41eb27d",
+            "spiderX": "/"
+        }
+    }
+}"
+}
+
+trojan-outbound-config() {
+    outbound="{
+    "protocol": "trojan",
+    "settings": {
+        "servers": [
+            {
+                "address": "${ip}",
+                "port": "${port}",
+                "password": "${password}"
+            }
+        ]
+    }
+}"
+}
+
 shadowsocket-2022-outbound-config() {
-    echo -e "${Green}Outbound配置:${Font}"
-    echo -e "{
+    outbound="{
     "protocol": "shadowsocks",
     "settings": {
         "servers": [
@@ -1062,7 +1134,6 @@ shadowsocket-2022-outbound-config() {
         ]
     }
 }"
-    echo -e "=================================================="
 }
 
 routing_set() {
@@ -1345,6 +1416,9 @@ show_info() {
     echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置:${Font}"
     echo -e "${QX_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Outbounds配置:${Font}"
+    echo -e "${OUTBOUND}"
     echo -e "------------------------------------------------"
 }
 
