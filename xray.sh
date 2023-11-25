@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.34"
+version="v1.7.35"
 
 #fonts color
 Green="\033[32m"
@@ -1616,7 +1616,7 @@ menu() {
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
     echo -e "${Green}1)   一键安装${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
-    echo -e "${Green}3)   安装/更新 Xray${Font}"
+    echo -e "${Green}3)   安装/更新/回退 Xray${Font}"
     echo -e "${Yellow}4)   卸载 Xray${Font}"
     echo -e "${Green}5)   安装 Nginx${Font}"
     echo -e "${Yellow}6)   卸载 Nginx${Font}"
