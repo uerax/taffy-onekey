@@ -35,8 +35,8 @@ trojan_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/co
 trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json"
 trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf"
 
-trojan_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json"
-trojan_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf"
+trojan_tcp_tls_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json"
+trojan_tcp_tls_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf"
 
 vmess_ws_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json"
 vmess_ws_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/nginx.conf"
@@ -672,7 +672,7 @@ trojan_tcp_tls() {
     password=$(xray uuid)
     port=443
     
-    wget -N ${trojan_config_url} -O ${xray_cfg}
+    wget -N ${trojan_tcp_tls_config_url} -O ${xray_cfg}
 
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -688,7 +688,7 @@ trojan_tcp_tls() {
 
     sleep 3
 
-    wget -N ${trojan_nginx_url} -O ${nginx_cfg}
+    wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -945,6 +945,7 @@ trojan-config() {
 }
 
 trojan-outbound-config() {
+    echo -e "${Green}Outbound配置:${Font}"
     echo -e "{
     "protocol": "trojan",
     "settings": {
@@ -957,6 +958,7 @@ trojan-outbound-config() {
         ]
     }
 }"
+    echo -e "=================================================="
 }
 
 shadowsocket-2022() {
@@ -1044,6 +1046,7 @@ shadowsocket-2022-config() {
 }
 
 shadowsocket-2022-outbound-config() {
+    echo -e "${Green}Outbound配置:${Font}"
     echo -e "{
     "protocol": "shadowsocks",
     "settings": {
@@ -1059,6 +1062,7 @@ shadowsocket-2022-outbound-config() {
         ]
     }
 }"
+    echo -e "=================================================="
 }
 
 routing_set() {
