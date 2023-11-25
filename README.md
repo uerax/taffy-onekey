@@ -46,4 +46,4 @@ bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xr
 
 ## Question
 
-* 分享链接可能存在问题,客户端如果解析失败建议手动填写参数
+* 分享链接可能存在问题,客户端如果解析失败可以手动填写参数
