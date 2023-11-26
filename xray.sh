@@ -57,10 +57,6 @@ vless_reality_h2_url="https://raw.githubusercontent.com/uerax/xray-script/master
 hysteria2_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config.yaml"
 hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config_nodomain.yaml"
 
-outbound_trojan_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Trojan.txt"
-outbound_ss_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Shadowsocket.txt"
-outbound_vmess_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Outbounds/Vmess.txt"
-
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
@@ -520,7 +516,6 @@ vless_reality_h2() {
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
     clash_config
 
-
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
@@ -529,7 +524,7 @@ XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -571,7 +566,7 @@ XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -614,7 +609,7 @@ OBFS_PATH="${ws_path}"
 XRAY_KEY="${public_key}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -667,7 +662,7 @@ XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -722,7 +717,7 @@ OBFS_PATH=""
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -780,7 +775,7 @@ OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -832,7 +827,7 @@ XRAY_OBFS="websocket"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -880,7 +875,7 @@ XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -915,7 +910,7 @@ XRAY_PORT="443"
 XRAY_FLOW="xtls-rprx-vision"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -957,7 +952,7 @@ XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -1021,7 +1016,7 @@ XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
-OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
@@ -1172,39 +1167,7 @@ routing_set() {
     *)
       ;;
     esac
-    
 
-}
-
-outbound_choose() {
-    transfer_type=1
-    echo -e "选择你的落地协议"
-    echo -e "${Cyan}1) Trojan ${Font}"
-    echo -e "${Cyan}2) Shadowsocket ${Font}"
-    echo -e "${Cyan}3) Vmess ${Font}"
-    echo -e ""
-    read -rp "请输入输字: " transfer
-    case $transfer in
-    1)
-      outbound_trojan
-      ;;
-    *)
-      ;;
-    esac
-
-    sed -i "s~\"OutboundsPlaceholder\"~$outbound~" config.json
-}
-
-outbound_trojan() {
-    wget -Nq ${outbound_trojan_url} -O outbound.tmp
-    read -rp "请输入trojan域名: " address
-    sed -i "s~\${address}~$address~" outbound.tmp
-    read -rp "请输入trojan密码: " trojan_pw
-    sed -i "s~\${password}~$trojan_pw~" outbound.tmp
-    read -rp "请输入trojan传输协议(tcp/grpc): " trojan_net
-    sed -i "s~\${network}~$trojan_net~" outbound.tmp
-    outbound=$(cat outbound.tmp)
-    rm outbound.tmp
 }
 
 hysteria2() {
@@ -1400,12 +1363,16 @@ info_return() {
     echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
-    
+    echo -e "------------------------------------------------"
     echo -e "${Green}Clash配置: ${Font}"
     echo -e "${clash_cfg}"
-
+    echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置: ${Font}"
     echo -e "${qx_cfg}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Outbounds配置:${Font}"
+    echo -e "${outbound}"
+    echo -e "------------------------------------------------"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
 }
@@ -1429,7 +1396,7 @@ show_info() {
     echo -e "${QX_CONFIG}"
     echo -e "------------------------------------------------"
     echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${OUTBOUND}"
+    echo -e "${XRAY_OUTBOUND}"
     echo -e "------------------------------------------------"
 }
 
