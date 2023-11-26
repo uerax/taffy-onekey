@@ -931,6 +931,8 @@ trojan() {
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
+    trojan-outbound-config
+    
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
@@ -938,7 +940,6 @@ XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
 EOF
-    trojan-outbound-config
 }
 
 trojan-config() {
@@ -992,6 +993,7 @@ shadowsocket-2022() {
     link="ss://$tmp@${domain}:${port}"
 
     xray_type="shadowsocket2022"
+    shadowsocket-2022-outbound-config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -1002,7 +1004,6 @@ XRAY_PORT="${port}"
 XRAY_LINK="${link}"
 OUTBOUND="${outbound}"
 EOF
-    shadowsocket-2022-outbound-config
 }
 
 shadowsocket-2022-config() {
@@ -1632,6 +1633,7 @@ select_type() {
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
+    mkdir -p ${xray_path}
     case $menu_num in
     1)
         vless_reality_tcp
