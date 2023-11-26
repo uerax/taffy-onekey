@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.36"
+version="v1.7.37"
 
 #fonts color
 Green="\033[32m"
@@ -90,10 +90,7 @@ install() {
     adjust_date
     env_install
     # increase_max_handle
-    port_check 80
-    port_check 443
     close_firewall
-    nginx_install
     xray_install
     xray_configure
     select_type
@@ -497,6 +494,7 @@ qx_config() {
 vless_reality_h2() {
     password=$(xray uuid)
     port=443
+    port_check 443
 
     domain="www.fate-go.com.tw"
     xray_type="reality_h2"
@@ -538,6 +536,7 @@ EOF
 vless_reality_tcp() {
     password=$(xray uuid)
     port=443
+    port_check 443
 
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp"
@@ -579,6 +578,7 @@ EOF
 vless_reality_grpc() {
     password=$(xray uuid)
     port=443
+    port_check 443
 
     xray_type="reality_grpc"
     keys=$(xray x25519)
@@ -619,6 +619,9 @@ EOF
 }
 
 trojan_grpc() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
@@ -669,6 +672,9 @@ EOF
 }
 
 trojan_tcp_tls() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
@@ -721,6 +727,9 @@ EOF
 }
 
 vmess_ws_tls() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
@@ -776,6 +785,9 @@ EOF
 }
 
 vless_ws_tls() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
@@ -825,6 +837,9 @@ EOF
 }
 
 vless_grpc() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
@@ -870,6 +885,9 @@ EOF
 }
 
 vless_tcp_xtls_vision() {
+    port_check 80
+    port_check 443
+    nginx_install
     domain_handle
     apply_certificate
     flush_certificate
