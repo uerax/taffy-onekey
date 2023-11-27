@@ -945,6 +945,8 @@ trojan() {
     link="trojan://${password}@${ip}:${port}#${domain}"
 
     trojan-outbound-config
+    clash_config
+    qx_config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -952,6 +954,8 @@ XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
 }
@@ -1008,6 +1012,7 @@ shadowsocket-2022() {
 
     xray_type="shadowsocket2022"
     shadowsocket-2022-outbound-config
+    clash_config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -1016,6 +1021,7 @@ XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
 }
