@@ -298,7 +298,7 @@ EOF
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        wget --no-check-certificate ${xray_install_url}
+        wget --no-check-certificate ${xray_install_url} -O install-release.sh
         judge "Xray安装脚本 下载"
         bash install-release.sh install
         judge "Xray 安装"
