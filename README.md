@@ -15,13 +15,13 @@ bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)
 __国内机器__
 
 ```
-bash -c "$(curl -L https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/xray-script/master/xray-cn.sh)" @
+wget -N --no-check-certificate -q -O xray.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/xray-script/master/xray-cn.sh" && chmod +x xray.sh && bash xray.sh
 ```
 
 `一键安装`
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" && chmod +x xray.sh && bash xray.sh
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @ install
 ```
 
 `完全卸载`
