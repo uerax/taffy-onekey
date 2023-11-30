@@ -3,25 +3,31 @@
 __保存脚本执行__
 
 ```
-wget -N --no-check-certificate -q -O xray.sh "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh" && chmod +x xray.sh && bash xray.sh
+wget -N --no-check-certificate -q -O xray.sh "https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh" && chmod +x xray.sh && bash xray.sh
 ```
 
 __不保存脚本执行__
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @
+```
+
+__国内机器__
+
+```
+bash -c "$(curl -L https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/xray-script/master/xray-cn.sh)" @
 ```
 
 `一键安装`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @ install
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" && chmod +x xray.sh && bash xray.sh
 ```
 
 `完全卸载`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh)" @ uninstall
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @ uninstall
 ```
 
 ## Script
