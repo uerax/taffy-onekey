@@ -12,10 +12,7 @@
             {
                 "type": "field",
                 "domain": [
-                    "geosite:netflix",
-                    "geosite:openai",
-                    "geosite:disney",
-                    "geosite:spotify"
+                    "geosite:openai"
                 ],
                 "outboundTag": "WARP"
             }

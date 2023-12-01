@@ -1,13 +1,11 @@
 {
     "routing": {
-        "domainStrategy": "AsIs",
+        "domainStrategy": "IPIfNonMatch",
         "rules": [
             {
                 "type": "field",
-                "domain": [
-                    "geosite:category-ads-all"
-                ],
-                "outboundTag": "block"
+                "network": "udp",
+                "outboundTag": "direct"
             }
         ]
     },
@@ -24,19 +22,13 @@
                 "level": 0,
                 "email": "crayfish@gmail.com",
                 "network": "udp,tcp"
-            },
-            "sniffing": {
-                "enabled": true,
-                "destOverride": [
-                    "http",
-                    "tls"
-                ]
             }
         }
     ],
     "outbounds": [
         {
-            "protocol": "freedom"
+            "protocol": "freedom",
+            "tag": "direct"
         },
         {
             "tag": "block",

@@ -1,4 +1,14 @@
 {
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+            {
+                "type": "field",
+                "network": "udp",
+                "outboundTag": "direct"
+            }
+        ]
+    },
     "log": {
         "loglevel": "warning"
     },
@@ -18,7 +28,8 @@
     ],
     "outbounds": [
         {
-            "protocol": "freedom"
+            "protocol": "freedom",
+            "tag": "direct"
         }
     ]
 }
