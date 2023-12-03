@@ -3,31 +3,31 @@
 __保存脚本执行__
 
 ```
-wget -N --no-check-certificate -q -O xray.sh "https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh" && chmod +x xray.sh && bash xray.sh
+wget -N --no-check-certificate -q -O taffy.sh "https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh" && chmod +x taffy.sh && bash taffy.sh
 ```
 
 __不保存脚本执行__
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @
 ```
 
 __国内机器__
 
 ```
-wget -N --no-check-certificate -q -O xray.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/xray-script/master/xray-cn.sh" && chmod +x xray.sh && bash xray.sh
+wget -N --no-check-certificate -q -O taffy.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh" && chmod +x taffy.sh && bash taffy.sh
 ```
 
 `一键安装`
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @ install
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @ install
 ```
 
 `完全卸载`
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/xray-script@master/xray.sh)" @ uninstall
+bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @ uninstall
 ```
 
 ## Script
