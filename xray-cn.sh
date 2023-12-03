@@ -215,7 +215,7 @@ domain_handle() {
     read -rp "输入你的域名(eg: example.com): " domain
     ok "正在获取 IP 地址信息"
     parse_ipv4=$(curl -sm8 ipget.net/?"${domain}")
-    local_ipv4=$(curl -s4m8 https://mirror.ghproxy.com/https://ifconfig.co)
+    local_ipv4=$(curl -s4m8 https://ifconfig.co)
     if [[ ${parse_ipv4} == "${local_ipv4}" ]]; then
         ok "域名ip解析通过"
         sleep 2
@@ -239,7 +239,7 @@ EOF
     service nginx restart
 
     if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
-        wget -O - https://mirror.ghproxy.com/https://get.acme.sh | sh
+        wget -O - https://get.acme.sh | sh
         judge "安装 Acme"
     else
         ok "Acme 已安装"
@@ -323,7 +323,7 @@ clash_config() {
     up: 30 Mbps
     down: 100 Mbps
     password: $password
-    sni: https://mirror.ghproxy.com/https://live.qq.com
+    sni: https://live.qq.com
     skip-cert-verify: true"
     ;;    
     "hysteria2")
@@ -1177,7 +1177,7 @@ hysteria2() {
     ${INS} curl
     judge "curl 安装"
 
-    bash <(curl -fsSL https://mirror.ghproxy.com/https://get.hy2.sh/)
+    bash <(curl -fsSL https://get.hy2.sh/)
 
     echo -e "------------------------------------------"
     read -rp "是否使用域名(Y/N): " hasDmain
@@ -1201,7 +1201,7 @@ hysteria2_without_domain() {
     openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/hysteria/server.key -out /etc/hysteria/server.crt -subj "/CN=live.qq.com" -days 36500 && chown hysteria /etc/hysteria/server.key &&  chown hysteria /etc/hysteria/server.crt && chmod +775 /etc/hysteria/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    domain=$(curl -s https://mirror.ghproxy.com/https://ip.me)
+    domain=$(curl -s https://ip.me)
 
     wget -N ${hysteria2_nodomain_config_url} -O config.yaml
 
@@ -1477,7 +1477,7 @@ uninstall_acme() {
 
 uninstall_hysteria2() {
 
-    bash <(curl -fsSL https://mirror.ghproxy.com/https://get.hy2.sh/) --remove
+    bash <(curl -fsSL https://get.hy2.sh/) --remove
 }
 
 uninstall() {
@@ -1585,7 +1585,7 @@ server_operation() {
 
 question_answer() {
     echo -e "${Red}1.我啥都不懂${Font}"
-    echo -e "${Green}https://mirror.ghproxy.com/https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
+    echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
     echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}2.Nginx 启动失败${Font}"
     echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
@@ -1598,7 +1598,7 @@ question_answer() {
     echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}5.ChatGPT访问不了${Font}"
     echo -e "${Green}可能性1): 你的VPS是大陆、香港或美国LA地区  ${Font}"
-    echo -e "${Green}可能性2): key失效前往 https://mirror.ghproxy.com/https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
+    echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
 }
 
 select_type() {
@@ -1666,12 +1666,12 @@ select_type() {
 
 menu() {
     echo -e "${Cyan}——————————————— 脚本信息 ———————————————${Font}"
-    echo -e "\t\t${Yellow}Xray 脚本${Font}"
+    echo -e "\t\t${Yellow}Taffy 脚本${Font}"
     echo -e "\t${Yellow}---authored by uerax---${Font}"
-    echo -e "\t${Yellow}https://mirror.ghproxy.com/https://github.com/uerax${Font}"
+    echo -e "\t${Yellow}https://github.com/uerax${Font}"
     echo -e "\t\t${Yellow}版本号：${version}${Font}"
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
-    echo -e "${Green}1)   一键安装${Font}"
+    echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   安装/更新/回退 Xray${Font}"
     echo -e "${Yellow}4)   卸载 Xray${Font}"
