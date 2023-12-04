@@ -1035,34 +1035,35 @@ shadowsocket-2022-config() {
 }
 
 # outbound start
+
 vless-reality-tcp-outbound-config() {
     outbound="{
-    "protocol": "vless",
-    "settings": {
-        "vnext": [
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
             {
-                "address": "${ip}",
-                "port": 443,
-                "users": [
+                \"address\": \"${ip}\",
+                \"port\": 443,
+                \"users\": [
                     {
-                        "id": "${password}",
-                        "flow": "xtls-rprx-vision",
-                        "encryption": "none"
+                        \"id\": \"${password}\",
+                        \"flow\": \"xtls-rprx-vision\",
+                        \"encryption\": \"none\"
                     }
                 ]
-            }
+            }\
         ]
     },
-    "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-            "show": false,
-            "fingerprint": "chrome",
-            "serverName": "${domain}",
-            "publicKey": "${public_key}",
-            "shortId": "8eb7bab5a41eb27d",
-            "spiderX": "/"
+    \"streamSettings\": {
+        \"network\": \"tcp\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"show\": false,\
+            \"fingerprint\": \"chrome\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${public_key}\",
+            \"shortId\": \"8eb7bab5a41eb27d\",
+            \"spiderX\": \"/\"
         }
     }
 }"
@@ -1070,22 +1071,22 @@ vless-reality-tcp-outbound-config() {
 
 trojan-tcp-tls-outbound-config() {
     outbound="{
-    "sendThrough": "0.0.0.0",
-    "protocol": "trojan",
-    "settings": {
-        "servers": [
+    \"sendThrough\": \"0.0.0.0\",
+    \"protocol\": \"trojan\",
+    \"settings\": {
+        \"servers\": [
             {
-                "address": "${domain}",
-                "password": "${password}",
-                "port": "${port}"
+                \"address\": \"${domain}\",
+                \"password\": \"${password}\",
+                \"port\": \"${port}\"
             }
         ]
     },
-    "streamSettings": {
-        "network": "tcp",
-        "security": "tls",
-        "tlsSettings": {
-            "serverName": "${domain}"
+    \"streamSettings\": {
+        \"network\": \"tcp\",
+        \"security\": \"tls\",
+        \"tlsSettings\": {
+            \"serverName\": \"${domain}\"
         }
     }
 }"
@@ -1093,32 +1094,32 @@ trojan-tcp-tls-outbound-config() {
 
 vless-reality-h2-outbound-config() {
     outbound="{
-    "protocol": "vless",
-    "settings": {
-        "vnext": [
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
             {
-                "address": "${ip}",
-                "port": 443,
-                "users": [
+                \"address\": \"${ip}\",
+                \"port\": 443,
+                \"users\": [
                     {
-                        "id": "${password}",
-                        "flow": "xtls-rprx-vision",
-                        "encryption": "none"
+                        \"id\": \"${password}\",
+                        \"flow\": \"xtls-rprx-vision\",
+                        \"encryption\": \"none\"
                     }
                 ]
             }
         ]
     },
-    "streamSettings": {
-        "network": "h2",
-        "security": "reality",
-        "realitySettings": {
-            "show": false,
-            "fingerprint": "chrome",
-            "serverName": "${domain}",
-            "publicKey": "${public_key}",
-            "shortId": "8eb7bab5a41eb27d",
-            "spiderX": "/"
+    \"streamSettings\": {
+        \"network\": \"h2\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"show\": false,
+            \"fingerprint\": \"chrome\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${public_key}\",
+            \"shortId\": \"8eb7bab5a41eb27d\",
+            \"spiderX\": \"/\"
         }
     }
 }"
@@ -1126,13 +1127,13 @@ vless-reality-h2-outbound-config() {
 
 trojan-outbound-config() {
     outbound="{
-    "protocol": "trojan",
-    "settings": {
-        "servers": [
+    \"protocol\": \"trojan\",
+    \"settings\": {
+        \"servers\": [
             {
-                "address": "${ip}",
-                "port": "${port}",
-                "password": "${password}"
+                \"address\": \"${ip}\",
+                \"port\": \"${port}\",
+                \"password\": \"${password}\"
             }
         ]
     }
@@ -1141,21 +1142,23 @@ trojan-outbound-config() {
 
 shadowsocket-2022-outbound-config() {
     outbound="{
-    "protocol": "shadowsocks",
-    "settings": {
-        "servers": [
+    \"protocol\": \"shadowsocks\",
+    \"settings\": {
+        \"servers\": [
             {
-                "address": "${domain}",
-                "port": "${port}",
-                "method": "${ss_method}",
-                "level": 0,
-                "email": "crayfish@gmail.com",
-                "password": "${password}"
+                \"address\": \"${domain}\",
+                \"port\": \"${port}\",
+                \"method\": \"${ss_method}\",
+                \"level\": 0,
+                \"email\": \"crayfish@gmail.com\",
+                \"password\": \"${password}\"
             }
         ]
     }
 }"
 }
+
+# outbound end
 
 routing_set() {
     echo -e "是否配置Routing路由"
