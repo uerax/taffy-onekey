@@ -24,38 +24,38 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-website_url="https://mirror.ghproxy.com/https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
-xray_install_url="https://mirror.ghproxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-release-cn.sh"
-ukonw_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
+website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
+xray_install_url="https://github.com/uerax/xray-script/raw/master/install-release.sh"
+ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-ss_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
+ss_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Shadowsocket2022/config.json"
 
-trojan_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
+trojan_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan/config.json"
 
-trojan_grpc_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
-trojan_grpc_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
+trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/config.json"
+trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-GRPC/nginx.conf"
 
-trojan_tcp_tls_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
-trojan_tcp_tls_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
+trojan_tcp_tls_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/config.json"
+trojan_tcp_tls_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Trojan-TCP-TLS/nginx.conf"
 
-vmess_ws_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
-vmess_ws_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
+vmess_ws_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/config.json"
+vmess_ws_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VMESS-WS-TLS/nginx.conf"
 
-vless_ws_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
-vless_ws_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/nginx.conf"
+vless_ws_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/config.json"
+vless_ws_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-WS-TLS/nginx.conf"
 
-vless_grpc_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/config.json"
-vless_grpc_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/nginx.conf"
+vless_grpc_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/config.json"
+vless_grpc_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-GRPC/nginx.conf"
 
-vless_vision_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
-vless_vision_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
+vless_vision_nginx_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
+vless_vision_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/VLESS-TCP-XTLS-VISION/config.json"
 
-vless_reality_tcp_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
-vless_reality_grpc_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
-vless_reality_h2_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
+vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-TCP/config.json"
+vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-GRPC/config.json"
+vless_reality_h2_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/REALITY-H2/config.json"
 
-hysteria2_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
-hysteria2_nodomain_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
+hysteria2_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config.yaml"
+hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/xray-script/master/config/Hysteria2/config_nodomain.yaml"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
@@ -298,7 +298,7 @@ EOF
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        wget --no-check-certificate ${xray_install_url} -O install-release.sh
+        wget --no-check-certificate ${xray_install_url}
         judge "Xray安装脚本 下载"
         bash install-release.sh install
         judge "Xray 安装"
@@ -945,6 +945,8 @@ trojan() {
     link="trojan://${password}@${ip}:${port}#${domain}"
 
     trojan-outbound-config
+    clash_config
+    qx_config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -952,6 +954,8 @@ XRAY_ADDR="${ip}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
 }
@@ -1008,6 +1012,7 @@ shadowsocket-2022() {
 
     xray_type="shadowsocket2022"
     shadowsocket-2022-outbound-config
+    clash_config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -1016,6 +1021,7 @@ XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
 }
@@ -1431,7 +1437,7 @@ server_check() {
 
 update_script() {
     script_path=$(cd `dirname $0`; pwd)
-    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh"
+    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/xray-script/master/xray.sh"
     exit
 }
 
@@ -1588,7 +1594,7 @@ server_operation() {
 
 question_answer() {
     echo -e "${Red}1.我啥都不懂${Font}"
-    echo -e "${Green}https://github.com/uerax/taffy-onekey/issues 去 New Issue 问${Font}"
+    echo -e "${Green}https://github.com/uerax/xray-script/issues 去 New Issue 问${Font}"
     echo -e "${Yellow} ------------------------------------------------ ${Font}"
     echo -e "${Red}2.Nginx 启动失败${Font}"
     echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
