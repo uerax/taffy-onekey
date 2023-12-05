@@ -489,8 +489,8 @@ qx_config() {
 
 vless_reality_h2() {
     password=$(xray uuid)
-    port=443
-    port_check 443
+    set_port
+    port_check $port
 
     domain="www.fate-go.com.tw"
     xray_type="reality_h2"
@@ -530,8 +530,8 @@ EOF
 
 vless_reality_tcp() {
     password=$(xray uuid)
-    port=443
-    port_check 443
+    set_port
+    port_check $port
 
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp"
@@ -572,8 +572,8 @@ EOF
 
 vless_reality_grpc() {
     password=$(xray uuid)
-    port=443
-    port_check 443
+    set_port
+    port_check $port
 
     xray_type="reality_grpc"
     keys=$(xray x25519)
@@ -589,6 +589,7 @@ vless_reality_grpc() {
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
     routing_set
+    vless-reality-grpc-outbound-config
 
     systemctl restart xray 
 
@@ -657,7 +658,7 @@ trojan_grpc() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
+XRAY_PORT="${port}"
 XRAY_OBFS="grpc"
 OBFS_PATH="${ws_path}"
 XRAY_LINK="${link}"
@@ -711,9 +712,7 @@ trojan_tcp_tls() {
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
 XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS=""
-OBFS_PATH=""
+XRAY_PORT="${port}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
@@ -1036,6 +1035,42 @@ shadowsocket-2022-config() {
 
 # outbound start
 
+vless-reality-grpc-outbound-config() {
+    outbound=" {
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${ip}\",
+                \"port\": \"${port}\",
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+                        \"encryption\": \"none\"
+                    }
+                ]
+            }
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"grpc\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"fingerprint\": \"chrome\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${public_key}\",
+            \"shortId\": \"8eb7bab5a41eb27d\"
+        },
+        \"grpcSettings\": {
+            \"serviceName\": \"${ws_path}\",
+            \"multiMode\": true,
+            \"idle_timeout\": 60,
+            \"health_check_timeout\": 20
+        }
+    }
+}"
+}
+
 vless-reality-tcp-outbound-config() {
     outbound="{
     \"protocol\": \"vless\",
@@ -1043,7 +1078,7 @@ vless-reality-tcp-outbound-config() {
         \"vnext\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": 443,
+                \"port\": \"${port}\",
                 \"users\": [
                     {
                         \"id\": \"${password}\",
@@ -1099,7 +1134,7 @@ vless-reality-h2-outbound-config() {
         \"vnext\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": 443,
+                \"port\": \"${port}\",
                 \"users\": [
                     {
                         \"id\": \"${password}\",
