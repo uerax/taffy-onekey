@@ -1038,7 +1038,7 @@ vless-reality-grpc-outbound-config() {
         \"vnext\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": \"${port}\",
+                \"port\": ${port},
                 \"users\": [
                     {
                         \"id\": \"${password}\",
@@ -1074,7 +1074,7 @@ vless-reality-tcp-outbound-config() {
         \"vnext\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": 443,
+                \"port\": ${port},
                 \"users\": [
                     {
                         \"id\": \"${password}\",
@@ -1130,7 +1130,7 @@ vless-reality-h2-outbound-config() {
         \"vnext\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": 443,
+                \"port\": ${port},
                 \"users\": [
                     {
                         \"id\": \"${password}\",
@@ -1163,7 +1163,7 @@ trojan-outbound-config() {
         \"servers\": [
             {
                 \"address\": \"${ip}\",
-                \"port\": \"${port}\",
+                \"port\": ${port},
                 \"password\": \"${password}\"
             }
         ]
@@ -1178,7 +1178,7 @@ shadowsocket-2022-outbound-config() {
         \"servers\": [
             {
                 \"address\": \"${domain}\",
-                \"port\": \"${port}\",
+                \"port\": ${port},
                 \"method\": \"${ss_method}\",
                 \"level\": 0,
                 \"email\": \"crayfish@gmail.com\",
