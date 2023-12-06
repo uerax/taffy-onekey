@@ -366,7 +366,8 @@ clash_config() {
       grpc-service-name: \"${ws_path}\"
     reality-opts:
       public-key: $public_key
-      short-id: 8eb7bab5a41eb27d"
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome"
     ;;
     "trojan_grpc")
     clash_cfg="  - name: $domain
