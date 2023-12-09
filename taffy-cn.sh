@@ -30,7 +30,7 @@ ukonw_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/bakasine
 
 ss_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
 
-bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
+bbr_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
 trojan_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
 
