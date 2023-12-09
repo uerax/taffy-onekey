@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.37"
+version="v1.7.38"
 
 #fonts color
 Green="\033[32m"
@@ -29,6 +29,8 @@ xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-relea
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
+
+bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
 trojan_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
 
@@ -1344,42 +1346,16 @@ open_bbr() {
     info "过于老的系统版本会导致开启失败"
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
-        apt update && apt -t buster-backports install linux-image-amd64
-        cat > /etc/sysctl.conf << EOF
-net.core.somaxconn = 65535
-net.ipv4.tcp_max_syn_backlog = 65535
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_fin_timeout = 30
-net.ipv4.tcp_keepalive_time = 1200
-net.ipv4.tcp_keepalive_probes = 5
-net.ipv4.tcp_keepalive_intvl = 15
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_max_tw_buckets = 50000
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
-EOF
-        sysctl -p
+        #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+        #apt update && apt -t buster-backports install linux-image-amd64
+        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        info "输入一下命令检测是否成功安装"
+        info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        cat > /etc/sysctl.conf << EOF
-net.core.somaxconn = 65535
-net.ipv4.tcp_max_syn_backlog = 65535
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_fin_timeout = 30
-net.ipv4.tcp_keepalive_time = 1200
-net.ipv4.tcp_keepalive_probes = 5
-net.ipv4.tcp_keepalive_intvl = 15
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_max_tw_buckets = 50000
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
-EOF
-        sysctl -p
+        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        info "输入一下命令检测是否成功安装"
+        info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
