@@ -3,13 +3,13 @@
 __保存脚本执行__
 
 ```
-wget -N --no-check-certificate -q -O taffy.sh "https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh" && chmod +x taffy.sh && bash taffy.sh
+wget -N --no-check-certificate -q -O taffy.sh "https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh" && chmod +x taffy.sh && bash taffy.sh
 ```
 
 __不保存脚本执行__
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @
 ```
 
 __国内机器__
@@ -21,13 +21,13 @@ wget -N --no-check-certificate -q -O taffy.sh "https://mirror.ghproxy.com/https:
 `一键安装`
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @ install
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ install
 ```
 
 `完全卸载`
 
 ```
-bash -c "$(curl -L https://cdn.jsdelivr.net/gh/uerax/taffy-onekey@master/taffy.sh)" @ uninstall
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ uninstall
 ```
 
 ## Script
