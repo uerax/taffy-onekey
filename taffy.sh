@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.0"
+version="v1.8.1"
 
 #fonts color
 Green="\033[32m"
@@ -1164,6 +1164,7 @@ shadowsocket-2022() {
     xray_type="shadowsocket2022"
     shadowsocket-2022-outbound-config
     clash_config
+    qx_config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -1173,6 +1174,7 @@ XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_config}"
 XRAY_OUTBOUND="${outbound}"
 EOF
 }
@@ -1250,6 +1252,7 @@ shadowsocket-2022-append() {
     xray_type="shadowsocket2022"
     shadowsocket-2022-outbound-config
     clash_config
+    qx_config
 }
 
 # outbound start
