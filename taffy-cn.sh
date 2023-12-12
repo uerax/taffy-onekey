@@ -470,9 +470,9 @@ clash_config() {
     client-fingerprint: chrome"
     ;;
     "shadowsocket2022")
-    clash_cfg="  - name: $ip
+    clash_cfg="  - name: $domain
     type: ss
-    server: '$ip'
+    server: '$domain'
     port: $port
     cipher: $ss_method
     password: "$password"
@@ -494,7 +494,7 @@ qx_config() {
     qx_cfg="trojan=$ip:$port, password=$password, tag=$ip"
     ;;
     "shadowsocket2022")
-    qx_cfg="shadowsocks=$ip:$port, method=$ss_method, password=$password, tag=$ip"
+    qx_cfg="shadowsocks=$domain:$port, method=$ss_method, password=$password, tag=$domain"
     ;;
     esac
 }
