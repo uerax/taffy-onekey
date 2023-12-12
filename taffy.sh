@@ -1833,7 +1833,7 @@ select_append_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        shadowsocket-2022-append 
+        shadowsocket-2022-append
         ;;
     2)
         trojan-append
@@ -1857,6 +1857,7 @@ select_append_type() {
         error "请输入正确的数字"
         ;;
     esac
+    info_return
 }
 
 select_type() {
