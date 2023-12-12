@@ -556,11 +556,15 @@ vless_reality_h2_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    append=$(curl -s ${vless_reality_h2_append_url} | sed "s~\${port}~$port~g")
-    append=$(echo "${append}" | sed "s~\${password}~$password~g")
-    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
+    wget -Nq ${vless_reality_h2_append_url} -O append.tmp
 
-    sed -i "/^\s*"inbounds": \[/a\\$append," ${xray_cfg}
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${privateKey}~$private_key~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
 
     vless-reality-h2-outbound-config
     systemctl restart xray 
@@ -624,11 +628,15 @@ vless_reality_tcp_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    append=$(curl -s ${vless_reality_tcp_append_url} | sed "s~\${port}~$port~g")
-    append=$(echo "${append}" | sed "s~\${password}~$password~g")
-    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
+    wget -Nq ${vless_reality_tcp_append_url} -O append.tmp
 
-    sed -i "/^\s*"inbounds": \[/a\\$append," ${xray_cfg}
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${privateKey}~$private_key~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
 
     vless-reality-tcp-outbound-config
     systemctl restart xray 
@@ -694,14 +702,16 @@ vless_reality_grpc_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    append=$(curl -s ${vless_reality_grpc_append_url} | sed "s~\${port}~$port~g")
-    append=$(echo "${append}" | sed "s~\${password}~$password~g")
-    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
-    append=$(echo "${append}" | sed "s~\${ws_path}~$ws_path~g")
+    wget -Nq ${vless_reality_grpc_append_url} -O append.tmp
 
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${privateKey}~$private_key~" append.tmp
+    sed -i "s~\${ws_path}~$ws_path~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
 
-    sed "/^\s*\"inbounds\": \[/a$append," ${xray_cfg}
-
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
 
     vless-reality-grpc-outbound-config
     systemctl restart xray 
@@ -1064,7 +1074,31 @@ trojan-config() {
 }
 
 trojan-append() {
+    xray_type="trojan"
+    ip=`curl ipinfo.io/ip`
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    set_port
+    password=$(openssl rand -base64 16)
 
+    wget -Nq ${trojan_append_config_url} -O append.tmp
+
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
+
+    systemctl restart xray
+
+    link="trojan://${password}@${ip}:${port}#${domain}"
+
+    trojan-outbound-config
+    clash_config
+    qx_config
 }
 
 shadowsocket-2022() {
@@ -1133,7 +1167,55 @@ shadowsocket-2022-config() {
 }
 
 shadowsocket-2022-append() {
-    
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    encrypt=1
+    ss_method="2022-blake3-aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(openssl rand -base64 16)
+      ;;
+    2)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    *)
+      password=$(openssl rand -base64 16)
+      ;;
+    esac
+
+    wget -Nq ${ss_append_config_url} -O append.tmp
+
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${method}~$ss_method~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
+
+
+    tmp="${ss_method}:${password}"
+    tmp=$( base64 <<< $tmp)
+    domain=`curl ipinfo.io/ip`
+    link="ss://$tmp@${domain}:${port}"
+
+    xray_type="shadowsocket2022"
+    shadowsocket-2022-outbound-config
+    clash_config
 }
 
 # outbound start
