@@ -39,7 +39,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/t
 - vless-tls-reality(推荐)
 - hysteria2(推荐)
 - trojan-tcp-tls(推荐)
-- vless-grpc-reality
+- vless-grpc-reality(推荐)
 - vless-h2-reality
 - trojan-grpc
 - vmess-ws-tls

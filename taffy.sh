@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.7.38"
+version="v1.8.0"
 
 #fonts color
 Green="\033[32m"
@@ -1508,10 +1508,19 @@ uninstall_hysteria2() {
 }
 
 uninstall() {
-    uninstall_xray
-    uninstall_nginx
-    uninstall_acme
-    uninstall_hysteria2
+    echo -e "------------------------------------------"
+    read -rp "是否确定要完全卸载(Y/N): " input
+    case $input in
+    [yY])
+      uninstall_xray
+      uninstall_nginx
+      uninstall_acme
+      uninstall_hysteria2
+      echo -e "全部卸载已完成"
+    ;;
+    *)
+    ;;
+    esac
 }
 
 restart_nginx() {
@@ -1583,6 +1592,7 @@ server_operation() {
     echo -e "${Yellow}2)  关闭 Nginx${Font}"
     echo -e "${Green}3)  重启/启动 Xray${Font}"
     echo -e "${Yellow}4)  关闭 Xray${Font}"
+    echo -e "${Gree}5)  操作 Hysteria${Font}"
     echo -e "${Red}q)  结束操作${Font}\n"
     echo -e "${Purple}-------------------------------- ${Font}"
     read -rp "输入数字(回车确认): " opt_num
@@ -1599,6 +1609,9 @@ server_operation() {
           ;;
       4)
           close_xray
+          ;;
+      5)
+          hysteria_operation
           ;;
       q)
           exit
@@ -1628,12 +1641,54 @@ question_answer() {
     echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
 }
 
+select_append_type() {
+    echo -e "${Green}选择要插入的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  shadowsocket-2022${Font}"
+    echo -e "${Green}2)  trojan${Font}"
+    echo -e "${Green}3)  socks5${Font}"
+    echo -e "${Cyan}4)  vless-reality-tcp${Font}"
+    echo -e "${Cyan}5)  vless-reality-grpc${Font}"
+    echo -e "${Cyan}6)  vless-reality-h2${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    mkdir -p ${xray_path}
+    case $menu_num in
+    1)
+        shadowsocket-2022-append 
+        ;;
+    2)
+        trojan-append
+        ;;
+    3)
+        socks5-append
+        ;;
+    4)
+        vless_reality_tcp_append
+        ;;
+    5)
+        vless_reality_grpc_append
+        ;;
+    6)
+        vless_reality_h2_append
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        ;;
+    esac
+}
+
 select_type() {
-    echo -e "${Green}选择安装的模式 ${Font}"
+    echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Green}3)  vless-reality-h2(推荐)${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc(推荐)${Font}"
+    echo -e "${Green}3)  vless-reality-h2${Font}"
     echo -e "${Cyan}4)  vless-ws-tls${Font}"
     echo -e "${Cyan}5)  vless-grpc${Font}"
     echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
@@ -1686,7 +1741,6 @@ select_type() {
         ;;
     *)
         error "请输入正确的数字"
-        select_type
         ;;
     esac
 }
@@ -1700,11 +1754,7 @@ menu() {
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
-    echo -e "${Green}3)   安装/更新/回退 Xray${Font}"
-    echo -e "${Yellow}4)   卸载 Xray${Font}"
-    echo -e "${Green}5)   安装 Nginx${Font}"
-    echo -e "${Yellow}6)   卸载 Nginx${Font}"
-    echo -e "${Purple}7)   启动 / 关闭 / 重启服务${Font}"
+    echo -e "${Cyan}7)   插入 Xray 其他协议${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
     echo -e "${Yellow}9)   完全卸载${Font}"
     echo -e "${Purple}10)  配置文件路径${Font}"
@@ -1715,6 +1765,11 @@ menu() {
     echo -e "${Green}30)  安装 Hysteria${Font}"
     echo -e "${Yellow}31)  卸载 Hysteria${Font}"
     echo -e "${Purple}32)  操作 Hysteria${Font}"
+    echo -e "${Green}33)  安装 / 更新 / 回退 Xray${Font}"
+    echo -e "${Yellow}34)  卸载 Xray${Font}"
+    echo -e "${Green}35)  安装 Nginx${Font}"
+    echo -e "${Yellow}36)  卸载 Nginx${Font}"
+    echo -e "${Purple}37)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -1729,26 +1784,15 @@ menu() {
     2)
     update_script
     ;;
-    3)
-    xray_upgrade
-    ;;
-    4)
-    uninstall_xray
-    ;;
-    5)
-    nginx_install
-    ;;
-    6)
-    uninstall_nginx
-    ;;
     7)
-    server_operation
+    select_append_type
+    info_return 
     ;;
     8)
     select_type
     info_return 
     ;;
-    9)
+    39)
     uninstall
     ;;
     10)
@@ -1774,6 +1818,21 @@ menu() {
     ;;
     32)
     hysteria_operation
+    ;;
+    33)
+    xray_upgrade
+    ;;
+    34)
+    uninstall_xray
+    ;;
+    35)
+    nginx_install
+    ;;
+    36)
+    uninstall_nginx
+    ;;
+    37)
+    server_operation
     ;;
     99)
     question_answer

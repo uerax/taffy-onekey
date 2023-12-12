@@ -1,0 +1,30 @@
+{
+    "listen": "0.0.0.0",
+    "port": "${port}",
+    "protocol": "vless",
+    "settings": {
+        "clients": [
+            {
+                "id": "${password}",
+                "flow": "xtls-rprx-vision"
+            }
+        ],
+        "decryption": "none"
+    },
+    "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+            "show": false,
+            "dest": "www.fate-go.com.tw:443",
+            "serverNames": [
+                "www.fate-go.com.tw"
+            ],
+            "privateKey": "${privateKey}",
+            "shortIds": [
+                "8eb7bab5a41eb27d",
+                ""
+            ]
+        }
+    }
+}

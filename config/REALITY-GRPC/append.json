@@ -1,0 +1,41 @@
+{
+    "listen": "0.0.0.0",
+    "port": "${port}",
+    "protocol": "vless",
+    "settings": {
+        "clients": [
+            {
+                "id": "${password}",
+                "flow": ""
+            }
+        ],
+        "decryption": "none"
+    },
+    "streamSettings": {
+        "network": "grpc",
+        "security": "reality",
+        "realitySettings": {
+            "show": false,
+            "dest": "www.fate-go.com.tw:443",
+            "serverNames": [
+                "www.fate-go.com.tw"
+            ],
+            "privateKey": "${privateKey}",
+            "shortIds": [
+                "8eb7bab5a41eb27d",
+                ""
+            ]
+        },
+        "grpcSettings": {
+            "serviceName": "${ws_path}"
+        }
+    },
+    "sniffing": {
+        "enabled": true,
+        "destOverride": [
+            "http",
+            "tls",
+            "quic"
+        ]
+    }
+}
