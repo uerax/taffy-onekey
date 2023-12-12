@@ -544,6 +544,10 @@ XRAY_OUTBOUND="${outbound}"
 EOF
 }
 
+vless_reality_h2_append() {
+
+}
+
 vless_reality_tcp() {
     password=$(xray uuid)
     set_port
@@ -584,6 +588,10 @@ XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
+}
+
+vless_reality_tcp_append() {
+
 }
 
 vless_reality_grpc() {
@@ -628,6 +636,10 @@ XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 XRAY_OUTBOUND="${outbound}"
 EOF
+}
+
+vless_reality_grpc_append() {
+
 }
 
 trojan_grpc() {
@@ -984,6 +996,10 @@ trojan-config() {
     systemctl restart xray && systemctl enable xray
 }
 
+trojan-append() {
+
+}
+
 shadowsocket-2022() {
     
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
@@ -1047,6 +1063,10 @@ shadowsocket-2022-config() {
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~\${port}~$port~" config.json
     mv config.json ${xray_cfg}
+}
+
+shadowsocket-2022-append() {
+    
 }
 
 # outbound start
