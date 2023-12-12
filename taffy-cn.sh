@@ -1210,8 +1210,6 @@ shadowsocket-2022-outbound-config() {
                 \"address\": \"${domain}\",
                 \"port\": ${port},
                 \"method\": \"${ss_method}\",
-                \"level\": 0,
-                \"email\": \"crayfish@gmail.com\",
                 \"password\": \"${password}\"
             }
         ]
