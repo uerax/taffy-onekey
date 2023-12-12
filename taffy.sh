@@ -2081,6 +2081,9 @@ case $1 in
     install)
         install
         ;;
+    hysteria)
+        hysteria2
+        ;;
     uninstall)
         uninstall
         ;;
