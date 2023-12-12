@@ -493,6 +493,9 @@ qx_config() {
     "trojan")
     qx_cfg="trojan=$ip:$port, password=$password, tag=$ip"
     ;;
+    "shadowsocket2022")
+    qx_cfg="shadowsocks=$ip:$port, method=$ss_method, password=$password, tag=$ip"
+    ;;
     esac
 }
 
@@ -990,6 +993,9 @@ shadowsocket-2022() {
     echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
     echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
     echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
     echo -e ""
     read -rp "选择加密方法(默认为1)：" encrypt
     case $encrypt in
@@ -1003,6 +1009,18 @@ shadowsocket-2022() {
     3)
       password=$(openssl rand -base64 32)
       ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(openssl rand -base64 16)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="xchacha20-ietf-poly1305"
       ;;
     *)
       password=$(openssl rand -base64 16)
