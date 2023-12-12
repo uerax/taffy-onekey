@@ -520,14 +520,13 @@ vless_reality_h2() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
-
+    sed -i "s~\${port}~$port~" ${xray_cfg}
+    
     routing_set
     vless-reality-h2-outbound-config
     systemctl restart xray 
 
     systemctl enable xray
-
-    service nginx stop
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
     clash_config
@@ -545,7 +544,28 @@ EOF
 }
 
 vless_reality_h2_append() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
 
+    domain="www.fate-go.com.tw"
+    xray_type="reality_h2"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    append=$(curl -s ${vless_reality_h2_append_url} | sed "s~\${port}~$port~g")
+    append=$(echo "${append}" | sed "s~\${password}~$password~g")
+    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
+
+    sed -i "/^\s*"inbounds": \[/a\\$append," ${xray_cfg}
+
+    vless-reality-h2-outbound-config
+    systemctl restart xray 
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
+    clash_config
 }
 
 vless_reality_tcp() {
@@ -565,6 +585,7 @@ vless_reality_tcp() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+    sed -i "s~\${port}~$port~" ${xray_cfg}
 
     routing_set
     vless-reality-tcp-outbound-config
@@ -575,7 +596,7 @@ vless_reality_tcp() {
 
     service nginx stop
 
-    link="vless://$password@$ip:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -591,7 +612,28 @@ EOF
 }
 
 vless_reality_tcp_append() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
 
+    domain="www.fate-go.com.tw"
+    xray_type="reality_tcp"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    append=$(curl -s ${vless_reality_tcp_append_url} | sed "s~\${port}~$port~g")
+    append=$(echo "${append}" | sed "s~\${password}~$password~g")
+    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
+
+    sed -i "/^\s*"inbounds": \[/a\\$append," ${xray_cfg}
+
+    vless-reality-tcp-outbound-config
+    systemctl restart xray 
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
+    clash_config
 }
 
 vless_reality_grpc() {
@@ -611,6 +653,7 @@ vless_reality_grpc() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+    sed -i "s~\${port}~$port~" ${xray_cfg}
 
     routing_set
     vless-reality-grpc-outbound-config
@@ -639,7 +682,31 @@ EOF
 }
 
 vless_reality_grpc_append() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
 
+    domain="www.fate-go.com.tw"
+    xray_type="reality_grpc"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    append=$(curl -s ${vless_reality_grpc_append_url} | sed "s~\${port}~$port~g")
+    append=$(echo "${append}" | sed "s~\${password}~$password~g")
+    append=$(echo "${append}" | sed "s~\${privateKey}~$private_key~g")
+    append=$(echo "${append}" | sed "s~\${ws_path}~$ws_path~g")
+
+
+    sed "/^\s*\"inbounds\": \[/a$append," ${xray_cfg}
+
+
+    vless-reality-grpc-outbound-config
+    systemctl restart xray 
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    clash_config
 }
 
 trojan_grpc() {

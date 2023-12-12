@@ -1,0 +1,16 @@
+{
+    \"listen\": \"0.0.0.0\",
+    \"port\": ${port},
+    \"protocol\": \"socks\",
+    \"settings\": {
+        \"auth\": \"password\",
+        \"accounts\": [
+            {
+                \"user\": \"${user}\",
+                \"pass\": \"${pass}\"
+            }
+        ],
+        \"udp\": true,
+        \"ip\": \"127.0.0.1\"
+    }
+}

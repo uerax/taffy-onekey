@@ -1,0 +1,12 @@
+{
+    \"port\": ${port},
+    \"protocol\": \"trojan\",
+    \"settings\": {
+        \"clients\": [
+            {
+                \"password\": \"${password}\",
+                \"email\": \"bakasine@email.com\"
+            }
+        ]
+    }
+}
