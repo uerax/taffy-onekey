@@ -7,7 +7,7 @@
         "accounts": [
             {
                 "user": "${user}",
-                "pass": "${pass}"
+                "pass": "${password}"
             }
         ],
         "udp": true,

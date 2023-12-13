@@ -28,6 +28,8 @@ website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/m
 xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-release.sh"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
+socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
+
 ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
 ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/append.json"
 
@@ -1411,6 +1413,37 @@ shadowsocket-2022-outbound-config() {
         ]
     }
 }"
+}
+
+socks5-append() {
+    xray_type="socks5"
+    ip=`curl ipinfo.io/ip`
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    set_port
+    echo -e "------------------------------------------"
+    read -rp "设置你的用户名: " user
+    echo -e "------------------------------------------"
+    read -rp "设置你的密码: " password
+
+    wget -Nq ${socks5_append_config_url} -O append.tmp
+
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${user}~$user~" append.tmp
+    sed -i "s~\${port}~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
+    rm append.tmp
+
+    systemctl restart xray
+
+    #link="trojan://${password}@${ip}:${port}#${domain}"
+
+    #clash_config
+    #qx_config
 }
 
 # outbound end
