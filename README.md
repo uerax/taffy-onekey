@@ -18,10 +18,16 @@ __国内机器__
 wget -N --no-check-certificate -q -O taffy.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh" && chmod +x taffy.sh && bash taffy.sh
 ```
 
-`一键安装`
+`一键安装 Xray`
 
 ```
 bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ install
+```
+
+`一键安装 Hysteria`
+
+```
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ hysteria
 ```
 
 `完全卸载`

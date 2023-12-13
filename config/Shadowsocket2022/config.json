@@ -19,6 +19,8 @@
             "settings": {
                 "method": "${method}",
                 "password": "${password}",
+                "level": 0,
+                "email": "love@xray.com",
                 "network": "udp,tcp"
             }
         }

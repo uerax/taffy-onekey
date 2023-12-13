@@ -1467,6 +1467,20 @@ routing_set() {
 
 }
 
+hysteria_install() {
+    echo -e "------------------------------------------"
+    read -rp "是否安装指定版本(Y/N): " input
+    case $input in
+    [yY])
+      read -rp "输入指定版本(eq: 2.2.2): " version
+      bash <(curl -fsSL https://get.hy2.sh/)  --version v${version}
+      ;;
+    *)
+      bash <(curl -fsSL https://get.hy2.sh/)
+      ;;
+    esac
+}
+
 hysteria2() {
     is_root
     get_system
@@ -1474,7 +1488,7 @@ hysteria2() {
     ${INS} curl
     judge "curl 安装"
 
-    bash <(curl -fsSL https://get.hy2.sh/)
+    hysteria_install
 
     echo -e "------------------------------------------"
     read -rp "是否使用域名(Y/N): " hasDmain
@@ -1747,7 +1761,6 @@ uninstall_acme() {
 }
 
 uninstall_hysteria2() {
-
     bash <(curl -fsSL https://get.hy2.sh/) --remove
 }
 
@@ -1803,6 +1816,7 @@ hysteria_operation() {
     echo -e "${Yellow}2)  关闭 Hysteria${Font}"
     echo -e "${Green}3)  重启 Hysteria${Font}"
     echo -e "${Green}4)  查看 Hysteria 状态${Font}"
+    echo -e "${Green}9)  安装 / 升级 Hysteria${Font}"
     echo -e "${Red}q)  退出${Font}\n"
     echo -e "${Purple}-------------------------------- ${Font}"
     read -rp "输入数字(回车确认): " opt_num
@@ -1819,6 +1833,9 @@ hysteria_operation() {
           ;;
       4)
           systemctl status hysteria-server.service
+          ;;
+      9)
+          hysteria_install
           ;;
       q)
           exit
@@ -2007,14 +2024,14 @@ menu() {
     echo -e "${Green}12)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
-    echo -e "${Green}30)  安装 Hysteria${Font}"
+    echo -e "${Green}30)  一键安装 Hysteria${Font}"
     echo -e "${Yellow}31)  卸载 Hysteria${Font}"
-    echo -e "${Purple}32)  操作 Hysteria${Font}"
+    echo -e "${Purple}32)  安装 / 更新 / 启动 Hysteria${Font}"
     echo -e "${Green}33)  安装 / 更新 / 回退 Xray${Font}"
     echo -e "${Yellow}34)  卸载 Xray${Font}"
     echo -e "${Green}35)  安装 Nginx${Font}"
     echo -e "${Yellow}36)  卸载 Nginx${Font}"
-    echo -e "${Purple}37)  启动 / 关闭 / 重启服务${Font}"
+    echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -2076,7 +2093,7 @@ menu() {
     36)
     uninstall_nginx
     ;;
-    37)
+    40)
     server_operation
     ;;
     99)
@@ -2096,6 +2113,9 @@ menu() {
 case $1 in
     install)
         install
+        ;;
+    hysteria)
+        hysteria2
         ;;
     uninstall)
         uninstall
