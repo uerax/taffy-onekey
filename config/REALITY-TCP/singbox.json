@@ -1,9 +1,4 @@
 {
-    "route": {
-        "rules": [],
-        "rule_set": [],
-        "final": "direct"
-    },
     "inbounds": [
         {
             "type": "vless",
@@ -31,9 +26,6 @@
                     ]
                 }
             },
-            "transport": {
-                "type": "http"
-            },
             "multiplex": {
                 "enabled": true,
                 "padding": true,
@@ -47,8 +39,7 @@
     ],
     "outbounds": [
         {
-            "type": "direct",
-            "tag": "direct"
+            "type": "direct"
         }
     ]
 }

@@ -32,7 +32,7 @@
             },
             "multiplex": {
                 "enabled": true,
-                "padding": false,
+                "padding": true,
                 "brutal": {
                     "enabled": true,
                     "up_mbps": 100,

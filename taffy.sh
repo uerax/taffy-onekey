@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.3"
+version="v1.8.4"
 
 #fonts color
 Green="\033[32m"
@@ -76,6 +76,7 @@ singbox_path="/opt/singbox/"
 
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
+singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
 # SINGBOX URL END
 
 xray_cfg="/usr/local/etc/xray/config.json"
@@ -378,6 +379,32 @@ clash_config() {
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: chrome"
     ;;
+    "reality_tcp_brutal")
+    clash_cfg="  - name: $ip
+    type: vless
+    server: '$ip'
+    port: $port
+    uuid: $password
+    network: tcp
+    tls: true
+    udp: true
+    flow: 
+    servername: www.fate-go.com.tw
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome
+    smux:
+      enabled: true
+      protocol: h2mux
+      max-connections: 1
+      min-streams: 4
+      padding: true
+      brutal-opts:
+        enabled: true
+        up: 30
+        down: 100"
+    ;;
     "reality_grpc")
     clash_cfg="  - name: $ip
     type: vless
@@ -405,6 +432,7 @@ clash_config() {
     network: grpc
     tls: true
     udp: true
+    flow: 
     # skip-cert-verify: true
     servername: www.fate-go.com.tw
     grpc-opts:
@@ -1731,6 +1759,42 @@ CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
+singbox_vless_reality_tcp() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
+
+    domain="www.fate-go.com.tw"
+    xray_type="reality_tcp_brutal"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
+
+    sed -i "s~\${password}~$password~" ${singbox_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~11451~$port~" ${singbox_cfg}
+
+    systemctl restart sing-box 
+
+    systemctl enable sing-box
+
+    clash_config
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_KEY="${public_key}"
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+}
+
 # SINGBOX END
 
 info() {
@@ -2102,7 +2166,8 @@ singbox_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  vless-reality-h2-brutal${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc-brutal${Font}"
+    echo -e "${Green}2)  vless-reality-grpc-brutal${Font}"
+    echo -e "${Green}3)  vless-reality-tcp-brutal${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2114,6 +2179,9 @@ singbox_select() {
         ;;
     2)
         singbox_vless_reality_grpc
+        ;;
+    3)
+        singbox_vless_reality_tcp
         ;;
     q)
         exit
