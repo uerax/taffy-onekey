@@ -8,7 +8,7 @@
         {
             "type": "vless",
             "listen": "::",
-            "listen_port": "${port}",
+            "listen_port": 11451,
             "users": [
                 {
                     "uuid": "${password}",

@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.2"
+version="v1.8.3"
 
 #fonts color
 Green="\033[32m"
@@ -1676,11 +1676,11 @@ singbox_vless_reality_h2() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
-    sed -i "s~\${port}~$port~" ${singbox_cfg}
+    sed -i "s~11451~$port~" ${singbox_cfg}
 
-    systemctl restart singbox
+    systemctl restart sing-box
 
-    systemctl enable singbox
+    systemctl enable sing-box
 
     clash_config
 
@@ -1712,11 +1712,11 @@ singbox_vless_reality_grpc() {
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
-    sed -i "s~\${port}~$port~" ${singbox_cfg}
+    sed -i "s~11451~$port~" ${singbox_cfg}
 
-    systemctl restart singbox
+    systemctl restart sing-box
 
-    systemctl enable singbox
+    systemctl enable sing-box
 
     clash_config
 
