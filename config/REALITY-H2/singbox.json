@@ -1,9 +1,4 @@
 {
-    "route": {
-        "rules": [],
-        "rule_set": [],
-        "final": "direct"
-    },
     "inbounds": [
         {
             "type": "vless",

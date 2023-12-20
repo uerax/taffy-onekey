@@ -2165,9 +2165,9 @@ select_append_type() {
 singbox_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  vless-reality-h2-brutal${Font}"
-    echo -e "${Green}2)  vless-reality-grpc-brutal${Font}"
-    echo -e "${Green}3)  vless-reality-tcp-brutal${Font}"
+    echo -e "${Green}1)  vless-reality-tcp-brutal${Font}"
+    #echo -e "${Green}2)  vless-reality-h2-brutal${Font}"
+    #echo -e "${Green}3)  vless-reality-grpc-brutal${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2175,13 +2175,13 @@ singbox_select() {
     mkdir -p ${singbox_path}
     case $menu_num in
     1)
-        singbox_vless_reality_h2
+        singbox_vless_reality_tcp
         ;;
     2)
-        singbox_vless_reality_grpc
+        singbox_vless_reality_h2
         ;;
     3)
-        singbox_vless_reality_tcp
+        singbox_vless_reality_grpc
         ;;
     q)
         exit
