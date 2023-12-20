@@ -1,0 +1,49 @@
+{
+    "inbounds": [
+        {
+            "type": "vless",
+            "listen": "::",
+            "listen_port": "${port}",
+            "users": [
+                {
+                    "uuid": "${password}",
+                    "flow": ""
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "server_name": "www.fate-go.com.tw",
+                "reality": {
+                    "enabled": true,
+                    "handshake": {
+                        "server": "www.fate-go.com.tw",
+                        "server_port": 443
+                    },
+                    "private_key": "${privateKey}",
+                    "short_id": [
+                        "8eb7bab5a41eb27d",
+                        ""
+                    ]
+                }
+            },
+            "transport": {
+                "type": "grpc",
+                "service_name": "${ws_path}"
+            },
+            "multiplex": {
+                "enabled": true,
+                "padding": false,
+                "brutal": {
+                    "enabled": true,
+                    "up_mbps": 100,
+                    "down_mbps": 30
+                }
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}

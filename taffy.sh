@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.1"
+version="v1.8.2"
 
 #fonts color
 Green="\033[32m"
@@ -67,6 +67,16 @@ vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-oneke
 
 hysteria2_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
 hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
+
+# SINGBOX URL START
+singbox_install_url="https://sing-box.app/deb-install.sh"
+tcp_brutal_install_url="https://tcp.hy2.sh/"
+singbox_cfg="/etc/sing-box/config.json"
+singbox_path="/opt/singbox/"
+
+singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
+singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
+# SINGBOX URL END
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
@@ -386,6 +396,34 @@ clash_config() {
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: chrome"
     ;;
+    "reality_grpc_brutal")
+    clash_cfg="  - name: $ip
+    type: vless
+    server: '$ip'
+    port: $port
+    uuid: $password
+    network: grpc
+    tls: true
+    udp: true
+    # skip-cert-verify: true
+    servername: www.fate-go.com.tw
+    grpc-opts:
+      grpc-service-name: \"${ws_path}\"
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome
+    smux:
+      enabled: true
+      protocol: h2mux
+      max-connections: 1
+      min-streams: 4
+      padding: true
+      brutal-opts:
+        enabled: true
+        up: 30
+        down: 100"
+    ;;
     "trojan_grpc")
     clash_cfg="  - name: $domain
     server: '$domain'
@@ -477,6 +515,32 @@ clash_config() {
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: chrome"
+    ;;
+    "reality_h2_brutal")
+    clash_cfg="  - name: $ip
+    type: vless
+    server: '$ip'
+    port: $port
+    uuid: $password
+    tls: true
+    udp: true
+    network: h2
+    flow: ''
+    servername: www.fate-go.com.tw
+    reality-opts:
+      public-key: $public_key
+      short-id: 8eb7bab5a41eb27d
+    client-fingerprint: chrome
+    smux:
+      enabled: true
+      protocol: h2mux
+      max-connections: 1
+      min-streams: 4
+      padding: true
+      brutal-opts:
+        enabled: true
+        up: 30
+        down: 100"
     ;;
     "shadowsocket2022")
     clash_cfg="  - name: $domain
@@ -674,8 +738,6 @@ vless_reality_grpc() {
     systemctl restart xray 
 
     systemctl enable xray
-
-    service nginx stop
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
@@ -1580,6 +1642,97 @@ set_port() {
 
 # XRAY END
 
+# SINGBOX START
+singbox_onekey_install() {
+    is_root
+    get_system
+    adjust_date
+    env_install
+    close_firewall
+    singbox_install
+    singbox_select
+    info_return
+}
+
+singbox_install() {
+    bash <(curl -fsSL $singbox_install_url)
+    bash <(curl -fsSL $tcp_brutal_install_url)
+}
+
+singbox_vless_reality_h2() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
+
+    domain="www.fate-go.com.tw"
+    xray_type="reality_h2_brutal"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
+
+    sed -i "s~\${password}~$password~" ${singbox_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~\${port}~$port~" ${singbox_cfg}
+
+    systemctl restart singbox
+
+    systemctl enable singbox
+
+    clash_config
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_KEY="${public_key}"
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+}
+
+singbox_vless_reality_grpc() {
+    password=$(xray uuid)
+    set_port
+    port_check $port
+
+    xray_type="reality_grpc_brutal"
+    keys=$(xray x25519)
+    private_key=$(echo $keys | awk -F " " '{print $3}')
+    public_key=$(echo $keys | awk -F " " '{print $6}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
+
+    sed -i "s~\${password}~$password~" ${singbox_cfg}
+    sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
+    sed -i "s~\${port}~$port~" ${singbox_cfg}
+
+    systemctl restart singbox
+
+    systemctl enable singbox
+
+    clash_config
+
+    cat>${xray_info}<<EOF
+XRAY_TYPE="${xray_type}"
+XRAY_ADDR="${ip}"
+XRAY_PWORD="${password}"
+XRAY_PORT="${port}"
+XRAY_KEY="${public_key}"
+XRAY_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+}
+
+# SINGBOX END
+
 info() {
     echo -e "${Info} ${Green} $1 ${Font}"
 }
@@ -1945,6 +2098,32 @@ select_append_type() {
     info_return
 }
 
+singbox_select() {
+    echo -e "${Green}选择安装的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  vless-reality-h2-brutal${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc-brutal${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    mkdir -p ${singbox_path}
+    case $menu_num in
+    1)
+        singbox_vless_reality_h2
+        ;;
+    2)
+        singbox_vless_reality_grpc
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        ;;
+    esac
+}
+
 select_type() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
@@ -2016,6 +2195,7 @@ menu() {
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
+    echo -e "${Green}3)   一键安装 Singbox${Font}"
     echo -e "${Cyan}7)   插入 Xray 其他协议${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
     echo -e "${Yellow}9)   完全卸载${Font}"
@@ -2045,6 +2225,9 @@ menu() {
     ;;
     2)
     update_script
+    ;;
+    3)
+    singbox_onekey_install
     ;;
     7)
     select_append_type
