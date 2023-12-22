@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.4"
+version="v1.8.5"
 
 #fonts color
 Green="\033[32m"
@@ -73,6 +73,7 @@ singbox_install_url="https://sing-box.app/deb-install.sh"
 tcp_brutal_install_url="https://tcp.hy2.sh/"
 singbox_cfg="/etc/sing-box/config.json"
 singbox_path="/opt/singbox/"
+singbox_info="${singbox_path}singbox_info"
 
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
@@ -82,6 +83,7 @@ singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-one
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
+hysteria_info="${xray_path}hysteria_info"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
 web_path="${xray_path}webpage"
@@ -1619,11 +1621,11 @@ hysteria2_without_domain() {
 
     clash_config
     mkdir -p ${xray_path}
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+    cat>${hysteria_info}<<EOF
+HY_TYPE="${xray_type}"
+HY_ADDR="${domain}"
+HY_PWORD="${password}"
+HY_PORT="${port}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1648,11 +1650,11 @@ hysteria2_domain() {
     clash_config
 
     mkdir -p ${xray_path}
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
+    cat>${hysteria_info}<<EOF
+HY_TYPE="${xray_type}"
+HY_ADDR="${domain}"
+HY_PWORD="${password}"
+HY_PORT="${port}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1687,6 +1689,11 @@ singbox_install() {
     bash <(curl -fsSL $tcp_brutal_install_url)
 }
 
+singbox_uninstall() {
+    dpkg --remove sing-box
+    systemctl daemon-reload
+}
+
 singbox_vless_reality_h2() {
     password=$(xray uuid)
     set_port
@@ -1712,13 +1719,14 @@ singbox_vless_reality_h2() {
 
     clash_config
 
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
+
+    cat>${singbox_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${ip}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="${port}"
+SINGBOX_KEY="${public_key}"
+SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
 }
@@ -1748,13 +1756,13 @@ singbox_vless_reality_grpc() {
 
     clash_config
 
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
+    cat>${singbox_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${ip}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="${port}"
+SINGBOX_KEY="${public_key}"
+SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
 }
@@ -1783,14 +1791,14 @@ singbox_vless_reality_tcp() {
     systemctl enable sing-box
 
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
+    
+    cat>${singbox_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${ip}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="${port}"
+SINGBOX_KEY="${public_key}"
+SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
 }
@@ -1902,6 +1910,52 @@ show_info() {
     echo -e "------------------------------------------------"
 }
 
+show_hysteria_info() {
+    source ${hysteria_info}
+    judge "查看配置"
+    echo -e "${Green}协议:${Font} ${HY_TYPE}"
+    echo -e "${Green}地址:${Font} ${HY_ADDR}"
+    echo -e "${Green}密码:${Font} ${HY_PWORD}"
+    echo -e "${Green}端口:${Font} ${HY_PORT}"
+    echo -e "${Green}混淆:${Font} ${HY_OBFS}"
+    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
+    echo -e "${Green}PubKey(REALITY):${Font} ${HY_KEY}"
+    echo -e "${Green}分享链接:${Font} ${HY_LINK}"
+    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
+    echo -e "${Green}Clash配置:${Font}"
+    echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}QuantumultX配置:${Font}"
+    echo -e "${QX_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Outbounds配置:${Font}"
+    echo -e "${HY_OUTBOUND}"
+    echo -e "------------------------------------------------"
+}
+
+show_singbox_info() {
+    source ${singbox_info}
+    judge "查看配置"
+    echo -e "${Green}协议:${Font} ${SINGBOX_TYPE}"
+    echo -e "${Green}地址:${Font} ${SINGBOX_ADDR}"
+    echo -e "${Green}密码:${Font} ${SINGBOX_PWORD}"
+    echo -e "${Green}端口:${Font} ${SINGBOX_PORT}"
+    echo -e "${Green}混淆:${Font} ${SINGBOX_OBFS}"
+    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
+    echo -e "${Green}PubKey(REALITY):${Font} ${SINGBOX_KEY}"
+    echo -e "${Green}分享链接:${Font} ${SINGBOX_LINK}"
+    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
+    echo -e "${Green}Clash配置:${Font}"
+    echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}QuantumultX配置:${Font}"
+    echo -e "${QX_CONFIG}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Outbounds配置:${Font}"
+    echo -e "${SINGBOX_OUTBOUND}"
+    echo -e "------------------------------------------------"
+}
+
 server_check() {
 
     info "开始检测 Xray 服务"
@@ -1990,6 +2044,7 @@ uninstall() {
       uninstall_nginx
       uninstall_acme
       uninstall_hysteria2
+      singbox_uninstall
       echo -e "全部卸载已完成"
     ;;
     *)
@@ -2264,12 +2319,15 @@ menu() {
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   一键安装 Singbox${Font}"
-    echo -e "${Cyan}7)   插入 Xray 其他协议${Font}"
+    echo -e "${Cyan}6)   插入 Xray 其他协议${Font}"
+    echo -e "${Cyan}7)   Singbox 协议更换${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
     echo -e "${Yellow}9)   完全卸载${Font}"
     echo -e "${Purple}10)  配置文件路径${Font}"
-    echo -e "${Purple}11)  查看配置链接${Font}"
-    echo -e "${Green}12)  检测服务状态${Font}"
+    echo -e "${Purple}11)  查看 xray 配置链接${Font}"
+    echo -e "${Purple}12)  查看 hysteria 配置链接${Font}"
+    echo -e "${Purple}13)  查看 sing-box 配置链接${Font}"
+    echo -e "${Green}14)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
     echo -e "${Green}30)  一键安装 Hysteria${Font}"
@@ -2279,6 +2337,7 @@ menu() {
     echo -e "${Yellow}34)  卸载 Xray${Font}"
     echo -e "${Green}35)  安装 Nginx${Font}"
     echo -e "${Yellow}36)  卸载 Nginx${Font}"
+    echo -e "${Yellow}37)  卸载 Singbox${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
@@ -2297,15 +2356,19 @@ menu() {
     3)
     singbox_onekey_install
     ;;
-    7)
+    6)
     select_append_type
+    info_return 
+    ;;
+    7)
+    singbox_select
     info_return 
     ;;
     8)
     select_type
     info_return 
     ;;
-    39)
+    9)
     uninstall
     ;;
     10)
@@ -2315,6 +2378,12 @@ menu() {
     show_info
     ;;
     12)
+    show_hysteria_info
+    ;;
+    13)
+    show_singbox_info
+    ;;
+    14)
     server_check
     ;;
     20)
@@ -2343,6 +2412,9 @@ menu() {
     ;;
     36)
     uninstall_nginx
+    ;;
+    37)
+    singbox_uninstall
     ;;
     40)
     server_operation
