@@ -80,10 +80,12 @@ singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-on
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
 # SINGBOX URL END
 
+hysteria_info="${xray_path}hysteria_info"
+hysteria_cfg="/etc/hysteria/config.json"
+
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
-hysteria_info="${xray_path}hysteria_info"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
 web_path="${xray_path}webpage"
@@ -1862,7 +1864,9 @@ open_bbr() {
 }
 
 show_path() {
-    echo -e "${Green}xray配置文件地址:${Font} ${xray_cfg}"
+    echo -e "${Green}xray 配置文件地址:${Font} ${xray_cfg}"
+    echo -e "${Green}singbox 配置文件地址:${Font} ${singbox_cfg}"
+    echo -e "${Green}hysteria 配置文件地址:${Font} ${hysteria_cfg}"
     echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
     echo -e "${Green}分享链接文件地址:${Font} ${xray_info}"
 }
@@ -2080,6 +2084,43 @@ renew_ca() {
     read -rp "输入新的域名: " domain
     apply_certificate
     flush_certificate
+}
+
+singbox_operation() {
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  启动 Singbox${Font}"
+    echo -e "${Yellow}2)  关闭 Singbox${Font}"
+    echo -e "${Green}3)  重启 Singbox${Font}"
+    echo -e "${Green}4)  查看 Singbox 状态${Font}"
+    echo -e "${Green}9)  查看 Singbox 日志${Font}"
+    echo -e "${Red}q)  退出${Font}\n"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    read -rp "输入数字(回车确认): " opt_num
+    echo -e ""
+      case $opt_num in
+      1)
+          systemctl start sing-box
+          ;;
+      2)
+          systemctl stop sing-box
+          ;;
+      3)
+          systemctl restart sing-box
+          ;;
+      4)
+          systemctl status sing-box
+          ;;
+      9)
+          journalctl -u sing-box --output cat -f
+          ;;
+      q)
+          exit
+          ;;
+      *)
+          error "请输入正确的数字"
+          ;;
+      esac
+      singbox_operation
 }
 
 hysteria_operation() {
@@ -2333,11 +2374,12 @@ menu() {
     echo -e "${Green}30)  一键安装 Hysteria${Font}"
     echo -e "${Yellow}31)  卸载 Hysteria${Font}"
     echo -e "${Purple}32)  安装 / 更新 / 启动 Hysteria${Font}"
-    echo -e "${Green}33)  安装 / 更新 / 回退 Xray${Font}"
+    echo -e "${Purple}33)  安装 / 更新 / 回退 Xray${Font}"
     echo -e "${Yellow}34)  卸载 Xray${Font}"
     echo -e "${Green}35)  安装 Nginx${Font}"
     echo -e "${Yellow}36)  卸载 Nginx${Font}"
     echo -e "${Yellow}37)  卸载 Singbox${Font}"
+    echo -e "${Purple}38)  操作面板 Singbox${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
@@ -2415,6 +2457,9 @@ menu() {
     ;;
     37)
     singbox_uninstall
+    ;;
+    38)
+    singbox_operation
     ;;
     40)
     server_operation
