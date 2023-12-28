@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.5"
+version="v1.8.6"
 
 #fonts color
 Green="\033[32m"
@@ -155,16 +155,16 @@ get_system() {
 }
 
 adjust_date() {
-  info "正在调整时区"
-  apt install -y locales
-  echo "Asia/Shanghai" > /etc/timezone && \
-  dpkg-reconfigure -f noninteractive tzdata && \
-  sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-  echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
-  dpkg-reconfigure --frontend=noninteractive locales && \
-  update-locale LANG=en_US.UTF-8
-  echo "Asia/Shanghai" > /etc/timezone
-  judge "时区调整"
+#   info "正在调整时区"
+#   apt install -y locales
+#   echo "Asia/Shanghai" > /etc/timezone && \
+#   dpkg-reconfigure -f noninteractive tzdata && \
+#   sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+#   echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
+#   dpkg-reconfigure --frontend=noninteractive locales && \
+#   update-locale LANG=en_US.UTF-8
+#   echo "Asia/Shanghai" > /etc/timezone
+#   judge "时区调整"
 }
 
 function env_install() {
