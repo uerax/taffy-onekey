@@ -109,7 +109,7 @@ port="1919"
 install() {
     is_root
     get_system
-    adjust_date
+    # adjust_date
     env_install
     # increase_max_handle
     close_firewall
@@ -1578,7 +1578,7 @@ hysteria_install() {
 hysteria2() {
     is_root
     get_system
-    adjust_date
+    # adjust_date
     ${INS} curl
     judge "curl 安装"
 
@@ -1678,7 +1678,7 @@ set_port() {
 singbox_onekey_install() {
     is_root
     get_system
-    adjust_date
+    # adjust_date
     env_install
     close_firewall
     singbox_install
