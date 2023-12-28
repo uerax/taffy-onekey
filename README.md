@@ -15,7 +15,7 @@ bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/t
 __国内机器__
 
 ```
-wget -N --no-check-certificate -q -O taffy.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh" && chmod +x taffy.sh && bash taffy.sh
+wget -N --no-check-certificate -q -O taffy-cn.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh" && chmod +x taffy-cn.sh && bash taffy-cn.sh
 ```
 
 `一键安装 Xray`
