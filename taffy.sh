@@ -75,6 +75,8 @@ singbox_cfg="/etc/sing-box/config.json"
 singbox_path="/opt/singbox/"
 singbox_info="${singbox_path}singbox_info"
 
+singbox_outbound=""
+
 singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
@@ -1163,6 +1165,7 @@ XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
 XRAY_OUTBOUND="${outbound}"
+SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
 }
 
@@ -1275,6 +1278,7 @@ XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_config}"
 XRAY_OUTBOUND="${outbound}"
+SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
 }
 
@@ -1494,6 +1498,12 @@ trojan-outbound-config() {
         ]
     }
 }"
+    singbox_outbound="{
+    \"type\": \"trojan\",
+    \"server\": \"${ip}\",
+    \"server_port\": ${port},
+    \"password\": \"${password}\"
+}"
 }
 
 shadowsocket-2022-outbound-config() {
@@ -1509,6 +1519,13 @@ shadowsocket-2022-outbound-config() {
             }
         ]
     }
+}"
+    singbox_outbound="{
+    \"type\": \"shadowsocks\",
+    \"server\": \"${domain}\",
+    \"server_port\": ${port},
+    \"method\": \"${ss_method}\",
+    \"password\": \"${password}\"
 }"
 }
 
