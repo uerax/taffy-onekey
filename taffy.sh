@@ -1733,6 +1733,8 @@ singbox_hy2() {
 
     mv config.yaml ${singbox_cfg}
 
+    singbox_routing_set
+
     systemctl restart sing-box
     
     xray_type="hysteria2_nodomain"
