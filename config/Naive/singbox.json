@@ -1,0 +1,27 @@
+{
+    "route": {
+    },
+    "inbounds": [
+        {
+            "type": "naive",
+            "listen": "::",
+            "listen_port": 114514,
+            "users": [
+                {
+                    "username": "${username}",
+                    "password": "${password}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "certificate_path": "/etc/sing-box/server.crt",
+                "key_path": "/etc/sing-box/server.key"
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}

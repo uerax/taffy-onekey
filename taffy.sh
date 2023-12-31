@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.6"
+version="v1.8.7"
 
 #fonts color
 Green="\033[32m"
@@ -75,9 +75,12 @@ singbox_cfg="/etc/sing-box/config.json"
 singbox_path="/opt/singbox/"
 singbox_info="${singbox_path}singbox_info"
 
+singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
+
+singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
 
 hysteria_info="${xray_path}hysteria_info"
@@ -1696,6 +1699,58 @@ singbox_uninstall() {
     systemctl daemon-reload
 }
 
+singbox_routing_set() {
+    echo -e "是否配置sing-box Route路由"
+    read -rp "请输入(y/n): " set_routing
+    case $set_routing in
+    [yY])
+      wget -Nq ${singbox_route_url} -O uknow.tmp
+
+      sed -i '2 r uknow.tmp' ${singbox_cfg}
+
+      rm uknow.tmp
+      ;;
+    [nN])
+      ;;
+    *)
+      ;;
+    esac
+}
+
+singbox_hy2() {
+    set_port
+    ${INS} openssl
+    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/sing-box/server.key -out /etc/sing-box/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 /etc/sing-box/server*
+
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    domain=$(curl -s https://ip.me)
+
+    wget -N ${singbox_hysteria2_url} -O config.yaml
+
+    sed -i "s/\${password}/$password/" config.yaml
+    sed -i "s/\${domain}/$domain/" config.yaml
+    sed -i "s~114514~$port~" config.yaml
+
+    mv config.yaml ${singbox_cfg}
+
+    systemctl restart sing-box
+    
+    xray_type="hysteria2_nodomain"
+
+    clash_config
+
+    mkdir -p ${singbox_path}
+    
+    cat>${singbox_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${domain}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="${port}"
+CLASH_CONFIG="${clash_cfg}"
+EOF
+    info_return
+}
+
 singbox_vless_reality_h2() {
     password=$(xray uuid)
     set_port
@@ -1713,7 +1768,7 @@ singbox_vless_reality_h2() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
-    sed -i "s~11451~$port~" ${singbox_cfg}
+    sed -i "s~114514~$port~" ${singbox_cfg}
 
     systemctl restart sing-box
 
@@ -1750,7 +1805,7 @@ singbox_vless_reality_grpc() {
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
-    sed -i "s~11451~$port~" ${singbox_cfg}
+    sed -i "s~114514~$port~" ${singbox_cfg}
 
     systemctl restart sing-box
 
@@ -1786,7 +1841,7 @@ singbox_vless_reality_tcp() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
-    sed -i "s~11451~$port~" ${singbox_cfg}
+    sed -i "s~114514~$port~" ${singbox_cfg}
 
     systemctl restart sing-box 
 

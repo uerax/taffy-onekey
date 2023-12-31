@@ -1,0 +1,31 @@
+{
+    "route": {
+    },
+    "inbounds": [
+        {
+            "type": "hysteria2",
+            "listen": "::",
+            "listen_port": 114514,
+            "up_mbps": 100,
+            "down_mbps": 30,
+            "users": [
+                {
+                    "password": "${password}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "alpn": [
+                    "h3"
+                ],
+                "certificate_path": "/etc/sing-box/server.crt",
+                "key_path": "/etc/sing-box/server.key"
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}

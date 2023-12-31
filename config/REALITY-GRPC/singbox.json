@@ -1,9 +1,11 @@
 {
+    "route": {      
+    },
     "inbounds": [
         {
             "type": "vless",
             "listen": "::",
-            "listen_port": 11451,
+            "listen_port": 114514,
             "users": [
                 {
                     "uuid": "${password}",
