@@ -1771,13 +1771,13 @@ EOF
 }
 
 singbox_vless_reality_h2() {
-    password=$(xray uuid)
+    password=$(sing-box generate uuid)
     set_port
     port_check $port
 
     domain="www.fate-go.com.tw"
     xray_type="reality_h2_brutal"
-    keys=$(xray x25519)
+    keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
@@ -1808,12 +1808,12 @@ EOF
 }
 
 singbox_vless_reality_grpc() {
-    password=$(xray uuid)
+    password=$(sing-box generate uuid)
     set_port
     port_check $port
 
     xray_type="reality_grpc_brutal"
-    keys=$(xray x25519)
+    keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
@@ -1844,13 +1844,13 @@ EOF
 }
 
 singbox_vless_reality_tcp() {
-    password=$(xray uuid)
+    password=$(sing-box generate uuid)
     set_port
     port_check $port
 
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp_brutal"
-    keys=$(xray x25519)
+    keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
