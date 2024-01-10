@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.8"
+version="v1.8.9"
 
 #fonts color
 Green="\033[32m"
@@ -114,10 +114,12 @@ port="1919"
 install() {
     is_root
     get_system
-    # adjust_date
-    env_install
-    # increase_max_handle
-    close_firewall
+    if ! command -v xray >/dev/null 2>&1; then
+        # adjust_date
+        env_install
+        # increase_max_handle
+        close_firewall
+    fi
     xray_install
     xray_configure
     select_type
@@ -1698,9 +1700,11 @@ set_port() {
 singbox_onekey_install() {
     is_root
     get_system
-    # adjust_date
-    env_install
-    close_firewall
+    if ! command -v sing-box >/dev/null 2>&1; then
+        # adjust_date
+        env_install
+        close_firewall
+    fi
     singbox_install
     singbox_select
     info_return
@@ -2167,6 +2171,7 @@ singbox_operation() {
     echo -e "${Green}3)  重启 Singbox${Font}"
     echo -e "${Green}4)  查看 Singbox 状态${Font}"
     echo -e "${Green}9)  查看 Singbox 日志${Font}"
+    echo -e "${Green}10)  升级 Singbox ${Font}"
     echo -e "${Red}q)  退出${Font}\n"
     echo -e "${Purple}-------------------------------- ${Font}"
     read -rp "输入数字(回车确认): " opt_num
@@ -2186,6 +2191,9 @@ singbox_operation() {
           ;;
       9)
           journalctl -u sing-box --output cat -f
+          ;;
+      10)
+          bash <(curl -fsSL $singbox_install_url)
           ;;
       q)
           exit
@@ -2457,7 +2465,7 @@ menu() {
     echo -e "${Green}35)  安装 Nginx${Font}"
     echo -e "${Yellow}36)  卸载 Nginx${Font}"
     echo -e "${Yellow}37)  卸载 Singbox${Font}"
-    echo -e "${Purple}38)  操作面板 Singbox${Font}"
+    echo -e "${Purple}38)  Singbox 操作面板${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
