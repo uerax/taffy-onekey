@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.0"
+version="v1.9.1"
 
 #fonts color
 Green="\033[32m"
@@ -2248,6 +2248,29 @@ xray_upgrade() {
     
 }
 
+nginx_select() {
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  安装 Nginx${Font}"
+    echo -e "${Yellow}2)  卸载 Nginx${Font}"
+    echo -e "${Red}q)  退出${Font}\n"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    read -rp "输入数字(回车确认): " opt_num
+    echo -e ""
+    case $opt_num in
+    1)
+    nginx_install
+    ;;
+    2)
+    uninstall_nginx
+    ;;
+    q)
+    ;;
+    *)
+    error "请输入正确的数字"
+    ;;
+    esac
+}
+
 uninstall_nginx() {
     info "Nginx 卸载"
     apt purge -y nginx nginx-common nginx-core
@@ -2328,7 +2351,8 @@ singbox_operation() {
     echo -e "${Green}3)  重启 Singbox${Font}"
     echo -e "${Green}4)  查看 Singbox 状态${Font}"
     echo -e "${Green}9)  查看 Singbox 日志${Font}"
-    echo -e "${Green}10)  升级 Singbox ${Font}"
+    echo -e "${Green}10) 升级 Singbox ${Font}"
+    echo -e "${Yellow}99) 卸载 Singbox ${Font}"
     echo -e "${Red}q)  退出${Font}\n"
     echo -e "${Purple}-------------------------------- ${Font}"
     read -rp "输入数字(回车确认): " opt_num
@@ -2352,6 +2376,9 @@ singbox_operation() {
       10)
           bash <(curl -fsSL $singbox_install_url)
           ;;
+      99)
+          singbox_uninstall
+          ;;
       q)
           exit
           ;;
@@ -2359,7 +2386,6 @@ singbox_operation() {
           error "请输入正确的数字"
           ;;
       esac
-      singbox_operation
 }
 
 hysteria_operation() {
@@ -2671,16 +2697,13 @@ menu() {
     echo -e "${Purple}10)  配置文件路径${Font}"
     echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
     echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
-    echo -e "${Green}13)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
     echo -e "${Green}30)  Hysteria 操作合集${Font}"
     echo -e "${Purple}31)  安装 / 更新 / 回退 Xray${Font}"
     echo -e "${Yellow}32)  卸载 Xray${Font}"
-    echo -e "${Green}33)  安装 Nginx${Font}"
-    echo -e "${Yellow}34)  卸载 Nginx${Font}"
-    echo -e "${Yellow}35)  卸载 Singbox${Font}"
-    echo -e "${Purple}36)  Singbox 操作面板${Font}"
+    echo -e "${Purple}33)  Singbox 操作面板${Font}"
+    echo -e "${Green}34)  安装 / 卸载 Nginx${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
@@ -2725,9 +2748,6 @@ menu() {
     12)
     show_singbox_info
     ;;
-    13)
-    server_check
-    ;;
     20)
     update_web
     ;;
@@ -2744,16 +2764,10 @@ menu() {
     uninstall_xray
     ;;
     33)
-    nginx_install
+    singbox_operation
     ;;
     34)
-    uninstall_nginx
-    ;;
-    35)
-    singbox_uninstall
-    ;;
-    36)
-    singbox_operation
+    nginx_select
     ;;
     40)
     server_operation
