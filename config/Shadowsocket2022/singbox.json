@@ -1,0 +1,20 @@
+{
+    "route": {},
+    "inbounds": [
+        {
+            "type": "shadowsocks",
+            "listen": "::",
+            "listen_port": 114514,
+            "method": "${method}",
+            "password": "${password}",
+            "multiplex": {
+                "enabled": true
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}
