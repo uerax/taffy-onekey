@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.12"
+version="v1.9.0"
 
 #fonts color
 Green="\033[32m"
@@ -2092,7 +2092,9 @@ show_path() {
 }
 
 info_return() {
-    echo -e "${Green}安装成功!${Font}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}安装成功!!!!!!!!${Font}"
+    echo -e "------------------------------------------------"
     echo -e "${Green}链接:${Font} ${link}"
     echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "${Green}密码为:${Font} ${password}"
@@ -2116,7 +2118,9 @@ info_return() {
 
 show_info() {
     source ${xray_info}
+    echo -e "------------------------------------------------"
     judge "查看配置"
+    echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
     echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
     echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
@@ -2126,8 +2130,6 @@ show_info() {
     echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
     echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
     echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
     echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置:${Font}"
     echo -e "${QX_CONFIG}"
@@ -2135,11 +2137,16 @@ show_info() {
     echo -e "${Green}Outbounds配置:${Font}"
     echo -e "${XRAY_OUTBOUND}"
     echo -e "------------------------------------------------"
+    echo -e "${Green}Clash配置:${Font}"
+    echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
 }
 
 show_hysteria_info() {
     source ${hysteria_info}
+    echo -e "------------------------------------------------"
     judge "查看配置"
+    echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${HY_TYPE}"
     echo -e "${Green}地址:${Font} ${HY_ADDR}"
     echo -e "${Green}密码:${Font} ${HY_PWORD}"
@@ -2149,8 +2156,6 @@ show_hysteria_info() {
     echo -e "${Green}PubKey(REALITY):${Font} ${HY_KEY}"
     echo -e "${Green}分享链接:${Font} ${HY_LINK}"
     echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
     echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置:${Font}"
     echo -e "${QX_CONFIG}"
@@ -2158,11 +2163,16 @@ show_hysteria_info() {
     echo -e "${Green}Outbounds配置:${Font}"
     echo -e "${HY_OUTBOUND}"
     echo -e "------------------------------------------------"
+    echo -e "${Green}Clash配置:${Font}"
+    echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
 }
 
 show_singbox_info() {
     source ${singbox_info}
+    echo -e "------------------------------------------------"
     judge "查看配置"
+    echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${SINGBOX_TYPE}"
     echo -e "${Green}地址:${Font} ${SINGBOX_ADDR}"
     echo -e "${Green}密码:${Font} ${SINGBOX_PWORD}"
@@ -2172,15 +2182,17 @@ show_singbox_info() {
     echo -e "${Green}PubKey(REALITY):${Font} ${SINGBOX_KEY}"
     echo -e "${Green}分享链接:${Font} ${SINGBOX_LINK}"
     echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
     echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置:${Font}"
     echo -e "${QX_CONFIG}"
     echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
+    echo -e "${Green}Singbox Outbounds配置:${Font}"
     echo -e "${SINGBOX_OUTBOUND}"
     echo -e "------------------------------------------------"
+    echo -e "${Green}Clash配置:${Font}"
+    echo -e "${CLASH_CONFIG}"
+    echo -e "------------------------------------------------"
+
 }
 
 server_check() {
@@ -2546,6 +2558,39 @@ singbox_select() {
     esac
 }
 
+hysteria_select() {
+    echo -e "${Green}Hysteria 相关操作 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  一键安装 Hysteria${Font}"
+    echo -e "${Yellow}2)  卸载 Hysteria${Font}"
+    echo -e "${Purple}3)  安装 / 更新 / 启动 Hysteria${Font}"
+    echo -e "${Purple}4)  查看 hysteria 配置链接${Font}"
+    echo -e "${Red}q)   退出${Font}"
+    echo -e "${Cyan}————————————————————————————————————————${Font}\n"
+
+    read -rp "输入数字(回车确认)：" menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+    hysteria2
+    ;;
+    2)
+    uninstall_hysteria2
+    ;;
+    3)
+    hysteria_operation
+    ;;
+    4)
+    show_hysteria_info
+    ;;
+    q)
+    ;;
+    *)
+    error "请输入正确的数字"
+    ;;
+    esac
+}
+
 select_type() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
@@ -2624,21 +2669,18 @@ menu() {
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
     echo -e "${Yellow}9)   完全卸载${Font}"
     echo -e "${Purple}10)  配置文件路径${Font}"
-    echo -e "${Purple}11)  查看 xray 配置链接${Font}"
-    echo -e "${Purple}12)  查看 hysteria 配置链接${Font}"
-    echo -e "${Purple}13)  查看 sing-box 配置链接${Font}"
-    echo -e "${Green}14)  检测服务状态${Font}"
+    echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
+    echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
+    echo -e "${Green}13)  检测服务状态${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
-    echo -e "${Green}30)  一键安装 Hysteria${Font}"
-    echo -e "${Yellow}31)  卸载 Hysteria${Font}"
-    echo -e "${Purple}32)  安装 / 更新 / 启动 Hysteria${Font}"
-    echo -e "${Purple}33)  安装 / 更新 / 回退 Xray${Font}"
-    echo -e "${Yellow}34)  卸载 Xray${Font}"
-    echo -e "${Green}35)  安装 Nginx${Font}"
-    echo -e "${Yellow}36)  卸载 Nginx${Font}"
-    echo -e "${Yellow}37)  卸载 Singbox${Font}"
-    echo -e "${Purple}38)  Singbox 操作面板${Font}"
+    echo -e "${Green}30)  Hysteria 操作合集${Font}"
+    echo -e "${Purple}31)  安装 / 更新 / 回退 Xray${Font}"
+    echo -e "${Yellow}32)  卸载 Xray${Font}"
+    echo -e "${Green}33)  安装 Nginx${Font}"
+    echo -e "${Yellow}34)  卸载 Nginx${Font}"
+    echo -e "${Yellow}35)  卸载 Singbox${Font}"
+    echo -e "${Purple}36)  Singbox 操作面板${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
@@ -2681,12 +2723,9 @@ menu() {
     show_info
     ;;
     12)
-    show_hysteria_info
-    ;;
-    13)
     show_singbox_info
     ;;
-    14)
+    13)
     server_check
     ;;
     20)
@@ -2696,30 +2735,24 @@ menu() {
     renew_ca
     ;;
     30)
-    hysteria2
+    hysteria_select
     ;;
     31)
-    uninstall_hysteria2
-    ;;
-    32)
-    hysteria_operation
-    ;;
-    33)
     xray_upgrade
     ;;
-    34)
+    32)
     uninstall_xray
     ;;
-    35)
+    33)
     nginx_install
     ;;
-    36)
+    34)
     uninstall_nginx
     ;;
-    37)
+    35)
     singbox_uninstall
     ;;
-    38)
+    36)
     singbox_operation
     ;;
     40)
