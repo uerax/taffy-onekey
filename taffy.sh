@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.10"
+version="v1.8.11"
 
 #fonts color
 Green="\033[32m"
@@ -76,6 +76,9 @@ singbox_path="/opt/singbox/"
 singbox_info="${singbox_path}singbox_info"
 
 singbox_outbound=""
+
+singbox_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/singbox.json"
+singbox_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/singbox_ap.json"
 
 singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
@@ -1883,6 +1886,145 @@ CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
+singbox_shadowsocket() {
+    
+    encrypt=4
+    ss_method="aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(sing-box generate rand 16 --base64)
+      ;;
+    2)
+      password=$(sing-box generate rand 32 --base64)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(sing-box generate rand 32 --base64)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="xchacha20-ietf-poly1305"
+      ;;
+    *)
+      password=$(sing-box generate rand 16 --base64)
+      ;;
+    esac
+
+    wget -N ${singbox_ss_config_url} -O config.json
+    sed -i "s~\${method}~$ss_method~" config.json
+    sed -i "s~\${password}~$password~" config.json
+    sed -i "s~114514~$port~" config.json
+    mv config.json ${singbox_cfg}
+    systemctl restart sing-box && systemctl enable sing-box
+
+    tmp="${ss_method}:${password}"
+    tmp=$( base64 <<< $tmp)
+    domain=`curl ipinfo.io/ip`
+    link="ss://$tmp@${domain}:${port}"
+
+    xray_type="shadowsocket2022"
+    shadowsocket-2022-outbound-config
+    clash_config
+    qx_config
+
+    cat>${singbox_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${domain}"
+SINGBOX_METHOD="${ss_method}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="${port}"
+SINGBOX_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_config}"
+XRAY_OUTBOUND="${outbound}"
+SINGBOX_OUTBOUND="${singbox_outbound}"
+EOF
+}
+
+singbox_shadowsocket_append() {
+    encrypt=4
+    ss_method="aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(sing-box generate rand 16 --base64)
+      ;;
+    2)
+      password=$(sing-box generate rand 32 --base64)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(sing-box generate rand 32 --base64)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(sing-box generate rand 16 --base64)
+      ss_method="xchacha20-ietf-poly1305"
+      ;;
+    *)
+      password=$(sing-box generate rand 16 --base64)
+      ;;
+    esac
+
+    wget -Nq ${singbox_ss_append_config_url} -O append.tmp
+
+    sed -i "s~\${password}~$password~" append.tmp
+    sed -i "s~\${method}~$ss_method~" append.tmp
+    sed -i "s~114514~$port~" append.tmp
+    echo "," >> append.tmp
+
+    sed -i '/inbounds/ r append.tmp' ${singbox_cfg}
+    rm append.tmp
+
+    systemctl restart sing-box && systemctl enable sing-box
+
+    tmp="${ss_method}:${password}"
+    tmp=$( base64 <<< $tmp)
+    domain=`curl ipinfo.io/ip`
+    link="ss://$tmp@${domain}:${port}"
+
+    xray_type="shadowsocket2022"
+    shadowsocket-2022-outbound-config
+    clash_config
+    qx_config
+}
+
 # SINGBOX END
 
 info() {
@@ -2340,13 +2482,37 @@ select_append_type() {
     info_return
 }
 
+select_singbox_append_type() {
+    echo -e "${Green}选择要插入的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  shadowsocket-2022${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    mkdir -p ${singbox_path}
+    case $menu_num in
+    1)
+        singbox_shadowsocket_append
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        ;;
+    esac
+    info_return
+}
+
 singbox_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  hysteria2${Font}"
     echo -e "${Green}2)  vless-reality-tcp-brutal${Font}"
-    #echo -e "${Green}3)  vless-reality-h2-brutal${Font}"
-    #echo -e "${Green}4)  vless-reality-grpc-brutal${Font}"
+    echo -e "${Green}3)  shadowsocket${Font}"
+    #echo -e "${Green}4)  vless-reality-h2-brutal${Font}"
+    #echo -e "${Green}5)  vless-reality-grpc-brutal${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2360,9 +2526,12 @@ singbox_select() {
         singbox_vless_reality_tcp
         ;;
     3)
-        singbox_vless_reality_h2
+        singbox_shadowsocket
         ;;
     4)
+        singbox_vless_reality_h2
+        ;;
+    5)
         singbox_vless_reality_grpc
         ;;
     q)
@@ -2446,6 +2615,7 @@ menu() {
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   一键安装 Singbox${Font}"
+    echo -e "${Cyan}5)   插入 Singbox 其他协议${Font}"
     echo -e "${Cyan}6)   插入 Xray 其他协议${Font}"
     echo -e "${Cyan}7)   Singbox 协议更换${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
@@ -2484,9 +2654,11 @@ menu() {
     3)
     singbox_onekey_install
     ;;
+    5)
+    select_singbox_append_type
+    ;;
     6)
     select_append_type
-    info_return 
     ;;
     7)
     singbox_select

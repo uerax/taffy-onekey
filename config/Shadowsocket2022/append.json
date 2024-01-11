@@ -1,11 +1,11 @@
-{
-    "port": "${port}",
-    "protocol": "shadowsocks",
-    "settings": {
-        "method": "${method}",
-        "password": "${password}",
-        "level": 0,
-        "email": "love@xray.com",
-        "network": "udp,tcp"
-    }
-}
+        {
+            "port": "${port}",
+            "protocol": "shadowsocks",
+            "settings": {
+                "method": "${method}",
+                "password": "${password}",
+                "level": 0,
+                "email": "love@xray.com",
+                "network": "udp,tcp"
+            }
+        }
