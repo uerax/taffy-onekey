@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.9"
+version="v1.8.10"
 
 #fonts color
 Green="\033[32m"
@@ -1782,8 +1782,8 @@ singbox_vless_reality_h2() {
     domain="www.fate-go.com.tw"
     xray_type="reality_h2_brutal"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
@@ -1818,8 +1818,8 @@ singbox_vless_reality_grpc() {
 
     xray_type="reality_grpc_brutal"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
@@ -1855,8 +1855,8 @@ singbox_vless_reality_tcp() {
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp_brutal"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
