@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.8.11"
+version="v1.8.12"
 
 #fonts color
 Green="\033[32m"
@@ -1899,7 +1899,7 @@ singbox_shadowsocket() {
     echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
     echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
     echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+    read -rp "选择加密方法(默认为4)：" encrypt
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
@@ -1972,7 +1972,7 @@ singbox_shadowsocket_append() {
     echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
     echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
     echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+    read -rp "选择加密方法(默认为4)：" encrypt
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
@@ -2098,14 +2098,17 @@ info_return() {
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
     echo -e "------------------------------------------------"
-    echo -e "${Green}Clash配置: ${Font}"
-    echo -e "${clash_cfg}"
-    echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置: ${Font}"
     echo -e "${qx_cfg}"
     echo -e "------------------------------------------------"
     echo -e "${Green}Outbounds配置:${Font}"
     echo -e "${outbound}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Singbox Outbounds配置:${Font}"
+    echo -e "${singbox_outbound}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Clash配置: ${Font}"
+    echo -e "${clash_cfg}"
     echo -e "------------------------------------------------"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
