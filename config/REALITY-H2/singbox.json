@@ -30,15 +30,6 @@
             },
             "transport": {
                 "type": "http"
-            },
-            "multiplex": {
-                "enabled": true,
-                "padding": true,
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 100,
-                    "down_mbps": 30
-                }
             }
         }
     ],

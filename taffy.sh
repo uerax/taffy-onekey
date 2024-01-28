@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.1"
+version="v1.9.3"
 
 #fonts color
 Green="\033[32m"
@@ -1715,7 +1715,6 @@ singbox_onekey_install() {
 
 singbox_install() {
     bash <(curl -fsSL $singbox_install_url)
-    bash <(curl -fsSL $tcp_brutal_install_url)
 }
 
 singbox_uninstall() {
@@ -1783,7 +1782,7 @@ singbox_vless_reality_h2() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_h2_brutal"
+    xray_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1819,7 +1818,7 @@ singbox_vless_reality_grpc() {
     set_port
     port_check $port
 
-    xray_type="reality_grpc_brutal"
+    xray_type="reality_grpc"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1850,10 +1849,11 @@ CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
-singbox_vless_reality_tcp() {
+singbox_vless_reality_tcp_brutal() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
+    bash <(curl -fsSL $tcp_brutal_install_url)
 
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp_brutal"
@@ -2551,9 +2551,9 @@ singbox_select() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  hysteria2${Font}"
     echo -e "${Green}2)  vless-reality-tcp-brutal${Font}"
-    echo -e "${Green}3)  shadowsocket${Font}"
-    #echo -e "${Green}4)  vless-reality-h2-brutal${Font}"
-    #echo -e "${Green}5)  vless-reality-grpc-brutal${Font}"
+    echo -e "${Green}3)  vless-reality-grpc${Font}"
+    echo -e "${Green}4)  vless-reality-h2${Font}"
+    echo -e "${Green}5)  shadowsocket${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2564,16 +2564,16 @@ singbox_select() {
         singbox_hy2
         ;;
     2)
-        singbox_vless_reality_tcp
+        singbox_vless_reality_tcp_brutal
         ;;
     3)
-        singbox_shadowsocket
+        singbox_vless_reality_grpc
         ;;
     4)
         singbox_vless_reality_h2
         ;;
     5)
-        singbox_vless_reality_grpc
+        singbox_shadowsocket
         ;;
     q)
         exit
