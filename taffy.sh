@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.3"
+version="v1.9.4"
 
 #fonts color
 Green="\033[32m"
@@ -2488,7 +2488,6 @@ select_append_type() {
     echo -e "${Green}3)  socks5${Font}"
     echo -e "${Cyan}4)  vless-reality-tcp${Font}"
     echo -e "${Cyan}5)  vless-reality-grpc${Font}"
-    echo -e "${Cyan}6)  vless-reality-h2${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2509,9 +2508,6 @@ select_append_type() {
         ;;
     5)
         vless_reality_grpc_append
-        ;;
-    6)
-        vless_reality_h2_append
         ;;
     q)
         exit
