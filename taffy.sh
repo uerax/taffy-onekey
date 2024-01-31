@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.5"
+version="v1.9.6"
 
 #fonts color
 Green="\033[32m"
@@ -786,7 +786,7 @@ vless_reality_grpc() {
     systemctl enable xray
 
     clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -828,7 +828,7 @@ vless_reality_grpc_append() {
 
     vless-reality-grpc-outbound-config
     systemctl restart xray 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
 }
 
@@ -1851,7 +1851,7 @@ singbox_vless_reality_grpc() {
 
     systemctl enable sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
 
     clash_config
 
@@ -2114,10 +2114,10 @@ info_return() {
     echo -e "------------------------------------------------"
     echo -e "${Green}安装成功!!!!!!!!${Font}"
     echo -e "------------------------------------------------"
-    echo -e "${Green}链接:${Font} ${link}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
+    echo -e "${Green}链接:${Font} ${link}"
+    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
     echo -e "------------------------------------------------"
     echo -e "${Green}QuantumultX配置: ${Font}"
     echo -e "${qx_cfg}"
