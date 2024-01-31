@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.6"
+version="v1.9.7"
 
 #fonts color
 Green="\033[32m"
@@ -1834,6 +1834,7 @@ singbox_vless_reality_grpc() {
     port_check $port
 
     xray_type="reality_grpc"
+    domain="www.fate-go.com.tw"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
