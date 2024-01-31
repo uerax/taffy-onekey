@@ -18,6 +18,12 @@ __国内机器__
 wget -N --no-check-certificate -q -O taffy-cn.sh "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh" && chmod +x taffy-cn.sh && bash taffy-cn.sh
 ```
 
+`一键安装 Singbox`
+
+```
+bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ singbox
+```
+
 `一键安装 Xray`
 
 ```
