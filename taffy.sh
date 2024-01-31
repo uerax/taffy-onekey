@@ -124,6 +124,10 @@ install() {
         close_firewall
     fi
     xray_install
+    if ! command -v xray >/dev/null 2>&1; then
+        echo -e "${Red}Xray 安装失败!!!${Font}"
+        exit 1
+    fi
     xray_configure
     select_type
     info_return
@@ -1645,6 +1649,7 @@ hysteria2_without_domain() {
     systemctl enable hysteria-server.service
     
     xray_type="hysteria2_nodomain"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
     clash_config
     mkdir -p ${xray_path}
@@ -1653,6 +1658,7 @@ HY_TYPE="${xray_type}"
 HY_ADDR="${domain}"
 HY_PWORD="${password}"
 HY_PORT="${port}"
+HY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1682,6 +1688,7 @@ HY_TYPE="${xray_type}"
 HY_ADDR="${domain}"
 HY_PWORD="${password}"
 HY_PORT="${port}"
+HY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1708,7 +1715,12 @@ singbox_onekey_install() {
         env_install
         close_firewall
     fi
+    if ! command -v sing-box >/dev/null 2>&1; then
+        echo -e "${Red}sing-box 安装失败!!!${Font}"
+        exit 1
+    fi
     singbox_install
+    
     singbox_select
     info_return
 }
@@ -1761,6 +1773,7 @@ singbox_hy2() {
     systemctl restart sing-box
     
     xray_type="hysteria2_nodomain"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
     clash_config
 
@@ -1771,6 +1784,7 @@ SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
+SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
     info_return
@@ -1799,8 +1813,9 @@ singbox_vless_reality_h2() {
 
     systemctl enable sing-box
 
-    clash_config
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
 
+    clash_config
 
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
@@ -1835,6 +1850,8 @@ singbox_vless_reality_grpc() {
     systemctl restart sing-box
 
     systemctl enable sing-box
+
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
     clash_config
 
@@ -1872,6 +1889,8 @@ singbox_vless_reality_tcp_brutal() {
     systemctl restart sing-box 
 
     systemctl enable sing-box
+
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
     
