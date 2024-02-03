@@ -69,7 +69,7 @@ hysteria2_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/maste
 hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
 
 # SINGBOX URL START
-singbox_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-sing-box.sh"
+singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-sing-box.sh"
 tcp_brutal_install_url="https://tcp.hy2.sh/"
 singbox_cfg="/etc/sing-box/config.json"
 singbox_path="/opt/singbox/"
