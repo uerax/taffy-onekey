@@ -122,8 +122,8 @@ install() {
         env_install
         # increase_max_handle
         close_firewall
+        xray_install
     fi
-    xray_install
     if ! command -v xray >/dev/null 2>&1; then
         echo -e "${Red}Xray 安装失败!!!${Font}"
         exit 1
