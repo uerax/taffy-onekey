@@ -1714,13 +1714,12 @@ singbox_onekey_install() {
         # adjust_date
         env_install
         close_firewall
+        singbox_install
     fi
     if ! command -v sing-box >/dev/null 2>&1; then
         echo -e "${Red}sing-box 安装失败!!!${Font}"
         exit 1
     fi
-    singbox_install
-    
     singbox_select
     info_return
 }
