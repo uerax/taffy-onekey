@@ -130,7 +130,6 @@ install() {
     fi
     xray_configure
     select_type
-    info_return
 }
 
 is_root() {
@@ -1721,7 +1720,6 @@ singbox_onekey_install() {
         exit 1
     fi
     singbox_select
-    info_return
 }
 
 singbox_install() {
@@ -2565,7 +2563,7 @@ singbox_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  hysteria2${Font}"
-    echo -e "${Green}2)  vless-reality-tcp-brutal${Font}"
+    echo -e "${Green}2)  vless-reality-tcp-brutal(效果不佳)${Font}"
     echo -e "${Green}3)  vless-reality-grpc${Font}"
     echo -e "${Green}4)  vless-reality-h2${Font}"
     echo -e "${Green}5)  shadowsocket${Font}"
@@ -2595,8 +2593,10 @@ singbox_select() {
         ;;
     *)
         error "请输入正确的数字"
+        exit
         ;;
     esac
+    info_return
 }
 
 hysteria_select() {
@@ -2692,6 +2692,7 @@ select_type() {
         error "请输入正确的数字"
         ;;
     esac
+    info_return
 }
 
 menu() {
@@ -2744,12 +2745,10 @@ menu() {
     select_append_type
     ;;
     7)
-    singbox_select
-    info_return 
+    singbox_select 
     ;;
     8)
     select_type
-    info_return 
     ;;
     9)
     uninstall
