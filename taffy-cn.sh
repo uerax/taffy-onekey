@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v1.7.39"
+version="v1.7.40"
 
 #fonts color
 Green="\033[32m"
@@ -280,6 +280,7 @@ if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keyle
   sleep 2
   mkdir -p ${ca_path}
   /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
+  nginx -s reload
 else
   exit 1
 fi
