@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.10"
+version="v1.9.11"
 
 #fonts color
 Green="\033[32m"
@@ -232,7 +232,7 @@ close_firewall() {
 nginx_install() {
     # 判断是否有 nginx 命令
     if ! command -v nginx >/dev/null 2>&1; then
-        ${INS} nginx
+        ${INS} nginx cron
         judge "Nginx 安装"
     else
         ok "Nginx 已存在"
@@ -1060,7 +1060,7 @@ vless_grpc() {
     password=$(xray uuid)
 
     wget -N ${vless_grpc_config_url} -O ${xray_cfg}
-    sed -i "s/\${password}/$password/" ${xray_cfg}
+    sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
     routing_set
@@ -1071,9 +1071,9 @@ vless_grpc() {
 
     wget -N ${vless_grpc_nginx_url} -O ${nginx_cfg}
 
-    sed -i "s/\${domain}/$domain/" ${nginx_cfg}
-    sed -i "s/\${web_path}/$web_path/" ${nginx_cfg}
-    sed -i "s/\${web_dir}/$web_dir/" ${nginx_cfg}
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
     sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
     sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
 
