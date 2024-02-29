@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.11"
+version="v1.9.12"
 
 #fonts color
 Green="\033[32m"
@@ -1073,6 +1073,8 @@ vless_grpc() {
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
     sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
     sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
     sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
