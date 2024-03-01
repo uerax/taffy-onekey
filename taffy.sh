@@ -2629,6 +2629,7 @@ singbox_select() {
     echo -e "${Green}3)  vless-reality-grpc${Font}"
     echo -e "${Green}4)  vless-reality-h2${Font}"
     echo -e "${Green}5)  shadowsocket${Font}"
+    echo -e "${Green}6)  vmess-tls-ws${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2649,6 +2650,9 @@ singbox_select() {
         ;;
     5)
         singbox_shadowsocket
+        ;;
+    6)
+        singbox_vmess_ws_tls
         ;;
     q)
         exit
