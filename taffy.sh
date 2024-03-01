@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.9.12"
+version="v1.10.1"
 
 #fonts color
 Green="\033[32m"
@@ -84,6 +84,7 @@ singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/mast
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
+singbox_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/singbox.json"
 
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
@@ -96,12 +97,12 @@ xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
-web_path="${xray_path}webpage"
 web_dir="blog-main"
 xray_type=""
-ca_path="${xray_path}xray_cert"
-ca_crt="${xray_path}xray_cert/xray.crt"
-ca_key="${xray_path}xray_cert/xray.key"
+web_path="/opt/web"
+ca_path="/opt/cert"
+ca_crt="${ca_path}/xray.crt"
+ca_key="${ca_path}/xray.key"
 ws_path="crayfish"
 ss_method=""
 
@@ -259,7 +260,8 @@ domain_handle() {
     echo -e "------------------------------------------"
     read -rp "输入你的域名(eg: example.com): " domain
     ok "正在获取 IP 地址信息"
-    parse_ipv4=$(curl -sm8 ipget.net/?"${domain}")
+    ${INS} dnsutils
+    parse_ipv4=$(dig +short ${domain})
     local_ipv4=$(curl -s4m8 https://ifconfig.co)
     if [[ ${parse_ipv4} == "${local_ipv4}" ]]; then
         ok "域名ip解析通过"
@@ -317,7 +319,6 @@ if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keyle
   sleep 2
   mkdir -p ${ca_path}
   /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
-  nginx -s reload
 else
   exit 1
 fi
@@ -327,8 +328,7 @@ echo "Xray Certificates Renewed"
 chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
-sudo systemctl restart xray
-sudo service nginx restart
+service nginx restart
 echo "Xray Restarted"
 EOF
 
@@ -1905,6 +1905,65 @@ SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 EOF
 }
+
+singbox_vmess_ws_tls() {
+    port_check 80
+    port_check 443
+    nginx_install
+    domain_handle
+    apply_certificate
+    flush_certificate
+
+    xray_type="vmess_ws"
+    password=$(xray uuid)
+
+    wget -N ${singbox_vmess_ws_config_url} -O ${xray_cfg}
+
+    sed -i "s~114514~$port~" ${xray_cfg}
+    sed -i "s~\${password}~$password~" ${xray_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+
+    singbox_routing_set
+
+    systemctl restart xray
+    
+    systemctl enable xray
+
+    sleep 3
+
+    wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
+
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
+    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
+    sed -i "s~\${port}~$port~" ${nginx_cfg}
+
+    service nginx restart
+
+    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
+    encode_link=$(base64 <<< $tmp)
+    link="vmess://$encode_link"
+
+    clash_config
+    qx_config
+
+    cat>${xray_info}<<EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${domain}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="443"
+SINGBOX_OBFS="websocket"
+OBFS_PATH="${ws_path}"
+SINGBOX_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
+SINGBOX_OUTBOUND="${outbound}"
+EOF
+}
+
 
 singbox_shadowsocket() {
     

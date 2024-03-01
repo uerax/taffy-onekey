@@ -1,0 +1,30 @@
+{
+    "route": {
+    },
+    "inbounds": [
+        {
+            "type": "vmess",
+            "listen": "::",
+            "listen_port": 114514,
+            "sniff": true,
+            "sniff_override_destination": true,
+            "users": [
+               {
+                  "uuid": "${password}",
+                  "alterId": 0
+               }
+            ],
+            "transport":{
+               "type": "ws",
+               "path": "${ws_path}",
+               "max_early_data": 2048,
+               "early_data_header_name": "Sec-WebSocket-Protocol"
+            }
+         }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}
