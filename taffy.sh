@@ -113,7 +113,7 @@ INS="apt install -y"
 password=""
 domain=""
 link=""
-port="1919"
+port="1991"
 
 install() {
     is_root
@@ -257,10 +257,10 @@ update_web() {
 }
 
 domain_handle() {
+    ${INS} dnsutils
     echo -e "------------------------------------------"
     read -rp "输入你的域名(eg: example.com): " domain
     ok "正在获取 IP 地址信息"
-    ${INS} dnsutils
     parse_ipv4=$(dig +short ${domain})
     local_ipv4=$(curl -s4m8 https://ifconfig.co)
     if [[ ${parse_ipv4} == "${local_ipv4}" ]]; then
