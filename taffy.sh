@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.3"
+version="v1.10.4"
 
 #fonts color
 Green="\033[32m"
@@ -272,6 +272,16 @@ domain_handle() {
 }
 
 apply_certificate() {
+    ipv6=''
+    echo -e "========================================"
+    read -rp "是否纯IPv6域名: " is_v6
+    case $is_v6 in
+    [yY])
+    ipv6='--listen-v6'
+    ;;
+    *)
+    ;;
+    esac
     sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
 
     cat > ${nginx_cfg} << EOF
@@ -296,7 +306,7 @@ EOF
     /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
     echo ${domain}
 
-    if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
+    if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force ${ipv6}; then
         ok "SSL 证书生成成功"
         sleep 2
         mkdir -p ${ca_path}
@@ -315,7 +325,7 @@ flush_certificate() {
     cat > ${ca_path}/xray-cert-renew.sh <<EOF
 #!/bin/bash
 
-if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
+if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force ${ipv6}; then
   sleep 2
   mkdir -p ${ca_path}
   /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
