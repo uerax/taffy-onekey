@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.4"
+version="v1.10.5"
 
 #fonts color
 Green="\033[32m"
@@ -274,7 +274,7 @@ domain_handle() {
 apply_certificate() {
     ipv6=''
     echo -e "========================================"
-    read -rp "是否纯IPv6域名: " is_v6
+    read -rp "是否纯IPv6域名(Y/N): " is_v6
     case $is_v6 in
     [yY])
     ipv6='--listen-v6'
