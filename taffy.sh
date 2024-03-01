@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.1"
+version="v1.10.2"
 
 #fonts color
 Green="\033[32m"
@@ -328,7 +328,7 @@ echo "Xray Certificates Renewed"
 chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
-service nginx restart
+/etc/init.d/nginx restart
 echo "Xray Restarted"
 EOF
 
@@ -1917,11 +1917,11 @@ singbox_vmess_ws_tls() {
     xray_type="vmess_ws"
     password=$(xray uuid)
 
-    wget -N ${singbox_vmess_ws_config_url} -O ${xray_cfg}
+    wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
 
-    sed -i "s~114514~$port~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
+    sed -i "s~114514~$port~" ${singbox_cfg}
+    sed -i "s~\${password}~$password~" ${singbox_cfg}
+    sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
 
     singbox_routing_set
 

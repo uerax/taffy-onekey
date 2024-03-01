@@ -289,7 +289,7 @@ echo "Xray Certificates Renewed"
 chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
-service nginx restart
+/etc/init.d/nginx restart
 echo "Xray Restarted"
 EOF
 
