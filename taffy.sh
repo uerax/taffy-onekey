@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.2"
+version="v1.10.3"
 
 #fonts color
 Green="\033[32m"
@@ -1915,7 +1915,7 @@ singbox_vmess_ws_tls() {
     flush_certificate
 
     xray_type="vmess_ws"
-    password=$(xray uuid)
+    password=$(sing-box generate uuid)
 
     wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
 
@@ -1925,9 +1925,9 @@ singbox_vmess_ws_tls() {
 
     singbox_routing_set
 
-    systemctl restart xray
+    systemctl restart sing-box
     
-    systemctl enable xray
+    systemctl enable sing-box
 
     sleep 3
 
