@@ -405,7 +405,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome"
+    client-fingerprint: safari"
     ;;
     "reality_tcp_brutal")
     clash_cfg="  - name: $ip
@@ -421,7 +421,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome
+    client-fingerprint: safari
     smux:
       enabled: true
       protocol: h2mux
@@ -449,7 +449,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome"
+    client-fingerprint: safari"
     ;;
     "reality_grpc_brutal")
     clash_cfg="  - name: $ip
@@ -468,7 +468,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome
+    client-fingerprint: safari
     smux:
       enabled: true
       protocol: h2mux
@@ -554,7 +554,7 @@ clash_config() {
     tls: true
     udp: true
     flow: xtls-rprx-vision 
-    client-fingerprint: chrome"
+    client-fingerprint: safari"
     ;;
     "reality_h2")
     clash_cfg="  - name: $ip
@@ -570,7 +570,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome"
+    client-fingerprint: safari"
     ;;
     "reality_h2_brutal")
     clash_cfg="  - name: $ip
@@ -586,7 +586,7 @@ clash_config() {
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
-    client-fingerprint: chrome
+    client-fingerprint: safari
     smux:
       enabled: true
       protocol: h2mux
@@ -653,7 +653,7 @@ vless_reality_h2() {
 
     systemctl enable xray
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -693,7 +693,7 @@ vless_reality_h2_append() {
 
     vless-reality-h2-outbound-config
     systemctl restart xray 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
 }
 
@@ -725,7 +725,7 @@ vless_reality_tcp() {
 
     service nginx stop
 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 
     cat>${xray_info}<<EOF
@@ -765,7 +765,7 @@ vless_reality_tcp_append() {
 
     vless-reality-tcp-outbound-config
     systemctl restart xray 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 }
 
@@ -796,7 +796,7 @@ vless_reality_grpc() {
     systemctl enable xray
 
     clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -838,7 +838,7 @@ vless_reality_grpc_append() {
 
     vless-reality-grpc-outbound-config
     systemctl restart xray 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
 }
 
@@ -985,7 +985,7 @@ vmess_ws_tls() {
 
     service nginx restart
 
-    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
+    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     encode_link=$(base64 <<< $tmp)
     link="vmess://$encode_link"
 
@@ -1402,7 +1402,7 @@ vless-reality-grpc-outbound-config() {
         \"network\": \"grpc\",
         \"security\": \"reality\",
         \"realitySettings\": {
-            \"fingerprint\": \"chrome\",
+            \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
             \"shortId\": \"8eb7bab5a41eb27d\"
@@ -1440,7 +1440,7 @@ vless-reality-tcp-outbound-config() {
         \"security\": \"reality\",
         \"realitySettings\": {
             \"show\": false,\
-            \"fingerprint\": \"chrome\",
+            \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
             \"shortId\": \"8eb7bab5a41eb27d\",
@@ -1496,7 +1496,7 @@ vless-reality-h2-outbound-config() {
         \"security\": \"reality\",
         \"realitySettings\": {
             \"show\": false,
-            \"fingerprint\": \"chrome\",
+            \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
             \"shortId\": \"8eb7bab5a41eb27d\",
@@ -1823,7 +1823,7 @@ singbox_vless_reality_h2() {
 
     systemctl enable sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
 
     clash_config
 
@@ -1862,7 +1862,7 @@ singbox_vless_reality_grpc() {
 
     systemctl enable sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
 
     clash_config
 
@@ -1901,7 +1901,7 @@ singbox_vless_reality_tcp_brutal() {
 
     systemctl enable sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
     
@@ -1953,7 +1953,7 @@ singbox_vmess_ws_tls() {
 
     service nginx restart
 
-    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
+    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     encode_link=$(base64 <<< $tmp)
     link="vmess://$encode_link"
 
