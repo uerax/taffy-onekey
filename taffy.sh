@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.7"
+version="v1.10.8"
 
 #fonts color
 Green="\033[32m"
@@ -137,6 +137,7 @@ install() {
 is_root() {
     if [ $(id -u) == 0 ]; then
         ok "进入安装流程"
+        apt purge needrestart -y
         sleep 3
     else
         error "请切使用root用户执行脚本"
