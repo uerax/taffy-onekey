@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.5"
+version="v1.10.6"
 
 #fonts color
 Green="\033[32m"
@@ -25,6 +25,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
+website_git="https://github.com/bakasine/bakasine.github.io.git"
 xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-release.sh"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
@@ -97,7 +98,7 @@ xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/xray.conf"
-web_dir="blog-main"
+web_dir="blog"
 xray_type=""
 web_path="/opt/web"
 ca_path="/opt/cert"
@@ -185,8 +186,8 @@ function env_install() {
 
     ${INS} wget
     judge "wget 安装"
-    ${INS} unzip
-    judge "unzip 安装"
+    ${INS} git
+    judge "git 安装"
     ${INS} lsof
     judge "lsof 安装"
     ${INS} curl
@@ -241,19 +242,11 @@ nginx_install() {
 
     mkdir -p ${web_path} && cd ${web_path}
 
-    wget -O web.zip --no-check-certificate ${website_url}
-    judge "伪装站 下载"
-    unzip web.zip && mv -f bakasine.github.io-master ${web_dir} && rm web.zip
+    git clone ${website_url} ${web_dir}
 }
 
 update_web() {
-    cd ${web_path}
-    wget -O web.zip --no-check-certificate ${website_url}
-    judge "伪装站 下载"
-    unzip web.zip
-    rm -rf ./${web_dir}
-    mv -f bakasine.github.io-master ${web_dir}
-    rm web.zip
+    git clone ${website_url} ${web_path}/${web_dir}
 }
 
 domain_handle() {
@@ -325,10 +318,11 @@ flush_certificate() {
     cat > ${ca_path}/xray-cert-renew.sh <<EOF
 #!/bin/bash
 
+git clone ${website_url} ${web_path}/${web_dir}
 if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force ${ipv6}; then
   sleep 2
   mkdir -p ${ca_path}
-  /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
+  /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key} --reloadcmd "nginx -s reload"
 else
   exit 1
 fi
@@ -338,7 +332,8 @@ echo "Xray Certificates Renewed"
 chmod +r ${ca_key}
 echo "Read Permission Granted for Private Key"
 
-/etc/init.d/nginx restart
+systemctl restart xray
+systemctl restart sing-box
 echo "Xray Restarted"
 EOF
 
