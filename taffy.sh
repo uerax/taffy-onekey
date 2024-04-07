@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.9"
+version="v1.10.10"
 
 #fonts color
 Green="\033[32m"
@@ -98,13 +98,13 @@ xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
 xray_log="${xray_path}xray_log"
-nginx_cfg="/etc/nginx/conf.d/xray.conf"
+nginx_cfg="/etc/nginx/conf.d/taffy.conf"
 web_dir="blog"
 xray_type=""
 web_path="/opt/web"
 ca_path="/opt/cert"
-ca_crt="${ca_path}/xray.crt"
-ca_key="${ca_path}/xray.key"
+ca_crt="${ca_path}/taffy.crt"
+ca_key="${ca_path}/taffy.key"
 ws_path="crayfish"
 ss_method=""
 
