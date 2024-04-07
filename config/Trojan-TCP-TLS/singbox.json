@@ -1,0 +1,42 @@
+{
+    "route": {
+    },
+    "inbounds": [
+        {
+            "type": "trojan",
+            "listen": "::",
+            "listen_port": 443,
+            "users": [
+                {
+                    "password": "${password}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "server_name": "${domain}",
+                "alpn": ["http/1.1"],
+                "min_version": "1.2",
+                "max_version": "1.3",
+                "acme": {
+                  "domain": ["${domain}"],
+                  "data_directory": "${ca_path}",
+                  "default_server_name": "",
+                  "email": "singbox@crayfish.com",
+                  "provider": "letsencrypt"
+                }
+            },
+            "multiplex": {
+                "enabled": true
+            },
+            "fallback": {
+                "server": "127.0.0.1",
+                "server_port": 80
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}

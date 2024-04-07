@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.8"
+version="v1.10.9"
 
 #fonts color
 Green="\033[32m"
@@ -86,6 +86,7 @@ singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onek
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
 singbox_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/singbox.json"
+singbox_trojab_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/singbox.json"
 
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
@@ -1970,6 +1971,55 @@ SINGBOX_OUTBOUND="${outbound}"
 EOF
 }
 
+singbox_trojan-tls-tcp() {
+    port_check 80
+    port_check 443
+    nginx_install
+    domain_handle
+
+    xray_type="trojan_tcp"
+    password=$(sing-box generate uuid)
+
+    wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
+
+    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
+    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
+    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+
+    service nginx restart
+
+    sleep 3
+
+    wget -N ${singbox_trojab_tls_config_url} -O ${singbox_cfg}
+
+    sed -i "s~\${password}~$password~" ${singbox_cfg}
+    sed -i "s~\${domain}~$domain~" ${singbox_cfg}
+    sed -i "s~\${ca_path}~$ca_path~" ${singbox_cfg}
+
+    singbox_routing_set
+
+    systemctl restart sing-box
+    
+    systemctl enable sing-box
+
+    link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
+
+    clash_config
+    qx_config
+
+    cat>${xray_info}<<EOF
+EOF
+SINGBOX_TYPE="${xray_type}"
+SINGBOX_ADDR="${domain}"
+SINGBOX_PWORD="${password}"
+SINGBOX_PORT="443"
+SINGBOX_LINK="${link}"
+CLASH_CONFIG="${clash_cfg}"
+QX_CONFIG="${qx_cfg}"
+SINGBOX_OUTBOUND="${outbound}"
+EOF
+}
+
 
 singbox_shadowsocket() {
     
@@ -2636,6 +2686,7 @@ singbox_select() {
     echo -e "${Green}4)  vless-reality-h2${Font}"
     echo -e "${Green}5)  shadowsocket${Font}"
     echo -e "${Green}6)  vmess-tls-ws${Font}"
+    echo -e "${Green}7)  trojan-tls-tcp${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2659,6 +2710,9 @@ singbox_select() {
         ;;
     6)
         singbox_vmess_ws_tls
+        ;;
+    7)
+        singbox_trojan-tls-tcp
         ;;
     q)
         exit
