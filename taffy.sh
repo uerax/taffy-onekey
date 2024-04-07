@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.10"
+version="v1.10.11"
 
 #fonts color
 Green="\033[32m"
@@ -1985,6 +1985,8 @@ singbox_trojan-tls-tcp() {
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
     sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
+
+    sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
 
     service nginx restart
 
