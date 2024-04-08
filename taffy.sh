@@ -2004,6 +2004,8 @@ singbox_trojan-tls-tcp() {
     
     systemctl enable sing-box
 
+    port=443
+
     link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
     clash_config
@@ -2014,7 +2016,7 @@ EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
 SINGBOX_PWORD="${password}"
-SINGBOX_PORT="443"
+SINGBOX_PORT="${port}"
 SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
