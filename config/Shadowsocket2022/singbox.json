@@ -1,5 +1,12 @@
 {
-    "route": {},
+    "route": {
+        "rules": [
+            {
+                "network": ["udp"],
+                "outbound": "direct"
+            }
+        ]
+    },
     "inbounds": [
         {
             "type": "shadowsocks",
@@ -14,7 +21,8 @@
     ],
     "outbounds": [
         {
-            "type": "direct"
+            "type": "direct",
+            "tag": "direct"
         }
     ]
 }
