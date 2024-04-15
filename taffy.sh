@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.11"
+version="v1.10.12"
 
 #fonts color
 Green="\033[32m"
@@ -86,7 +86,8 @@ singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onek
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
 singbox_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/singbox.json"
-singbox_trojab_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/singbox.json"
+singbox_trojan_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/singbox.json"
+singbox_trojan_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/taffy.conf"
 
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
@@ -1980,7 +1981,7 @@ singbox_trojan-tls-tcp() {
     xray_type="trojan_tcp"
     password=$(sing-box generate uuid)
 
-    wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
+    wget -N ${singbox_trojan_tls_nginx_url} -O ${nginx_cfg}
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -1992,7 +1993,7 @@ singbox_trojan-tls-tcp() {
 
     sleep 3
 
-    wget -N ${singbox_trojab_tls_config_url} -O ${singbox_cfg}
+    wget -N ${singbox_trojan_tls_config_url} -O ${singbox_cfg}
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${domain}~$domain~" ${singbox_cfg}
