@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.12"
+version="v1.10.13"
 
 #fonts color
 Green="\033[32m"
@@ -150,10 +150,10 @@ is_root() {
 
 get_system() {
     source '/etc/os-release'
-    if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
+    if [[ "${ID}" == "debian"]]; then
         info "检测系统为 debian"
         apt update
-    elif [[ "${ID}"=="ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
+    elif [[ "${ID}"=="ubuntu" ]]; then
         info "检测系统为 ubuntu"
         apt update
     elif [[ "${ID}"=="centos" ]]; then
