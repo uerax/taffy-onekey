@@ -18,8 +18,8 @@
                 "alpn": [
                     "h3"
                 ],
-                "certificate_path": "/opt/cert/server.crt",
-                "key_path": "/opt/cert/server.key"
+                "certificate_path": "/etc/sing-box/server.crt",
+                "key_path": "/etc/sing-box/server.key"
             }
         }
     ],
