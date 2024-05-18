@@ -150,7 +150,7 @@ is_root() {
 
 get_system() {
     source '/etc/os-release'
-    if [[ "${ID}" == "debian"]]; then
+    if [[ "${ID}" == "debian" ]]; then
         info "检测系统为 debian"
         apt update
     elif [[ "${ID}"=="ubuntu" ]]; then
