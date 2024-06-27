@@ -6,8 +6,8 @@
             "type": "hysteria2",
             "listen": "::",
             "listen_port": 114514,
-            "up_mbps": 100,
-            "down_mbps": 30,
+            "up_mbps": 200,
+            "down_mbps": 50,
             "users": [
                 {
                     "password": "${password}"
