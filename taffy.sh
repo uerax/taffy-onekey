@@ -187,16 +187,8 @@ adjust_date() {
 
 env_install() {
 
-    ${INS} wget
-    judge "wget 安装"
-    ${INS} git
-    judge "git 安装"
-    ${INS} lsof
-    judge "lsof 安装"
-    ${INS} curl
-    judge "curl 安装"
-    ${INS} jq
-    judge "jq 安装"
+    ${INS} wget lsof curl jq
+    judge "git wget lsof curl jq 安装"
 }
 
 env_install_singbox() {
