@@ -185,7 +185,7 @@ adjust_date() {
   judge "时区调整"
 }
 
-function env_install() {
+env_install() {
 
     ${INS} wget
     judge "wget 安装"
@@ -197,6 +197,12 @@ function env_install() {
     judge "curl 安装"
     ${INS} jq
     judge "jq 安装"
+}
+
+env_install_singbox() {
+
+    ${INS} wget lsof curl jq
+    judge "wget lsof curl jq 安装"
 }
 
 increase_max_handle() {
@@ -1722,7 +1728,7 @@ singbox_onekey_install() {
     get_system
     if ! command -v sing-box >/dev/null 2>&1; then
         # adjust_date
-        env_install
+        env_install_singbox
         close_firewall
         singbox_install
     fi
