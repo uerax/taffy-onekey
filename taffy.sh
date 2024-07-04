@@ -1739,7 +1739,7 @@ singbox_install() {
 
 uninstall_singbox() {
     systemctl stop sing-box
-    dpkg --remove sing-box
+    apt remove sing-box -y
     systemctl daemon-reload
 }
 
