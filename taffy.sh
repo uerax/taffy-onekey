@@ -1737,7 +1737,8 @@ singbox_install() {
     bash <(curl -fsSL $singbox_install_url)
 }
 
-singbox_uninstall() {
+uninstall_singbox() {
+    systemctl stop sing-box
     dpkg --remove sing-box
     systemctl daemon-reload
 }
@@ -2446,7 +2447,7 @@ uninstall() {
       uninstall_nginx
       uninstall_acme
       uninstall_hysteria2
-      singbox_uninstall
+      uninstall_singbox
       echo -e "全部卸载已完成"
     ;;
     *)
@@ -2517,7 +2518,7 @@ singbox_operation() {
           bash <(curl -fsSL $singbox_install_url)
           ;;
       99)
-          singbox_uninstall
+          uninstall_singbox
           ;;
       q)
           exit
