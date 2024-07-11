@@ -2141,17 +2141,21 @@ singbox_shadowsocket_append() {
       ;;
     esac
 
-    wget -Nq ${singbox_ss_append_config_url} -O append.tmp
+    wget -Nq ${singbox_ss_append_config_url} -O append.json
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${method}~$ss_method~" append.tmp
-    sed -i "s~114514~$port~" append.tmp
-    echo "," >> append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${method}~$ss_method~" append.json
+    sed -i "s~114514~$port~" append.json
+    
+    systemctl stop sing-box
 
-    sed -i '/inbounds/ r append.tmp' ${singbox_cfg}
-    rm append.tmp
+    sing-box merge /etc/sing-box/tmp.json -c /etc/sing-box/config.json -c  append.json
 
-    systemctl restart sing-box && systemctl enable sing-box
+    mv /etc/sing-box/config.json /etc/sing-box/config.json.bak
+
+    mv /etc/sing-box/tmp.json /etc/sing-box/config.json
+
+    systemctl restart sing-box
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
