@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.11.0"
+version="v1.11.1"
 
 #fonts color
 Green="\033[32m"
@@ -2108,11 +2108,11 @@ singbox_hy2_append() {
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
 
-    wget -N ${singbox_hysteria2_url} -O append.yaml
+    wget -N ${singbox_hysteria2_url} -O append.json
 
-    sed -i "s/\${password}/$password/" append.yaml
-    sed -i "s/\${domain}/$domain/" append.yaml
-    sed -i "s~114514~$port~" append.yaml
+    sed -i "s/\${password}/$password/" append.json
+    sed -i "s/\${domain}/$domain/" append.json
+    sed -i "s~114514~$port~" append.json
 
     systemctl stop sing-box
 
@@ -2737,8 +2737,8 @@ select_singbox_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket-2022${Font}"
-    echo -e "${Green}1)  hysteria2${Font}"
-    echo -e "${Green}1)  vless-reality-grpc${Font}"
+    echo -e "${Green}2)  hysteria2${Font}"
+    echo -e "${Green}3)  vless-reality-grpc${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
