@@ -377,7 +377,9 @@ clash_config() {
     down: 200 Mbps
     password: $password
     sni: https://live.qq.com
-    skip-cert-verify: true"
+    skip-cert-verify: true
+    alpn:
+    - h3"
     ;;    
     "hysteria2")
     clash_cfg="  - name: $domain
@@ -386,7 +388,9 @@ clash_config() {
     port: $port
     up: 50 Mbps
     down: 200 Mbps
-    password: $password"
+    password: $password
+    alpn:
+    - h3"
     ;;
     "reality_tcp")
     clash_cfg="  - name: $ip
