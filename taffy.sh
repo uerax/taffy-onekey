@@ -373,8 +373,8 @@ clash_config() {
     type: hysteria2
     server: '$domain'
     port: $port
-    up: 30 Mbps
-    down: 100 Mbps
+    up: 50 Mbps
+    down: 200 Mbps
     password: $password
     sni: https://live.qq.com
     skip-cert-verify: true"
@@ -384,8 +384,8 @@ clash_config() {
     type: hysteria2
     server: '$domain'
     port: $port
-    up: 30 Mbps
-    down: 100 Mbps
+    up: 50 Mbps
+    down: 200 Mbps
     password: $password"
     ;;
     "reality_tcp")
