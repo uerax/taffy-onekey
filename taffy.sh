@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.10.14"
+version="v1.11.0"
 
 #fonts color
 Green="\033[32m"
@@ -72,7 +72,8 @@ hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/taffy-one
 # SINGBOX URL START
 singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-sing-box.sh"
 tcp_brutal_install_url="https://tcp.hy2.sh/"
-singbox_cfg="/etc/sing-box/config.json"
+singbox_cfg_path="/etc/sing-box"
+singbox_cfg="${singbox_cfg_path}/config.json"
 singbox_path="/opt/singbox/"
 singbox_info="${singbox_path}singbox_info"
 
@@ -1762,7 +1763,7 @@ singbox_routing_set() {
 singbox_hy2() {
     set_port
     ${INS} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/sing-box/server.key -out /etc/sing-box/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 /etc/sing-box/server*
+    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
@@ -2099,6 +2100,74 @@ SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
 }
 
+singbox_hy2_append() {
+    set_port
+    ${INS} openssl
+    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
+
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    domain=$(curl -s https://ip.me)
+
+    wget -N ${singbox_hysteria2_url} -O append.yaml
+
+    sed -i "s/\${password}/$password/" append.yaml
+    sed -i "s/\${domain}/$domain/" append.yaml
+    sed -i "s~114514~$port~" append.yaml
+
+    systemctl stop sing-box
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
+
+    rm append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    systemctl restart sing-box
+    
+    xray_type="hysteria2_nodomain"
+
+    clash_config
+}
+
+singbox_reality_append() {
+    password=$(sing-box generate uuid)
+    set_port
+    port_check $port
+
+    xray_type="reality_grpc"
+    domain="www.fate-go.com.tw"
+    keys=$(sing-box generate reality-keypair)
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl ipinfo.io/ip)
+
+    wget -N ${singbox_vless_reality_grpc_url} -O append.json
+
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${ws_path}~$ws_path~" append.json
+    sed -i "s~114514~$port~" append.json
+
+    systemctl stop sing-box
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
+
+    rm append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    systemctl restart sing-box
+
+    vless-reality-grpc-outbound-config
+    clash_config
+    qx_config
+}
+
 singbox_shadowsocket_append() {
     encrypt=4
     ss_method="aes-128-gcm"
@@ -2149,11 +2218,13 @@ singbox_shadowsocket_append() {
     
     systemctl stop sing-box
 
-    sing-box merge /etc/sing-box/tmp.json -c /etc/sing-box/config.json -c  append.json
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
 
-    mv /etc/sing-box/config.json /etc/sing-box/config.json.bak
+    rm append.json
 
-    mv /etc/sing-box/tmp.json /etc/sing-box/config.json
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
     systemctl restart sing-box
 
@@ -2666,6 +2737,8 @@ select_singbox_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket-2022${Font}"
+    echo -e "${Green}1)  hysteria2${Font}"
+    echo -e "${Green}1)  vless-reality-grpc${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2674,6 +2747,12 @@ select_singbox_append_type() {
     case $menu_num in
     1)
         singbox_shadowsocket_append
+        ;;
+    2)
+        singbox_hy2_append
+        ;;
+    3)
+        singbox_reality_append
         ;;
     q)
         exit
