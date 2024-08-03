@@ -641,6 +641,7 @@ vless_reality_h2() {
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${vless_reality_h2_url} -O ${xray_cfg}
 
@@ -660,6 +661,7 @@ vless_reality_h2() {
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
+XRAY_ADDR_IPV6="${ipv6}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
@@ -710,6 +712,7 @@ vless_reality_tcp() {
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${vless_reality_tcp_url} -O ${xray_cfg}
 
@@ -732,6 +735,7 @@ vless_reality_tcp() {
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
+XRAY_ADDR_IPV6="${ipv6}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_KEY="${public_key}"
@@ -781,6 +785,7 @@ vless_reality_grpc() {
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${vless_reality_grpc_url} -O ${xray_cfg}
 
@@ -802,6 +807,7 @@ vless_reality_grpc() {
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${ip}"
+XRAY_ADDR_IPV6="${ipv6}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
 XRAY_OBFS="grpc"
@@ -1283,6 +1289,7 @@ shadowsocket-2022() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl ipinfo.io/ip`
+    ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     xray_type="shadowsocket2022"
@@ -1293,6 +1300,7 @@ shadowsocket-2022() {
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
 XRAY_ADDR="${domain}"
+XRAY_ADDR_IPV6="${ipv6}"
 XRAT_METHOD="${ss_method}"
 XRAY_PWORD="${password}"
 XRAY_PORT="${port}"
@@ -1372,6 +1380,7 @@ shadowsocket-2022-append() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl ipinfo.io/ip`
+    ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     xray_type="shadowsocket2022"
@@ -1771,6 +1780,7 @@ singbox_hy2() {
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_hysteria2_url} -O config.yaml
 
@@ -1794,6 +1804,7 @@ singbox_hy2() {
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
+SINGBOX_ADDR_IPV6="${ipv6}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
 SINGBOX_LINK="${link}"
@@ -1814,6 +1825,7 @@ singbox_vless_reality_h2() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
 
@@ -1832,6 +1844,7 @@ singbox_vless_reality_h2() {
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${ip}"
+SINGBOX_ADDR_IPV6="${ipv6}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
 SINGBOX_KEY="${public_key}"
@@ -1852,6 +1865,7 @@ singbox_vless_reality_grpc() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
 
@@ -1871,6 +1885,7 @@ singbox_vless_reality_grpc() {
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${ip}"
+SINGBOX_ADDR_IPV6="${ipv6}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
 SINGBOX_KEY="${public_key}"
@@ -1892,6 +1907,7 @@ singbox_vless_reality_tcp_brutal() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
+    ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
 
@@ -1910,6 +1926,7 @@ singbox_vless_reality_tcp_brutal() {
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${ip}"
+SINGBOX_ADDR_IPV6="${ipv6}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
 SINGBOX_KEY="${public_key}"
@@ -2083,6 +2100,7 @@ singbox_shadowsocket() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl ipinfo.io/ip`
+    ipv6=$(curl -6 ip.me)
     link="ss://$tmp@${domain}:${port}"
 
     xray_type="shadowsocket2022"
@@ -2093,12 +2111,13 @@ singbox_shadowsocket() {
     cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
+SINGBOX_ADDR_IPV6="${ipv6}"
 SINGBOX_METHOD="${ss_method}"
 SINGBOX_PWORD="${password}"
 SINGBOX_PORT="${port}"
 SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_config}"
+QX_CONFIG="${qx_cfg}"
 XRAY_OUTBOUND="${outbound}"
 SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
@@ -2341,6 +2360,7 @@ show_info() {
     echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
     echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
+    echo -e "${Green}地址IPv6:${Font} ${XRAY_ADDR_IPV6}"
     echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
     echo -e "${Green}端口:${Font} ${XRAY_PORT}"
     echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
@@ -2393,6 +2413,7 @@ show_singbox_info() {
     echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${SINGBOX_TYPE}"
     echo -e "${Green}地址:${Font} ${SINGBOX_ADDR}"
+    echo -e "${Green}地址IPv6:${Font} ${SINGBOX_ADDR_IPV6}"
     echo -e "${Green}密码:${Font} ${SINGBOX_PWORD}"
     echo -e "${Green}端口:${Font} ${SINGBOX_PORT}"
     echo -e "${Green}混淆:${Font} ${SINGBOX_OBFS}"
