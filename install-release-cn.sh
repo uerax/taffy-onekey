@@ -407,7 +407,7 @@ get_latest_version() {
   for i in "${!releases_list[@]}"
   do
     releases_list["$i"]="v${releases_list[$i]#v}"
-    grep -q "https://mirror.ghproxy.com/https://github.com/XTLS/Xray-core/releases/download/${releases_list[$i]}/Xray-linux-$MACHINE.zip" "$tmp_file" && break
+    grep -q "https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/download/${releases_list[$i]}/Xray-linux-$MACHINE.zip" "$tmp_file" && break
   done
   "rm" "$tmp_file"
   PRE_RELEASE_LATEST="${releases_list[$i]}"
@@ -418,7 +418,7 @@ version_gt() {
 }
 
 download_xray() {
-  DOWNLOAD_LINK="https://mirror.ghproxy.com/https://github.com/XTLS/Xray-core/releases/download/${INSTALL_VERSION}/Xray-linux-${MACHINE}.zip"
+  DOWNLOAD_LINK="https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/download/${INSTALL_VERSION}/Xray-linux-${MACHINE}.zip"
   echo "Downloading Xray archive: $DOWNLOAD_LINK"
   if curl -f -x "${PROXY}" -R -H 'Cache-Control: no-cache' -o "$ZIP_FILE" "$DOWNLOAD_LINK"; then
     echo "ok."
@@ -680,8 +680,8 @@ install_geodata() {
       exit 1
     fi
   }
-  local download_link_geoip="https://mirror.ghproxy.com/https://github.com/v2fly/geoip/releases/latest/download/geoip.dat"
-  local download_link_geosite="https://mirror.ghproxy.com/https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat"
+  local download_link_geoip="https://gh-proxy.com/https://github.com/v2fly/geoip/releases/latest/download/geoip.dat"
+  local download_link_geosite="https://gh-proxy.com/https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat"
   local file_ip='geoip.dat'
   local file_dlc='dlc.dat'
   local file_site='geosite.dat'
