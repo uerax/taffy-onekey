@@ -24,40 +24,40 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-website_url="https://mirror.ghproxy.com/https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
-xray_install_url="https://mirror.ghproxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-release-cn.sh"
-ukonw_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
+website_url="https://gh-proxy.com/https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
+xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-release-cn.sh"
+ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-ss_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
+ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
 
-bbr_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
+bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
-trojan_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
+trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
 
-trojan_grpc_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
-trojan_grpc_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
+trojan_grpc_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
+trojan_grpc_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
 
-trojan_tcp_tls_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
-trojan_tcp_tls_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
+trojan_tcp_tls_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
+trojan_tcp_tls_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
 
-vmess_ws_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
-vmess_ws_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
+vmess_ws_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
+vmess_ws_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
 
-vless_ws_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
-vless_ws_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/nginx.conf"
+vless_ws_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
+vless_ws_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/nginx.conf"
 
-vless_grpc_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/config.json"
-vless_grpc_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/nginx.conf"
+vless_grpc_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/config.json"
+vless_grpc_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/nginx.conf"
 
-vless_vision_nginx_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
-vless_vision_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
+vless_vision_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
+vless_vision_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
 
-vless_reality_tcp_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
-vless_reality_grpc_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
-vless_reality_h2_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
+vless_reality_tcp_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
+vless_reality_grpc_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
+vless_reality_h2_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
 
-hysteria2_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
-hysteria2_nodomain_config_url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
+hysteria2_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
+hysteria2_nodomain_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
@@ -1469,7 +1469,7 @@ server_check() {
 
 update_script() {
     script_path=$(cd `dirname $0`; pwd)
-    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://mirror.ghproxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh"
+    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh"
     exit
 }
 
