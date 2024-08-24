@@ -1936,41 +1936,23 @@ EOF
 }
 
 singbox_vmess_ws_tls() {
-    port_check 80
     port_check 443
-    nginx_install
     domain_handle
-    apply_certificate
-    flush_certificate
 
     xray_type="vmess_ws"
     password=$(sing-box generate uuid)
 
     wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
 
-    sed -i "s~114514~$port~" ${singbox_cfg}
+    sed -i "s~114514~443~" ${singbox_cfg}
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
-
-    singbox_routing_set
+    sed -i "s~\${domain}~$domain~" ${singbox_cfg}
 
     systemctl restart sing-box
     
     systemctl enable sing-box
 
-    sleep 3
-
-    wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-    sed -i "s~\${port}~$port~" ${nginx_cfg}
-
-    service nginx restart
 
     tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     encode_link=$(base64 <<< $tmp)

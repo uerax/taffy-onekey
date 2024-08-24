@@ -14,6 +14,18 @@
                   "alterId": 0
                }
             ],
+            "tls": {
+                "enabled": true,
+                "server_name": "${domain}",
+                "acme": {
+                  "domain": "${domain}",
+                  "email": "shan_shanhy@qq.com",
+                  "data_directory": "acme"
+                }
+            },
+            "multiplex": {
+                "enabled": true
+            },
             "transport":{
                "type": "ws",
                "path": "${ws_path}",
