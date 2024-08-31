@@ -51,7 +51,7 @@ shadowsocket_info() {
 }
 
 
-range_xray() {
+xray_range() {
 
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
@@ -75,7 +75,7 @@ range_xray() {
     
 }
 
-range_singbox() {
+singbox_range() {
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $singbox_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.type')
