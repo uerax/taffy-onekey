@@ -14,6 +14,7 @@ singbox_shadowsocket() {
     port=$(echo "$item" | jq -r '.listen_port')
     method=$(echo "$item" | jq -r '.method')
     password=$(echo "$item" | jq -r '.password')
+    shadowsocket_info
 }
 
 shadowsocket_info() {
@@ -48,10 +49,17 @@ shadowsocket_info() {
     tmp="${ss_method}:${password}"
     tmp=$(base64 <<< $tmp)
     link="ss://$tmp@${ip}:${port}"
+    
+    show_info
 }
 
 
 xray_range() {
+
+    if [ ! -e "$xray_cfg" ]; then
+        echo "Xray Config does not exist. Exiting."
+        exit 1  # 非零的退出状态表示异常退出
+    fi
 
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
@@ -59,16 +67,16 @@ xray_range() {
 
         case "$type" in
             "shadowsocks")
-                process_apple "$item"
+                process_apple "$inbound"
                 ;;
             "banana")
-                process_banana "$item"
+                process_banana "$inbound"
                 ;;
             "cherry")
-                process_cherry "$item"
+                process_cherry "$inbound"
                 ;;
             *)
-                echo "Unknown item: $name"
+                echo "Unknown item: $inbound"
                 ;;
         esac
     done
@@ -76,22 +84,28 @@ xray_range() {
 }
 
 singbox_range() {
+
+    if [ ! -e "$singbox_cfg" ]; then
+        echo "Singbox Config does not exist. Exiting."
+        exit 1  # 非零的退出状态表示异常退出
+    fi
+
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $singbox_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.type')
 
         case "$type" in
             "shadowsocks")
-                singbox_shadowsocket "$item"
+                singbox_shadowsocket "$inbound"
                 ;;
             "banana")
-                process_banana "$item"
+                process_banana "$inbound"
                 ;;
             "cherry")
-                process_cherry "$item"
+                process_cherry "$inbound"
                 ;;
             *)
-                echo "Unknown item: $name"
+                echo "Unknown item: $inbound"
                 ;;
         esac
     done
@@ -99,7 +113,7 @@ singbox_range() {
 
 show_info() {
     echo -e "------------------------------------------------"
-    judge "查看配置"
+    echo -e "------------------------------------------------"
     echo -e "------------------------------------------------"
     echo -e "${Green}协议:${Font} ${type}"
     echo -e "${Green}地址:${Font} ${ip}"
@@ -138,13 +152,11 @@ show_info() {
 }
 
 xray_run() {
-    singbox_range
-    show_info
+    xray_range
 }
 
 singbox_run() {
-    xray_range
-    show_info
+    singbox_range
 }
 
 case $1 in
