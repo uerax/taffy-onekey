@@ -605,7 +605,7 @@ clash_config() {
     server: '$domain'
     port: $port
     cipher: $ss_method
-    password: "$password"
+    password: $password
     udp: true"
     ;;
     esac
@@ -2091,7 +2091,6 @@ singbox_trojan-tls-tcp() {
     qx_config
 
     cat>${xray_info}<<EOF
-EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
 SINGBOX_PWORD="${password}"
