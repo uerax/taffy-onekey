@@ -17,10 +17,17 @@
             "tls": {
                 "enabled": true,
                 "server_name": "${domain}",
+                "alpn": [
+                    "http/1.1"
+                ],
+                "min_version": "1.2",
+                "max_version": "1.3",
                 "acme": {
-                  "domain": "${domain}",
-                  "email": "shan_shanhy@qq.com",
-                  "data_directory": "acme"
+                    "domain": ["${domain}"],
+                    "data_directory": "/etc/sing-box",
+                    "default_server_name": "",
+                    "email": "singbox@crayfish.com",
+                    "provider": "letsencrypt"
                 }
             },
             "multiplex": {
@@ -28,8 +35,8 @@
             },
             "transport":{
                "type": "ws",
-               "path": "${ws_path}",
-               "max_early_data": 2048,
+               "path": "/${ws_path}",
+               "max_early_data": 0,
                "early_data_header_name": "Sec-WebSocket-Protocol"
             }
         }

@@ -998,6 +998,7 @@ vmess_ws_tls() {
 
     clash_config
     qx_config
+    vmess-ws-tls-outbound-config
 
     cat>${xray_info}<<EOF
 XRAY_TYPE="${xray_type}"
@@ -1010,6 +1011,7 @@ XRAY_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
 XRAY_OUTBOUND="${outbound}"
+SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
 }
 
@@ -1391,8 +1393,79 @@ shadowsocket-2022-append() {
 
 # outbound start
 
+vmess-ws-tls-outbound-config() {
+    outbound="{
+    \"protocol\": \"vmess\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${domain}\",
+                \"port\": 443,
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+			            \"alterId\": 0,
+			            \"level\": 0,
+			            \"security\": \"auto\",
+			            \"email\": \"b@your.domain\"
+                    }
+                ]
+            }
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"ws\",
+	    \"security\": \"tls\",
+	    \"tlsSettings\": {
+            \"allowInsecure\": false,
+            \"serverName\": \"${domain}\"
+        },
+        \"wsSettings\": {
+            \"path\": \"/${ws_path}\",
+            \"headers\": {
+            \"Host\":\"${domain}\"
+            }
+        }
+    }
+}"
+
+    singbox_outbound="{
+	\"type\": \"vmess\",
+	\"server\": \"${domain}\",
+	\"server_port\": 443,
+	\"uuid\": \"${password}\",
+	\"security\": \"auto\",
+	\"alter_id\": 0,
+	\"global_padding\": false,
+	\"authenticated_length\": true,
+	\"tls\": {
+		\"enabled\": true,
+		\"disable_sni\": false,
+		\"server_name\": \"${domain}\",
+		\"insecure\": false,
+		\"alpn\": [
+			\"http/1.1\"
+		]
+	},
+	\"multiplex\": {
+		\"enabled\": true,
+		\"protocol\": \"smux\",
+		\"max_connections\": 5,
+		\"min_streams\": 4,
+		\"max_streams\": 0
+	},
+	\"transport\": {
+		\"type\": \"ws\",
+		\"path\": \"/${ws_path}\",
+		\"max_early_data\": 0,
+		\"early_data_header_name\": \"Sec-WebSocket-Protocol\"
+	},
+	\"connect_timeout\": \"5s\"
+}"
+}
+
 vless-reality-grpc-outbound-config() {
-    outbound=" {
+    outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
         \"vnext\": [
@@ -1937,6 +2010,7 @@ EOF
 
 singbox_vmess_ws_tls() {
     port_check 443
+    nginx_install
     domain_handle
 
     xray_type="vmess_ws"
@@ -1953,15 +2027,15 @@ singbox_vmess_ws_tls() {
     
     systemctl enable sing-box
 
-
     tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     encode_link=$(base64 <<< $tmp)
     link="vmess://$encode_link"
 
     clash_config
     qx_config
+    vmess-ws-tls-outbound-config
 
-    cat>${xray_info}<<EOF
+    cat>${singbox_info}<<EOF
 SINGBOX_TYPE="${xray_type}"
 SINGBOX_ADDR="${domain}"
 SINGBOX_PWORD="${password}"
@@ -1971,7 +2045,8 @@ OBFS_PATH="${ws_path}"
 SINGBOX_LINK="${link}"
 CLASH_CONFIG="${clash_cfg}"
 QX_CONFIG="${qx_cfg}"
-SINGBOX_OUTBOUND="${outbound}"
+XRAY_OUTBOUND="${outbound}"
+SINGBOX_OUTBOUND="${singbox_outbound}"
 EOF
 }
 
