@@ -6,9 +6,7 @@ xray_cfg="/usr/local/etc/xray/config.json"
 xray_outbound=""
 singbox_outbound=""
 
-vmess() {
-
-}
+#vmess() {}
 
 singbox_shadowsocket() {
     local item="$1"
