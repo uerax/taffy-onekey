@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+#fonts color
+Green="\033[32m"
+Red="\033[31m"
+Yellow="\033[33m"
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'
+GreenBG="\033[42;37m"
+RedBG="\033[41;37m"
+Font="\033[0m"
+
 singbox_cfg="/etc/sing-box/config.json"
 xray_cfg="/usr/local/etc/xray/config.json"
 
@@ -14,6 +26,7 @@ singbox_shadowsocket() {
     port=$(echo "$item" | jq -r '.listen_port')
     method=$(echo "$item" | jq -r '.method')
     password=$(echo "$item" | jq -r '.password')
+    
     shadowsocket_info
 }
 
@@ -76,7 +89,6 @@ xray_range() {
                 process_cherry "$inbound"
                 ;;
             *)
-                echo "Unknown item: $inbound"
                 ;;
         esac
     done
@@ -105,7 +117,6 @@ singbox_range() {
                 process_cherry "$inbound"
                 ;;
             *)
-                echo "Unknown item: $inbound"
                 ;;
         esac
     done
