@@ -279,7 +279,7 @@ apply_certificate() {
     esac
     sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
 
-    cat > ${nginx_cfg} << EOF
+    cat>${nginx_cfg}<<EOF
 server {
     listen 80;
     server_name ${domain};
@@ -408,32 +408,6 @@ clash_config() {
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: safari"
     ;;
-    "reality_tcp_brutal")
-    clash_cfg="  - name: $ip
-    type: vless
-    server: '$ip'
-    port: $port
-    uuid: $password
-    network: tcp
-    tls: true
-    udp: true
-    flow: 
-    servername: www.fate-go.com.tw
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
-    client-fingerprint: safari
-    smux:
-      enabled: true
-      protocol: h2mux
-      max-connections: 1
-      min-streams: 4
-      padding: true
-      brutal-opts:
-        enabled: true
-        up: 30
-        down: 100"
-    ;;
     "reality_grpc")
     clash_cfg="  - name: $ip
     type: vless
@@ -451,35 +425,6 @@ clash_config() {
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: safari"
-    ;;
-    "reality_grpc_brutal")
-    clash_cfg="  - name: $ip
-    type: vless
-    server: '$ip'
-    port: $port
-    uuid: $password
-    network: grpc
-    tls: true
-    udp: true
-    flow: 
-    # skip-cert-verify: true
-    servername: www.fate-go.com.tw
-    grpc-opts:
-      grpc-service-name: \"${ws_path}\"
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
-    client-fingerprint: safari
-    smux:
-      enabled: true
-      protocol: h2mux
-      max-connections: 1
-      min-streams: 4
-      padding: true
-      brutal-opts:
-        enabled: true
-        up: 30
-        down: 100"
     ;;
     "trojan_grpc")
     clash_cfg="  - name: $domain
@@ -572,32 +517,6 @@ clash_config() {
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: safari"
-    ;;
-    "reality_h2_brutal")
-    clash_cfg="  - name: $ip
-    type: vless
-    server: '$ip'
-    port: $port
-    uuid: $password
-    tls: true
-    udp: true
-    network: h2
-    flow: ''
-    servername: www.fate-go.com.tw
-    reality-opts:
-      public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
-    client-fingerprint: safari
-    smux:
-      enabled: true
-      protocol: h2mux
-      max-connections: 1
-      min-streams: 4
-      padding: true
-      brutal-opts:
-        enabled: true
-        up: 30
-        down: 100"
     ;;
     "shadowsocket2022")
     clash_cfg="  - name: $domain
@@ -1904,6 +1823,7 @@ singbox_vless_reality_h2() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
     systemctl restart sing-box
@@ -1944,6 +1864,7 @@ singbox_vless_reality_grpc() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
@@ -1967,14 +1888,14 @@ CLASH_CONFIG="${clash_cfg}"
 EOF
 }
 
-singbox_vless_reality_tcp_brutal() {
+singbox_vless_reality_tcp() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
     bash <(curl -fsSL $tcp_brutal_install_url)
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_tcp_brutal"
+    xray_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1986,6 +1907,7 @@ singbox_vless_reality_tcp_brutal() {
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
     systemctl restart sing-box 
@@ -2849,7 +2771,7 @@ singbox_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  hysteria2${Font}"
-    echo -e "${Green}2)  vless-reality-tcp-brutal(效果不佳)${Font}"
+    echo -e "${Green}2)  vless-reality-tcp${Font}"
     echo -e "${Green}3)  vless-reality-grpc${Font}"
     echo -e "${Green}4)  vless-reality-h2${Font}"
     echo -e "${Green}5)  shadowsocket${Font}"
@@ -2865,7 +2787,7 @@ singbox_select() {
         singbox_hy2
         ;;
     2)
-        singbox_vless_reality_tcp_brutal
+        singbox_vless_reality_tcp
         ;;
     3)
         singbox_vless_reality_grpc

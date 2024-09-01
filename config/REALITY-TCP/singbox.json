@@ -8,6 +8,7 @@
             "listen_port": 114514,
             "users": [
                 {
+                    "name": "${pubicKey}",
                     "uuid": "${password}",
                     "flow": ""
                 }
@@ -26,15 +27,6 @@
                         "8eb7bab5a41eb27d",
                         ""
                     ]
-                }
-            },
-            "multiplex": {
-                "enabled": true,
-                "padding": true,
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 100,
-                    "down_mbps": 30
                 }
             }
         }

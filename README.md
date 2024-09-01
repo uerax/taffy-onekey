@@ -9,7 +9,7 @@ wget -N --no-check-certificate -q -O taffy.sh "https://raw.githubusercontent.com
 __不保存脚本执行__
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @
 ```
 
 __国内机器__
@@ -21,25 +21,25 @@ wget -N --no-check-certificate -q -O taffy-cn.sh "https://gh-proxy.com/https://r
 `一键安装 Singbox`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ singbox
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ singbox
 ```
 
 `一键安装 Xray`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ install
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ install
 ```
 
 `一键安装 Hysteria`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ hysteria
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ hysteria
 ```
 
 `完全卸载`
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ uninstall
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ uninstall
 ```
 
 ## Script
