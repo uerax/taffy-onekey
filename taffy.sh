@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.0.2"
+version="v2.0.3"
 
 #fonts color
 Green="\033[32m"
@@ -2432,7 +2432,6 @@ menu() {
     echo -e "${Cyan}6)   插入 Xray 其他协议${Font}"
     echo -e "${Cyan}7)   Singbox 协议更换${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
-    echo -e "${Yellow}9)   完全卸载${Font}"
     echo -e "${Purple}10)  配置文件路径${Font}"
     echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
     echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
@@ -2443,8 +2442,9 @@ menu() {
     echo -e "${Purple}33)  Singbox 操作面板${Font}"
     echo -e "${Green}34)  安装 / 卸载 Nginx${Font}"
     echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
-    echo -e "${Red}99)  常见问题${Font}"
+    echo -e "${Yellow}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
+    echo -e "${Red}999) 完全卸载${Font}"
     echo -e "${Red}q)   退出${Font}"
     echo -e "${Cyan}————————————————————————————————————————${Font}\n"
 
@@ -2471,9 +2471,6 @@ menu() {
     ;;
     8)
     select_type
-    ;;
-    9)
-    uninstall
     ;;
     10)
     show_path
@@ -2510,6 +2507,9 @@ menu() {
     ;;
     100)
     open_bbr
+    ;;
+    999)
+    uninstall
     ;;
     q)
     ;;
