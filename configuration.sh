@@ -104,6 +104,7 @@ singbox_vless() {
         fi
         show_info
     else
+        echo ""
     fi
 }
 
@@ -133,6 +134,8 @@ xray_vless() {
             clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         fi
         show_info
+    else
+        echo ""
     fi
 }
 # vless end
