@@ -1637,7 +1637,6 @@ singbox_vless_reality_tcp() {
 
 singbox_vmess_ws_tls() {
     port_check 443
-    nginx_install
     domain_handle
 
     xray_type="vmess_ws"
