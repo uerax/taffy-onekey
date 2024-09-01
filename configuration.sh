@@ -25,6 +25,7 @@ xray_vmess() {
     local type=$(echo "$item" | jq -r '.protocol')
     local password=$(echo "$item" | jq -r '.settings.clients[0].id')
     local method=$(echo "$item" | jq -r '.streamSettings.network')
+    local port=443
     local path=$(echo "$item" | jq -r '.streamSettings.wsSettings.path')
     local domain=$ip
 
