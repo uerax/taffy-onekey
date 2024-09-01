@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v1.7.40"
+version="v1.8.0"
 
 #fonts color
 Green="\033[32m"
@@ -1419,26 +1419,7 @@ info_return() {
 }
 
 show_info() {
-    source ${xray_info}
-    judge "查看配置"
-    echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
-    echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
-    echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
-    echo -e "${Green}端口:${Font} ${XRAY_PORT}"
-    echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
-    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
-    echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
-    echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}QuantumultX配置:${Font}"
-    echo -e "${QX_CONFIG}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${XRAY_OUTBOUND}"
-    echo -e "------------------------------------------------"
+    bash -c "$(curl -sL https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ xray
 }
 
 server_check() {
