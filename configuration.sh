@@ -18,7 +18,119 @@ xray_cfg="/usr/local/etc/xray/config.json"
 xray_outbound=""
 singbox_outbound=""
 
-#vmess() {}
+# vmess start
+
+xray_vmess() {
+    local item="$1"
+    local type=$(echo "$item" | jq -r '.protocol')
+    local password=$(echo "$item" | jq -r '.settings.clients[0].id')
+    local method=$(echo "$item" | jq -r '.streamSettings.network')
+    local path=$(echo "$item" | jq -r '.streamSettings.wsSettings.path')
+    local domain=$ip
+
+    local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
+    local encode_link=$(base64 <<< $tmp)
+    local link="vmess://$encode_link"
+
+    local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"/${path}\"\n      headers:\n        Host: $domain"
+
+    local qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=/${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+
+    vmess-info
+    show_info
+}
+
+singbox_vmess() {
+    local item="$1"
+    local type=$(echo "$item" | jq -r '.type')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local password=$(echo "$item" | jq -r '.users[0].uuid')
+    local domain=$(echo "$item" | jq -r '.tls.server_name')
+    local method=$(echo "$item" | jq -r '.transport.type')
+    local path=$(echo "$item" | jq -r '.transport.path')
+
+    local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
+    local encode_link=$(base64 <<< $tmp)
+    local link="vmess://$encode_link"
+
+    clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"/${path}\"\n      headers:\n        Host: $domain"
+
+    qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=/${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+
+    vmess-info
+    show_info
+}
+
+vmess-info() {
+    outbound="{
+    \"protocol\": \"vmess\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${domain}\",
+                \"port\": 443,
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+			            \"alterId\": 0,
+			            \"level\": 0,
+			            \"security\": \"auto\",
+			            \"email\": \"b@your.domain\"
+                    }
+                ]
+            }
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"ws\",
+	    \"security\": \"tls\",
+	    \"tlsSettings\": {
+            \"allowInsecure\": false,
+            \"serverName\": \"${domain}\"
+        },
+        \"wsSettings\": {
+            \"path\": \"/${path}\",
+            \"headers\": {
+            \"Host\":\"${domain}\"
+            }
+        }
+    }\n}"
+
+    singbox_outbound="{
+	\"type\": \"vmess\",
+	\"server\": \"${domain}\",
+	\"server_port\": 443,
+	\"uuid\": \"${password}\",
+	\"security\": \"auto\",
+	\"alter_id\": 0,
+	\"global_padding\": false,
+	\"authenticated_length\": true,
+	\"tls\": {
+		\"enabled\": true,
+		\"disable_sni\": false,
+		\"server_name\": \"${domain}\",
+		\"insecure\": false,
+		\"alpn\": [
+			\"http/1.1\"
+		]
+	},
+	\"multiplex\": {
+		\"enabled\": true,
+		\"protocol\": \"smux\",
+		\"max_connections\": 5,
+		\"min_streams\": 4,
+		\"max_streams\": 0
+	},
+	\"transport\": {
+		\"type\": \"ws\",
+		\"path\": \"/${path}\",
+		\"max_early_data\": 0,
+		\"early_data_header_name\": \"Sec-WebSocket-Protocol\"
+	},
+	\"connect_timeout\": \"5s\"\n}"
+}
+
+# vmess end
 
 # shadowsocket start
 
@@ -172,6 +284,9 @@ xray_range() {
             "vless")
                 xray_vless "$inbound"
                 ;;
+            "vmess")
+                xray_vmess "$inbound"
+                ;;
             *)
                 ;;
         esac
@@ -201,6 +316,9 @@ singbox_range() {
                 ;;
             "hysteria2")
                 singbox_hy2 "$inbound"
+                ;;
+            "vmess")
+                singbox_vmess "$inbound"
                 ;;
             *)
                 ;;

@@ -1345,8 +1345,7 @@ vmess-ws-tls-outbound-config() {
             \"Host\":\"${domain}\"
             }
         }
-    }
-}"
+    }\n}"
 
     singbox_outbound="{
 	\"type\": \"vmess\",
@@ -1379,8 +1378,7 @@ vmess-ws-tls-outbound-config() {
 		\"max_early_data\": 0,
 		\"early_data_header_name\": \"Sec-WebSocket-Protocol\"
 	},
-	\"connect_timeout\": \"5s\"
-}"
+	\"connect_timeout\": \"5s\"\n}"
 }
 
 vless-reality-grpc-outbound-config() {
@@ -1415,8 +1413,7 @@ vless-reality-grpc-outbound-config() {
             \"idle_timeout\": 60,
             \"health_check_timeout\": 20
         }
-    }
-}"
+    }\n}"
 }
 
 vless-reality-tcp-outbound-config() {
@@ -1448,8 +1445,7 @@ vless-reality-tcp-outbound-config() {
             \"shortId\": \"8eb7bab5a41eb27d\",
             \"spiderX\": \"/\"
         }
-    }
-}"
+    }\n}"
 }
 
 trojan-tcp-tls-outbound-config() {
@@ -1471,8 +1467,7 @@ trojan-tcp-tls-outbound-config() {
         \"tlsSettings\": {
             \"serverName\": \"${domain}\"
         }
-    }
-}"
+    }\n}"
 }
 
 vless-reality-h2-outbound-config() {
@@ -1504,8 +1499,7 @@ vless-reality-h2-outbound-config() {
             \"shortId\": \"8eb7bab5a41eb27d\",
             \"spiderX\": \"/\"
         }
-    }
-}"
+    }\n}"
 }
 
 trojan-outbound-config() {
@@ -1519,14 +1513,12 @@ trojan-outbound-config() {
                 \"password\": \"${password}\"
             }
         ]
-    }
-}"
+    }\n}"
     singbox_outbound="{
     \"type\": \"trojan\",
     \"server\": \"${ip}\",
     \"server_port\": ${port},
-    \"password\": \"${password}\"
-}"
+    \"password\": \"${password}\"\n}"
 }
 
 shadowsocket-2022-outbound-config() {
