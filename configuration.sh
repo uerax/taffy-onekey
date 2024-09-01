@@ -89,7 +89,7 @@ vmess-info() {
         \"serverName\": \"${domain}\"
       },
       \"wsSettings\": {
-        \"path\": \"/${path}\",
+        \"path\": \"${path}\",
         \"headers\": {
           \"Host\":\"${domain}\"
         }
@@ -123,7 +123,7 @@ vmess-info() {
 	},
 	\"transport\": {
 		\"type\": \"ws\",
-		\"path\": \"/${path}\",
+		\"path\": \"${path}\",
 		\"max_early_data\": 0,
 		\"early_data_header_name\": \"Sec-WebSocket-Protocol\"
 	},
