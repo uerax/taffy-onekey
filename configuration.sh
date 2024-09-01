@@ -63,7 +63,7 @@ shadowsocket_info() {
     \"password\": \"${password}\"\n}"
     local qx_cfg="shadowsocks=$ip:$port, method=$method, password=$password, tag=$ip"
     local clash_cfg="  - name: $ip\n    type: ss\n    server: '$ip'\n    port: $port\n    cipher: $method\n    password: $password\n    udp: true"
-    local tmp="${ss_method}:${password}"
+    local tmp="${method}:${password}"
     tmp=$(base64 <<< $tmp)
     local link="ss://$tmp@${ip}:${port}"
     
