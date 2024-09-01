@@ -24,26 +24,26 @@ singbox_outbound=""
 
 xray_shadowsocket() {
     local item="$1"
-    type=$(echo "$item" | jq -r '.protocol')
-    port=$(echo "$item" | jq -r '.port')
-    method=$(echo "$item" | jq -r '..settings.method')
-    password=$(echo "$item" | jq -r '.settings.password')
+    local type=$(echo "$item" | jq -r '.protocol')
+    local port=$(echo "$item" | jq -r '.port')
+    local method=$(echo "$item" | jq -r '..settings.method')
+    local password=$(echo "$item" | jq -r '.settings.password')
     
     shadowsocket_info
 }
 
 singbox_shadowsocket() {
     local item="$1"
-    type=$(echo "$item" | jq -r '.type')
-    port=$(echo "$item" | jq -r '.listen_port')
-    method=$(echo "$item" | jq -r '.method')
-    password=$(echo "$item" | jq -r '.password')
+    local type=$(echo "$item" | jq -r '.type')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local method=$(echo "$item" | jq -r '.method')
+    local password=$(echo "$item" | jq -r '.password')
     
     shadowsocket_info
 }
 
 shadowsocket_info() {
-    xray_outbound="{
+    local xray_outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
         \"servers\": [
@@ -55,17 +55,17 @@ shadowsocket_info() {
             }
         ]
     }\n}"
-    singbox_outbound="{
+    local singbox_outbound="{
     \"type\": \"shadowsocks\",
     \"server\": \"${ip}\",
     \"server_port\": ${port},
     \"method\": \"${method}\",
     \"password\": \"${password}\"\n}"
-    qx_cfg="shadowsocks=$ip:$port, method=$method, password=$password, tag=$ip"
-    clash_cfg="  - name: $ip\n    type: ss\n    server: '$ip'\n    port: $port\n    cipher: $method\n    password: $password\n    udp: true"
-    tmp="${ss_method}:${password}"
+    local qx_cfg="shadowsocks=$ip:$port, method=$method, password=$password, tag=$ip"
+    local clash_cfg="  - name: $ip\n    type: ss\n    server: '$ip'\n    port: $port\n    cipher: $method\n    password: $password\n    udp: true"
+    local tmp="${ss_method}:${password}"
     tmp=$(base64 <<< $tmp)
-    link="ss://$tmp@${ip}:${port}"
+    local link="ss://$tmp@${ip}:${port}"
     
     show_info
 }
@@ -75,28 +75,28 @@ shadowsocket_info() {
 # vless start
 singbox_vless() {
     local item="$1"
-    type=$(echo "$item" | jq -r '.type')
-    port=$(echo "$item" | jq -r '.listen_port')
-    password=$(echo "$item" | jq -r '.users[0].uuid')
-    reality=$(echo "$item" | jq -r '.tls.reality')
+    local type=$(echo "$item" | jq -r '.type')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local password=$(echo "$item" | jq -r '.users[0].uuid')
+    local reality=$(echo "$item" | jq -r '.tls.reality')
     if [ -n "$reality" ]; then
-        protocol=$(echo "$reality" | jq -r '.transport.type')
-        pubkey=$(echo "$item" | jq -r '.users[0].name')
-        domain=$(echo "$item" | jq -r '.tls.server_name')
-        shortId=$(echo "$reality" | jq -r '.short_id[0]')
+        local protocol=$(echo "$reality" | jq -r '.transport.type')
+        local pubkey=$(echo "$item" | jq -r '.users[0].name')
+        local domain=$(echo "$item" | jq -r '.tls.server_name')
+        local shortId=$(echo "$reality" | jq -r '.short_id[0]')
         if [ "$protocol" = "grpc" ]; then
             # reality+grpc
-            servName=$(echo "$reality" | jq -r '.transport.service_name')
-            link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local servName=$(echo "$reality" | jq -r '.transport.service_name')
+            local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         elif [ "$protocol" = "http" ]; then
             # reality+h2
-            link="vless://$password@$ip:$port?encryption=none&security=reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&security=reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         else
             # reality+tcp
-            link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         fi
         show_info
     else
@@ -106,26 +106,26 @@ singbox_vless() {
 
 xray_vless() {
     local item="$1"
-    type=$(echo "$item" | jq -r '.protocol')
-    port=$(echo "$item" | jq -r '.listen_port')
-    password=$(echo "$item" | jq -r '.clients[0].id')
-    reality=$(echo "$item" | jq -r '.streamSettings.security')
+    local type=$(echo "$item" | jq -r '.protocol')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local password=$(echo "$item" | jq -r '.clients[0].id')
+    local reality=$(echo "$item" | jq -r '.streamSettings.security')
     if [ "$reality" = "reality" ]; then
-        protocol=$(echo "$item" | jq -r '.streamSettings.network')
-        pubkey=$(echo "$item" | jq -r '.key')
-        domain=$(echo "$item" | jq -r '.streamSettings.realitySettings.serverNames[0]')
-        shortId=$(echo "$reality" | jq -r '.streamSettings.realitySettings.shortIds[0]')
+        local protocol=$(echo "$item" | jq -r '.streamSettings.network')
+        local pubkey=$(echo "$item" | jq -r '.key')
+        local domain=$(echo "$item" | jq -r '.streamSettings.realitySettings.serverNames[0]')
+        local shortId=$(echo "$reality" | jq -r '.streamSettings.realitySettings.shortIds[0]')
         if [ "$protocol" = "grpc" ]; then
-            servName=$(echo "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
-            link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local servName=$(echo "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
+            local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         elif [ "$protocol" = "h2" ]; then
-            link="vless://$password@$ip:$port?encryption=none&security=$reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"        
+            local link="vless://$password@$ip:$port?encryption=none&security=$reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"        
         else
             # reality+tcp
-            link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=$reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
-            clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=$reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
         fi
         show_info
     else
@@ -137,15 +137,15 @@ xray_vless() {
 # hysteria2 start
 singbox_hy2() {
     local item="$1"
-    type=$(echo "$item" | jq -r '.type')
-    port=$(echo "$item" | jq -r '.listen_port')
-    up=$(echo "$item" | jq -r '.up_mbps')
-    down=$(echo "$item" | jq -r '.down_mbps')
-    password=$(echo "$item" | jq -r '.users[0].uuid')
+    local type=$(echo "$item" | jq -r '.type')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local up=$(echo "$item" | jq -r '.up_mbps')
+    local down=$(echo "$item" | jq -r '.down_mbps')
+    local password=$(echo "$item" | jq -r '.users[0].password')
     
-    link="hysteria2://${password}@${ip}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${ip}"
 
-    clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://live.qq.com\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://live.qq.com\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     show_info
 }
