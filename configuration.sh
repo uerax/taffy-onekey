@@ -160,11 +160,11 @@ xray_range() {
         exit 1  # 非零的退出状态表示异常退出
     fi
 
+    ip=$(curl -s4 https://ip.me)
+    ipv6=$(curl -s6 https://ip.me)
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.protocol')
-        ip=$(curl -s4 https://ip.me)
-        ipv6=$(curl -s6 https://ip.me)
         case "$type" in
             "shadowsocks")
                 xray_shadowsocket "$inbound"
