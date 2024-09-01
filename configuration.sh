@@ -138,7 +138,7 @@ xray_shadowsocket() {
     local item="$1"
     local type=$(echo "$item" | jq -r '.protocol')
     local port=$(echo "$item" | jq -r '.port')
-    local method=$(echo "$item" | jq -r '..settings.method')
+    local method=$(echo "$item" | jq -r '.settings.method')
     local password=$(echo "$item" | jq -r '.settings.password')
     
     shadowsocket_info
