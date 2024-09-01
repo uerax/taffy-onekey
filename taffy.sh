@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.0.0"
+version="v2.0.1"
 
 #fonts color
 Green="\033[32m"
@@ -103,7 +103,7 @@ ws_path="crayfish"
 ss_method=""
 
 outbound_method=""
-outbound='{"protocol": "freedom"}\n'
+outbound=""
 
 INS="apt install -y"
 password=""
@@ -1980,22 +1980,31 @@ info_return() {
     echo -e "${Green}密码为:${Font} ${password}"
     echo -e "${Green}端口为:${Font} ${port}"
     echo -e "${Green}链接:${Font} ${link}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
+    if [ -n "$qx_cfg" ]; then
+        echo -e "------------------------------------------------"
+        echo -e "${Green}QuantumultX配置: ${Font}"
+        echo -e "${qx_cfg}"
+    fi
+    if [ -n "$outbound" ]; then
+        echo -e "------------------------------------------------"
+        echo -e "${Green}Outbounds配置:${Font}"
+        echo -e "${outbound}"
+    fi
+    if [ -n "$singbox_outbound" ]; then
+        echo -e "------------------------------------------------"
+        echo -e "${Green}Singbox Outbounds配置:${Font}"
+        echo -e "${singbox_outbound}"
+    fi
+    if [ -n "$clash_cfg" ]; then
+        echo -e "------------------------------------------------"
+        echo -e "${Green}Clash配置: ${Font}"
+        echo -e "${clash_cfg}"
+    fi
     echo -e "------------------------------------------------"
-    echo -e "${Green}QuantumultX配置: ${Font}"
-    echo -e "${qx_cfg}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${outbound}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Singbox Outbounds配置:${Font}"
-    echo -e "${singbox_outbound}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Clash配置: ${Font}"
-    echo -e "${clash_cfg}"
-    echo -e "------------------------------------------------"
-
-    echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
+    if [ "$xray_type" = "vmess_ws" ]; then
+        echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
+    fi
+    
 }
 
 show_info() {

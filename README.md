@@ -48,19 +48,12 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 
 现在已支持以下协议
 
-- vless-tls-reality
 - hysteria2
-- trojan-tcp-tls
-- trojan-tcp-tls-brutal
+- vless-tls-reality
 - vless-grpc-reality
 - vless-h2-reality
-- trojan-grpc
 - vmess-ws-tls
-- vless-ws-tls
-- vless-grpc
-- vless-tcp-xtls-vision
 - shadowsocket-2022
-- trojan
 
 
 ## Question
