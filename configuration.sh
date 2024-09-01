@@ -107,14 +107,14 @@ singbox_vless() {
 xray_vless() {
     local item="$1"
     local type=$(echo "$item" | jq -r '.protocol')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local password=$(echo "$item" | jq -r '.clients[0].id')
+    local port=$(echo "$item" | jq -r '.port')
+    local password=$(echo "$item" | jq -r '.settings.clients[0].id')
     local reality=$(echo "$item" | jq -r '.streamSettings.security')
     if [ "$reality" = "reality" ]; then
         local protocol=$(echo "$item" | jq -r '.streamSettings.network')
         local pubkey=$(echo "$item" | jq -r '.key')
         local domain=$(echo "$item" | jq -r '.streamSettings.realitySettings.serverNames[0]')
-        local shortId=$(echo "$reality" | jq -r '.streamSettings.realitySettings.shortIds[0]')
+        local shortId=$(echo "$item" | jq -r '.streamSettings.realitySettings.shortIds[0]')
         if [ "$protocol" = "grpc" ]; then
             local servName=$(echo "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
@@ -209,9 +209,9 @@ singbox_range() {
 }
 
 show_info() {
-    echo -e "------------------------------------------------------------"
-    echo -e "----------------------------${Cyan}配置开始${Font}----------------------------"
-    echo -e "------------------------------------------------------------"
+    echo -e "${Cyan}------------------------------------------------------------${Font}"
+    echo -e "${Cyan}----------------------------配置开始----------------------------${Font}"
+    echo -e "${Cyan}------------------------------------------------------------${Font}"
     echo -e "${Green}协议:${Font} ${type}"
     echo -e "${Green}地址:${Font} ${ip}"
     if [ -n "$ipv6" ]; then
@@ -245,9 +245,9 @@ show_info() {
         echo -e "${Green}Clash配置:${Font}"
         echo -e "${clash_cfg}"
     fi
-    echo -e     echo -e "------------------------------------------------------------"
-    echo -e "----------------------------${Cyan}配置结束${Font}----------------------------"
-    echo -e "------------------------------------------------------------"
+    echo -e "${Cyan}------------------------------------------------------------${Font}"
+    echo -e "${Cyan}----------------------------配置结束----------------------------${Font}"
+    echo -e "${Cyan}------------------------------------------------------------${Font}"
 }
 
 xray_run() {
