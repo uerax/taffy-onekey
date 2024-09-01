@@ -62,38 +62,38 @@ singbox_vmess() {
 }
 
 vmess-info() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"vmess\",
     \"settings\": {
-        \"vnext\": [
+      \"vnext\": [
+        {
+          \"address\": \"${domain}\",
+          \"port\": 443,
+          \"users\": [
             {
-                \"address\": \"${domain}\",
-                \"port\": 443,
-                \"users\": [
-                    {
-                        \"id\": \"${password}\",
-			            \"alterId\": 0,
-			            \"level\": 0,
-			            \"security\": \"auto\",
-			            \"email\": \"b@your.domain\"
-                    }
-                ]
+              \"id\": \"${password}\",
+              \"alterId\": 0,
+              \"level\": 0,
+              \"security\": \"auto\",
+              \"email\": \"b@your.domain\"
             }
-        ]
+          ]
+        }
+      ]
     },
     \"streamSettings\": {
-        \"network\": \"ws\",
-	    \"security\": \"tls\",
-	    \"tlsSettings\": {
-            \"allowInsecure\": false,
-            \"serverName\": \"${domain}\"
-        },
-        \"wsSettings\": {
-            \"path\": \"/${path}\",
-            \"headers\": {
-            \"Host\":\"${domain}\"
-            }
+      \"network\": \"ws\",
+      \"security\": \"tls\",
+      \"tlsSettings\": {
+        \"allowInsecure\": false,
+        \"serverName\": \"${domain}\"
+      },
+      \"wsSettings\": {
+        \"path\": \"/${path}\",
+        \"headers\": {
+          \"Host\":\"${domain}\"
         }
+      }
     }\n}"
 
     singbox_outbound="{
