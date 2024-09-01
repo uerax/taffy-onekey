@@ -43,8 +43,6 @@ singbox_shadowsocket() {
 }
 
 shadowsocket_info() {
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
     xray_outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
@@ -76,8 +74,6 @@ shadowsocket_info() {
 
 # vless start
 singbox_vless() {
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
     local item="$1"
     type=$(echo "$item" | jq -r '.type')
     port=$(echo "$item" | jq -r '.listen_port')
@@ -109,8 +105,6 @@ singbox_vless() {
 }
 
 xray_vless() {
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
     local item="$1"
     type=$(echo "$item" | jq -r '.protocol')
     port=$(echo "$item" | jq -r '.listen_port')
@@ -142,8 +136,6 @@ xray_vless() {
 
 # hysteria2 start
 singbox_hy2() {
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
     local item="$1"
     type=$(echo "$item" | jq -r '.type')
     port=$(echo "$item" | jq -r '.listen_port')
@@ -171,7 +163,8 @@ xray_range() {
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.protocol')
-
+        ip=$(curl -s4 https://ip.me)
+        ipv6=$(curl -s6 https://ip.me)
         case "$type" in
             "shadowsocks")
                 xray_shadowsocket "$inbound"
