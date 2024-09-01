@@ -274,6 +274,9 @@ xray_range() {
 
     ip=$(curl -s4 https://ip.me)
     ipv6=$(curl -s6 https://ip.me)
+    if [ ! -n "$ip" ]; then
+        ip=$ipv6
+    fi
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.protocol')
@@ -303,6 +306,9 @@ singbox_range() {
 
     ip=$(curl -s4 https://ip.me)
     ipv6=$(curl -s6 https://ip.me)
+    if [ ! -n "$ip" ]; then
+        ip=$ipv6
+    fi
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $singbox_cfg | while read -r inbound; do
         type=$(echo "$inbound" | jq -r '.type')
