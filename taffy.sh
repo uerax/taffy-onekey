@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v1.11.2"
+version="v2.0.0"
 
 #fonts color
 Green="\033[32m"
@@ -66,16 +66,12 @@ vless_reality_grpc_append_url="https://raw.githubusercontent.com/uerax/taffy-one
 vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
 vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/append.json"
 
-hysteria2_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
-hysteria2_nodomain_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
-
 # SINGBOX URL START
 singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-sing-box.sh"
 tcp_brutal_install_url="https://tcp.hy2.sh/"
 singbox_cfg_path="/etc/sing-box"
 singbox_cfg="${singbox_cfg_path}/config.json"
 singbox_path="/opt/singbox/"
-singbox_info="${singbox_path}singbox_info"
 
 singbox_outbound=""
 
@@ -93,12 +89,8 @@ singbox_trojan_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onek
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
 
-hysteria_info="${xray_path}hysteria_info"
-hysteria_cfg="/etc/hysteria/config.json"
-
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
-xray_info="${xray_path}xray_info"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/taffy.conf"
 web_dir="blog"
@@ -576,18 +568,6 @@ vless_reality_h2() {
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_ADDR_IPV6="${ipv6}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_reality_h2_append() {
@@ -650,18 +630,6 @@ vless_reality_tcp() {
 
     link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_ADDR_IPV6="${ipv6}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_reality_tcp_append() {
@@ -722,20 +690,6 @@ vless_reality_grpc() {
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_ADDR_IPV6="${ipv6}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_reality_grpc_append() {
@@ -807,18 +761,6 @@ trojan_grpc() {
     link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
 
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 trojan_tcp_tls() {
@@ -861,17 +803,6 @@ trojan_tcp_tls() {
 
     clash_config
     qx_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vmess_ws_tls() {
@@ -918,20 +849,6 @@ vmess_ws_tls() {
     clash_config
     qx_config
     vmess-ws-tls-outbound-config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="websocket"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-SINGBOX_OUTBOUND="${singbox_outbound}"
-EOF
 }
 
 vless_ws_tls() {
@@ -972,18 +889,6 @@ vless_ws_tls() {
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="websocket"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_grpc() {
@@ -1022,18 +927,6 @@ vless_grpc() {
     parts="auto:${password}@${domain}:443"
     encode_parts=$(base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_tcp_xtls_vision() {
@@ -1058,17 +951,6 @@ vless_tcp_xtls_vision() {
     link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
     clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_FLOW="xtls-rprx-vision"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 vless_tcp_xtls_vision_nginx_cfg() {
@@ -1105,17 +987,6 @@ trojan() {
     clash_config
     qx_config
 
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-SINGBOX_OUTBOUND="${singbox_outbound}"
-EOF
 }
 
 trojan-config() {
@@ -1218,19 +1089,6 @@ shadowsocket-2022() {
     clash_config
     qx_config
 
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_ADDR_IPV6="${ipv6}"
-XRAT_METHOD="${ss_method}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_config}"
-XRAY_OUTBOUND="${outbound}"
-SINGBOX_OUTBOUND="${singbox_outbound}"
-EOF
 }
 
 shadowsocket-2022-config() {
@@ -1596,110 +1454,6 @@ routing_set() {
 
 }
 
-hysteria_install() {
-    echo -e "------------------------------------------"
-    read -rp "是否安装指定版本(Y/N): " input
-    case $input in
-    [yY])
-      read -rp "输入指定版本(eq: 2.2.2): " version
-      bash <(curl -fsSL https://get.hy2.sh/)  --version v${version}
-      ;;
-    *)
-      bash <(curl -fsSL https://get.hy2.sh/)
-      ;;
-    esac
-}
-
-hysteria2() {
-    is_root
-    get_system
-    # adjust_date
-    ${INS} curl
-    judge "curl 安装"
-
-    hysteria_install
-
-    echo -e "------------------------------------------"
-    read -rp "是否使用域名(Y/N): " hasDmain
-    case $hasDmain in
-    [yY])
-      hysteria2_domain
-      ;;
-    [nN])
-      hysteria2_without_domain
-      ;;
-    *)
-      hysteria2_without_domain
-      ;;
-    esac
-    
-}
-
-hysteria2_without_domain() {
-    set_port
-    ${INS} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/hysteria/server.key -out /etc/hysteria/server.crt -subj "/CN=live.qq.com" -days 36500 && chown hysteria /etc/hysteria/server.key &&  chown hysteria /etc/hysteria/server.crt && chmod +775 /etc/hysteria/server*
-
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    domain=$(curl -s https://ip.me)
-
-    wget -N ${hysteria2_nodomain_config_url} -O config.yaml
-
-    sed -i "s/\${password}/$password/" config.yaml
-    sed -i "s/\${domain}/$domain/" config.yaml
-    sed -i "s/\${port}/$port/" config.yaml
-
-    mv config.yaml /etc/hysteria/config.yaml
-
-    systemctl start hysteria-server.service
-    systemctl enable hysteria-server.service
-    
-    xray_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
-
-    clash_config
-    mkdir -p ${xray_path}
-    cat>${hysteria_info}<<EOF
-HY_TYPE="${xray_type}"
-HY_ADDR="${domain}"
-HY_PWORD="${password}"
-HY_PORT="${port}"
-HY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
-    info_return
-}
-
-hysteria2_domain() {
-    domain_handle
-    set_port
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    wget -N ${hysteria2_config_url} -O config.yaml
-
-    sed -i "s/\${password}/$password/" config.yaml
-    sed -i "s/\${port}/$port/" config.yaml
-    sed -i "s/\${domain}/$domain/" config.yaml
-
-    mv config.yaml /etc/hysteria/config.yaml
-
-    systemctl start hysteria-server.service
-    systemctl enable hysteria-server.service
-    xray_type="hysteria2"
-
-    clash_config
-
-    mkdir -p ${xray_path}
-    cat>${hysteria_info}<<EOF
-HY_TYPE="${xray_type}"
-HY_ADDR="${domain}"
-HY_PWORD="${password}"
-HY_PORT="${port}"
-HY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
-    info_return
-}
-
 set_port() {
     echo -e "------------------------------------------"
     read -rp "设置你的端口(默认443): " input
@@ -1784,16 +1538,7 @@ singbox_hy2() {
     clash_config
 
     mkdir -p ${singbox_path}
-    
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${domain}"
-SINGBOX_ADDR_IPV6="${ipv6}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
+
     info_return
 }
 
@@ -1825,17 +1570,6 @@ singbox_vless_reality_h2() {
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
 
     clash_config
-
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${ip}"
-SINGBOX_ADDR_IPV6="${ipv6}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_KEY="${public_key}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
 }
 
 singbox_vless_reality_grpc() {
@@ -1867,17 +1601,6 @@ singbox_vless_reality_grpc() {
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
 
     clash_config
-
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${ip}"
-SINGBOX_ADDR_IPV6="${ipv6}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_KEY="${public_key}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
 }
 
 singbox_vless_reality_tcp() {
@@ -1909,17 +1632,7 @@ singbox_vless_reality_tcp() {
     link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
-    
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${ip}"
-SINGBOX_ADDR_IPV6="${ipv6}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_KEY="${public_key}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
+
 }
 
 singbox_vmess_ws_tls() {
@@ -1949,19 +1662,6 @@ singbox_vmess_ws_tls() {
     qx_config
     vmess-ws-tls-outbound-config
 
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${domain}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="443"
-SINGBOX_OBFS="websocket"
-OBFS_PATH="${ws_path}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-SINGBOX_OUTBOUND="${singbox_outbound}"
-EOF
 }
 
 singbox_trojan-tls-tcp() {
@@ -2003,17 +1703,6 @@ singbox_trojan-tls-tcp() {
 
     clash_config
     qx_config
-
-    cat>${xray_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${domain}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-SINGBOX_OUTBOUND="${outbound}"
-EOF
 }
 
 
@@ -2077,20 +1766,6 @@ singbox_shadowsocket() {
     shadowsocket-2022-outbound-config
     clash_config
     qx_config
-
-    cat>${singbox_info}<<EOF
-SINGBOX_TYPE="${xray_type}"
-SINGBOX_ADDR="${domain}"
-SINGBOX_ADDR_IPV6="${ipv6}"
-SINGBOX_METHOD="${ss_method}"
-SINGBOX_PWORD="${password}"
-SINGBOX_PORT="${port}"
-SINGBOX_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-SINGBOX_OUTBOUND="${singbox_outbound}"
-EOF
 }
 
 singbox_hy2_append() {
@@ -2324,84 +1999,11 @@ info_return() {
 }
 
 show_info() {
-    source ${xray_info}
-    echo -e "------------------------------------------------"
-    judge "查看配置"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}协议:${Font} ${XRAY_TYPE}"
-    echo -e "${Green}地址:${Font} ${XRAY_ADDR}"
-    echo -e "${Green}地址IPv6:${Font} ${XRAY_ADDR_IPV6}"
-    echo -e "${Green}密码:${Font} ${XRAY_PWORD}"
-    echo -e "${Green}端口:${Font} ${XRAY_PORT}"
-    echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
-    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
-    echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
-    echo -e "${Green}分享链接:${Font} ${XRAY_LINK}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}QuantumultX配置:${Font}"
-    echo -e "${QX_CONFIG}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${XRAY_OUTBOUND}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
-    echo -e "------------------------------------------------"
-}
-
-show_hysteria_info() {
-    source ${hysteria_info}
-    echo -e "------------------------------------------------"
-    judge "查看配置"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}协议:${Font} ${HY_TYPE}"
-    echo -e "${Green}地址:${Font} ${HY_ADDR}"
-    echo -e "${Green}密码:${Font} ${HY_PWORD}"
-    echo -e "${Green}端口:${Font} ${HY_PORT}"
-    echo -e "${Green}混淆:${Font} ${HY_OBFS}"
-    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
-    echo -e "${Green}PubKey(REALITY):${Font} ${HY_KEY}"
-    echo -e "${Green}分享链接:${Font} ${HY_LINK}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}QuantumultX配置:${Font}"
-    echo -e "${QX_CONFIG}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${HY_OUTBOUND}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
-    echo -e "------------------------------------------------"
+    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ xray
 }
 
 show_singbox_info() {
-    source ${singbox_info}
-    echo -e "------------------------------------------------"
-    judge "查看配置"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}协议:${Font} ${SINGBOX_TYPE}"
-    echo -e "${Green}地址:${Font} ${SINGBOX_ADDR}"
-    echo -e "${Green}地址IPv6:${Font} ${SINGBOX_ADDR_IPV6}"
-    echo -e "${Green}密码:${Font} ${SINGBOX_PWORD}"
-    echo -e "${Green}端口:${Font} ${SINGBOX_PORT}"
-    echo -e "${Green}混淆:${Font} ${SINGBOX_OBFS}"
-    echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
-    echo -e "${Green}PubKey(REALITY):${Font} ${SINGBOX_KEY}"
-    echo -e "${Green}分享链接:${Font} ${SINGBOX_LINK}"
-    echo -e "${Red}分享链接可能不可用,建议手动填写客户端参数${Font}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}QuantumultX配置:${Font}"
-    echo -e "${QX_CONFIG}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Singbox Outbounds配置:${Font}"
-    echo -e "${SINGBOX_OUTBOUND}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}Clash配置:${Font}"
-    echo -e "${CLASH_CONFIG}"
-    echo -e "------------------------------------------------"
-
+    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ singbox
 }
 
 server_check() {
@@ -2502,10 +2104,6 @@ uninstall_acme() {
     ) | crontab -
 }
 
-uninstall_hysteria2() {
-    bash <(curl -fsSL https://get.hy2.sh/) --remove
-}
-
 uninstall() {
     echo -e "------------------------------------------"
     read -rp "是否确定要完全卸载(Y/N): " input
@@ -2514,7 +2112,6 @@ uninstall() {
       uninstall_xray
       uninstall_nginx
       uninstall_acme
-      uninstall_hysteria2
       uninstall_singbox
       echo -e "全部卸载已完成"
     ;;
@@ -2595,43 +2192,6 @@ singbox_operation() {
           error "请输入正确的数字"
           ;;
       esac
-}
-
-hysteria_operation() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  启动 Hysteria${Font}"
-    echo -e "${Yellow}2)  关闭 Hysteria${Font}"
-    echo -e "${Green}3)  重启 Hysteria${Font}"
-    echo -e "${Green}4)  查看 Hysteria 状态${Font}"
-    echo -e "${Green}9)  安装 / 升级 Hysteria${Font}"
-    echo -e "${Red}q)  退出${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-      case $opt_num in
-      1)
-          systemctl start hysteria-server.service
-          ;;
-      2)
-          systemctl stop hysteria-server.service
-          ;;
-      3)
-          systemctl restart hysteria-server.service
-          ;;
-      4)
-          systemctl status hysteria-server.service
-          ;;
-      9)
-          hysteria_install
-          ;;
-      q)
-          exit
-          ;;
-      *)
-          error "请输入正确的数字"
-          ;;
-      esac
-      hysteria_operation
 }
 
 server_operation() {
@@ -2807,53 +2367,15 @@ singbox_select() {
     info_return
 }
 
-hysteria_select() {
-    echo -e "${Green}Hysteria 相关操作 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  一键安装 Hysteria${Font}"
-    echo -e "${Yellow}2)  卸载 Hysteria${Font}"
-    echo -e "${Purple}3)  安装 / 更新 / 启动 Hysteria${Font}"
-    echo -e "${Purple}4)  查看 hysteria 配置链接${Font}"
-    echo -e "${Red}q)   退出${Font}"
-    echo -e "${Cyan}————————————————————————————————————————${Font}\n"
-
-    read -rp "输入数字(回车确认)：" menu_num
-    echo -e ""
-    case $menu_num in
-    1)
-    hysteria2
-    ;;
-    2)
-    uninstall_hysteria2
-    ;;
-    3)
-    hysteria_operation
-    ;;
-    4)
-    show_hysteria_info
-    ;;
-    q)
-    ;;
-    *)
-    error "请输入正确的数字"
-    ;;
-    esac
-}
-
 select_type() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc(推荐)${Font}"
     echo -e "${Green}3)  vless-reality-h2${Font}"
-    echo -e "${Cyan}4)  vless-ws-tls${Font}"
-    echo -e "${Cyan}5)  vless-grpc${Font}"
-    echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
     echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
-    echo -e "${Cyan}12)  trojan-grpc${Font}"
     echo -e "${Cyan}21)  vmess-ws-tls${Font}"
     echo -e "${Cyan}31)  shadowsocket-2022${Font}"
-    echo -e "${Cyan}32)  trojan${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2869,29 +2391,14 @@ select_type() {
     3)
         vless_reality_h2
         ;;
-    4)
-        vless_ws_tls
-        ;;
-    5)
-        vless_grpc
-        ;;
-    6)
-        vless_tcp_xtls_vision
-        ;;
     11)
         trojan_tcp_tls
-        ;;
-    12)
-        trojan_grpc
         ;;
     21)
         vmess_ws_tls
         ;;
     31)
         shadowsocket-2022
-        ;;
-    32)
-        trojan
         ;;
     q)
         exit
@@ -2923,7 +2430,6 @@ menu() {
     echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
     echo -e "${Cyan}21)  更换域名证书${Font}"
-    echo -e "${Green}30)  Hysteria 操作合集${Font}"
     echo -e "${Purple}31)  安装 / 更新 / 回退 Xray${Font}"
     echo -e "${Yellow}32)  卸载 Xray${Font}"
     echo -e "${Purple}33)  Singbox 操作面板${Font}"
@@ -2976,9 +2482,6 @@ menu() {
     21)
     renew_ca
     ;;
-    30)
-    hysteria_select
-    ;;
     31)
     xray_upgrade
     ;;
@@ -3011,9 +2514,6 @@ menu() {
 case $1 in
     install)
         install
-        ;;
-    hysteria)
-        hysteria2
         ;;
     singbox)
         singbox_onekey_install

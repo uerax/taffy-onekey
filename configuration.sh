@@ -36,7 +36,7 @@ xray_vmess() {
 
     local qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
 
-    vmess-info
+    vmess_info
     show_info
 }
 
@@ -57,11 +57,11 @@ singbox_vmess() {
 
     qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
 
-    vmess-info
+    vmess_info
     show_info
 }
 
-vmess-info() {
+vmess_info() {
     xray_outbound="{
     \"protocol\": \"vmess\",
     \"settings\": {
