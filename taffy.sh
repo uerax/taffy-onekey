@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.0.3"
+version="v2.0.4"
 
 #fonts color
 Green="\033[32m"
@@ -1663,34 +1663,17 @@ singbox_vmess_ws_tls() {
 
 }
 
-singbox_trojan-tls-tcp() {
-    port_check 80
+singbox_trojan_tls_tcp() {
     port_check 443
-    nginx_install
     domain_handle
 
     xray_type="trojan_tcp"
     password=$(sing-box generate uuid)
 
-    wget -N ${singbox_trojan_tls_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-
-    sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
-
-    service nginx restart
-
-    sleep 3
-
     wget -N ${singbox_trojan_tls_config_url} -O ${singbox_cfg}
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${domain}~$domain~" ${singbox_cfg}
-    sed -i "s~\${ca_path}~$ca_path~" ${singbox_cfg}
-
-    singbox_routing_set
 
     systemctl restart sing-box
     
@@ -2362,7 +2345,7 @@ singbox_select() {
         singbox_vmess_ws_tls
         ;;
     7)
-        singbox_trojan-tls-tcp
+        singbox_trojan_tls_tcp
         ;;
     q)
         exit

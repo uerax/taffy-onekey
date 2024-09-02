@@ -19,18 +19,16 @@
                 "max_version": "1.3",
                 "acme": {
                   "domain": ["${domain}"],
-                  "data_directory": "${ca_path}",
+                  "data_directory": "/etc/sing-box",
                   "default_server_name": "",
                   "email": "singbox@crayfish.com",
                   "provider": "letsencrypt"
                 }
             },
             "multiplex": {
-                "enabled": true
-            },
-            "fallback": {
-                "server": "127.0.0.1",
-                "server_port": 8080
+                "enabled": false,
+                "protocol": "smux",
+                "max_streams": 32
             }
         }
     ],
