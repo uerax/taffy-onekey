@@ -29,12 +29,9 @@
                     "provider": "letsencrypt"
                 }
             },
-            "multiplex": {
-                "enabled": true
-            },
             "transport": {
                 "type": "grpc",
-                "service_name": "/${ws_path}"
+                "service_name": "${ws_path}"
             }
         }
     ],

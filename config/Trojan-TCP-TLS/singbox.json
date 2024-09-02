@@ -24,11 +24,6 @@
                   "email": "singbox@crayfish.com",
                   "provider": "letsencrypt"
                 }
-            },
-            "multiplex": {
-                "enabled": false,
-                "protocol": "smux",
-                "max_streams": 32
             }
         }
     ],

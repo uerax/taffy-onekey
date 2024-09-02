@@ -19,7 +19,6 @@ xray_outbound=""
 singbox_outbound=""
 
 # vmess start
-
 xray_vmess() {
     local item="$1"
     local type=$(echo "$item" | jq -r '.protocol')
@@ -133,8 +132,23 @@ vmess_info() {
 
 # vmess end
 
-# shadowsocket start
+# trojan start
+singbox_trojan() {
+    local item="$1"
+    local type=$(echo "$item" | jq -r '.type')
+    local password=$(echo "$item" | jq -r '.users[0].password')
+    local port=$(echo "$item" | jq -r '.listen_port')
+    local domain=$(echo "$item" | jq -r '.tls.server_name')
 
+    local link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
+
+    local clash_cfg="  - name: $domain\n    type: trojan\n    server: '$domain'\n    port: $port\n    password: $password\n    alpn:\n      - h2\n      - http/1.1"
+
+    local qx_cfg="trojan=$domain:$port, password=$password, over-tls=true, tls-host=$domain, tls-verification=true, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+}
+# trojan end
+
+# shadowsocket start
 xray_shadowsocket() {
     local item="$1"
     local type=$(echo "$item" | jq -r '.protocol')
@@ -264,8 +278,6 @@ singbox_hy2() {
 }
 
 # hysteria2 end
-
-
 xray_range() {
 
     if [ ! -e "$xray_cfg" ]; then
@@ -326,6 +338,9 @@ singbox_range() {
                 ;;
             "vmess")
                 singbox_vmess "$inbound"
+                ;;
+            "trojan")
+                singbox_trojan "$inbound"
                 ;;
             *)
                 ;;

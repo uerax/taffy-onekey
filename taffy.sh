@@ -244,18 +244,8 @@ update_web() {
 }
 
 domain_handle() {
-    ${INS} dnsutils
     echo -e "------------------------------------------"
     read -rp "输入你的域名(eg: example.com): " domain
-    ok "正在获取 IP 地址信息"
-    parse_ipv4=$(dig +short ${domain})
-    local_ipv4=$(curl -s4m8 https://ifconfig.co)
-    if [[ ${parse_ipv4} == "${local_ipv4}" ]]; then
-        ok "域名ip解析通过"
-        sleep 2
-    else
-        error "域名解析ip: ${parse_ipv4} 与本机不符, 请检测是否有误"
-    fi
 }
 
 apply_certificate() {
@@ -1607,7 +1597,6 @@ singbox_vless_reality_tcp() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
-    bash <(curl -fsSL $tcp_brutal_install_url)
 
     domain="www.fate-go.com.tw"
     xray_type="reality_tcp"
