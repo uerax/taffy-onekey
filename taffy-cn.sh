@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v1.8.0"
+version="v2.0.0"
 
 #fonts color
 Green="\033[32m"
@@ -24,7 +24,6 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-website_url="https://gh-proxy.com/https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
 xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-release-cn.sh"
 ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
@@ -34,43 +33,13 @@ bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taf
 
 trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
 
-trojan_grpc_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
-trojan_grpc_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
-
-trojan_tcp_tls_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
-trojan_tcp_tls_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
-
-vmess_ws_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
-vmess_ws_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
-
-vless_ws_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
-vless_ws_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/nginx.conf"
-
-vless_grpc_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/config.json"
-vless_grpc_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/nginx.conf"
-
-vless_vision_nginx_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
-vless_vision_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
-
-vless_reality_tcp_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
-vless_reality_grpc_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
-vless_reality_h2_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
-
-hysteria2_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config.yaml"
-hysteria2_nodomain_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/config_nodomain.yaml"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_info="${xray_path}xray_info"
 xray_log="${xray_path}xray_log"
-nginx_cfg="/etc/nginx/conf.d/xray.conf"
-web_path="${xray_path}webpage"
-web_dir="blog-main"
 xray_type=""
-ca_path="${xray_path}xray_cert"
-ca_crt="${xray_path}xray_cert/xray.crt"
-ca_key="${xray_path}xray_cert/xray.key"
-ws_path="crayfish"
+
 ss_method=""
 
 outbound_method=""
@@ -85,9 +54,7 @@ port="1919"
 install() {
     is_root
     get_system
-    # adjust_date
     env_install
-    # increase_max_handle
     close_firewall
     xray_install
     xray_configure
@@ -130,39 +97,18 @@ get_system() {
     fi
 }
 
-adjust_date() {
-  info "正在调整时区"
-  apt install -y locales
-  echo "Asia/Shanghai" > /etc/timezone && \
-  dpkg-reconfigure -f noninteractive tzdata && \
-  sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-  echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
-  dpkg-reconfigure --frontend=noninteractive locales && \
-  update-locale LANG=en_US.UTF-8
-  echo "Asia/Shanghai" > /etc/timezone
-  judge "时区调整"
-}
-
-function env_install() {
+env_install() {
 
     ${INS} wget
     judge "wget 安装"
-    ${INS} unzip
-    judge "unzip 安装"
+    ${INS} zip
+    judge "zip 安装"
     ${INS} lsof
     judge "lsof 安装"
     ${INS} curl
     judge "curl 安装"
     ${INS} jq
     judge "jq 安装"
-}
-
-increase_max_handle() {
-    # 最大文件打开数
-    sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
-    sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
-    echo '* soft nofile 65536' >>/etc/security/limits.conf
-    echo '* hard nofile 65536' >>/etc/security/limits.conf
 }
 
 port_check() {
@@ -208,16 +154,6 @@ nginx_install() {
     unzip web.zip && mv -f bakasine.github.io-master ${web_dir} && rm web.zip
 }
 
-update_web() {
-    cd ${web_path}
-    wget -O web.zip --no-check-certificate ${website_url}
-    judge "伪装站 下载"
-    unzip web.zip
-    rm -rf ./${web_dir}
-    mv -f bakasine.github.io-master ${web_dir}
-    rm web.zip
-}
-
 domain_handle() {
     echo -e "------------------------------------------"
     read -rp "输入你的域名(eg: example.com): " domain
@@ -232,84 +168,11 @@ domain_handle() {
     fi
 }
 
-apply_certificate() {
-    sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
-
-    cat > ${nginx_cfg} << EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-EOF
-
-    service nginx restart
-
-    if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
-        wget -O - https://get.acme.sh | sh
-        judge "安装 Acme"
-    else
-        ok "Acme 已安装"
-    fi
-    cd ~ && . .bashrc
-    /root/.acme.sh/acme.sh --upgrade --auto-upgrade
-    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-    echo ${domain}
-
-    if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
-        ok "SSL 证书生成成功"
-        sleep 2
-        mkdir -p ${ca_path}
-        if /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}; then
-            chmod +r ${ca_key}
-            ok "SSL 证书配置成功"
-            sleep 2
-        fi
-    else
-        error "证书生成失败"
-        exit 1
-    fi
-}
-
-flush_certificate() {
-    cat > ${ca_path}/xray-cert-renew.sh <<EOF
-#!/bin/bash
-
-if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force; then
-  sleep 2
-  mkdir -p ${ca_path}
-  /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}
-else
-  exit 1
-fi
-
-echo "Xray Certificates Renewed"
-
-chmod +r ${ca_key}
-echo "Read Permission Granted for Private Key"
-
-/etc/init.d/nginx restart
-echo "Xray Restarted"
-EOF
-
-    chmod +x ${ca_path}/xray-cert-renew.sh
-
-    (
-        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
-        echo "0 7 1 */2 *   bash ${ca_path}/xray-cert-renew.sh"
-    ) | crontab -
-
-}
-
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        wget --no-check-certificate ${xray_install_url} -O install-release.sh
-        judge "Xray安装脚本 下载"
-        bash install-release.sh install
+        bash <(curl -fsSL $xray_install_url)
         judge "Xray 安装"
-        rm install-release.sh
     else
         ok "Xray 已安装"
     fi
@@ -498,449 +361,6 @@ qx_config() {
     esac
 }
 
-vless_reality_h2() {
-    password=$(xray uuid)
-    set_port
-    port_check $port
-
-    domain="www.fate-go.com.tw"
-    xray_type="reality_h2"
-    keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-
-    wget -N ${vless_reality_h2_url} -O ${xray_cfg}
-
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
-
-    routing_set
-    vless-reality-h2-outbound-config
-    systemctl restart xray 
-
-    systemctl enable xray
-
-    service nginx stop
-
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=http#$ip"
-    clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_reality_tcp() {
-    password=$(xray uuid)
-    set_port
-    port_check $port
-
-    domain="www.fate-go.com.tw"
-    xray_type="reality_tcp"
-    keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-
-    wget -N ${vless_reality_tcp_url} -O ${xray_cfg}
-
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
-
-    routing_set
-    vless-reality-tcp-outbound-config
-
-    systemctl restart xray 
-
-    systemctl enable xray
-
-    service nginx stop
-
-    link="vless://$password@$ip:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=chrome&pbk=$public_key&type=tcp&headerType=none#$ip"
-    clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_reality_grpc() {
-    password=$(xray uuid)
-    set_port
-    port_check $port
-
-    xray_type="reality_grpc"
-    keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-
-    wget -N ${vless_reality_grpc_url} -O ${xray_cfg}
-
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-    vless-reality-grpc-outbound-config
-
-    systemctl restart xray 
-
-    systemctl enable xray
-
-    service nginx stop
-
-    clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=chrome&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_KEY="${public_key}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-trojan_grpc() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-    
-    xray_type="trojan_grpc"
-    password=$(xray uuid)
-    port=443
-    
-    wget -N ${trojan_grpc_config_url} -O ${xray_cfg}
-
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray 
-
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${trojan_grpc_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ca_key~" ${nginx_cfg}
-
-    service nginx restart
-
-    link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
-
-    clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-trojan_tcp_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-    
-    xray_type="trojan_tcp"
-    password=$(xray uuid)
-    set_port
-    
-    wget -N ${trojan_tcp_tls_config_url} -O ${xray_cfg}
-
-    sed -i "s~${port}~$port~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${xray_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
-
-    routing_set
-    trojan-tcp-tls-outbound-config
-
-    systemctl restart xray
-
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-
-    service nginx restart
-
-    link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
-
-    clash_config
-    qx_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS=""
-OBFS_PATH=""
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vmess_ws_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    xray_type="vmess_ws"
-    password=$(xray uuid)
-
-    wget -N ${vmess_ws_config_url} -O ${xray_cfg}
-
-    sed -i "s~19191~$port~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray
-    
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-    sed -i "s~\${port}~$port~" ${nginx_cfg}
-
-    service nginx restart
-
-    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"chrome\"}"
-    encode_link=$(base64 <<< $tmp)
-    link="vmess://$encode_link"
-
-    clash_config
-    qx_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="websocket"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-QX_CONFIG="${qx_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_ws_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    xray_type="vless_ws"
-    password=$(xray uuid)
-
-    wget -N ${vless_ws_config_url} -O ${xray_cfg}
-
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray && systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vless_ws_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
-
-    clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="websocket"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_grpc() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    xray_type="vless_grpc"
-    password=$(xray uuid)
-
-    wget -N ${vless_grpc_config_url} -O ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray && systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vless_grpc_nginx_url} -O ${nginx_cfg}
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_OBFS="grpc"
-OBFS_PATH="${ws_path}"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_tcp_xtls_vision() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    xray_type="vless_vison"
-    password=$(xray uuid)
-    vless_tcp_xtls_vision_xray_cfg
-    systemctl restart xray && systemctl enable xray
-    sleep 3
-    vless_tcp_xtls_vision_nginx_cfg
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
-
-    clash_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="443"
-XRAY_FLOW="xtls-rprx-vision"
-XRAY_LINK="${link}"
-CLASH_CONFIG="${clash_cfg}"
-XRAY_OUTBOUND="${outbound}"
-EOF
-}
-
-vless_tcp_xtls_vision_nginx_cfg() {
-    cd /etc/nginx/ && wget -N ${vless_vision_nginx_url} -O /etc/nginx/nginx.conf
-}
-
-vless_tcp_xtls_vision_xray_cfg() {
-    wget -N ${vless_vision_config_url} -O config.json
-    sed -i "s/\${password}/$password/" config.json
-    sed -i "s~\${ca_crt}~$ca_crt~" config.json
-    sed -i "s~\${ca_key}~$ca_key~" config.json
-
-    routing_set
-
-    mv config.json ${xray_cfg}
-}
-
 trojan() {
     xray_type="trojan"
     ip=`curl ipinfo.io/ip`
@@ -957,15 +377,6 @@ trojan() {
     link="trojan://${password}@${ip}:${port}#${domain}"
 
     trojan-outbound-config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${ip}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_LINK="${link}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 trojan-config() {
@@ -986,7 +397,7 @@ shadowsocket-2022() {
           judge "openssl 安装"
     fi
     encrypt=1
-    ss_method="2022-blake3-aes-128-gcm"
+    ss_method="aes-128-gcm"
     set_port
     echo -e "选择加密方法"
     echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
@@ -1038,16 +449,6 @@ shadowsocket-2022() {
 
     clash_config
     qx_config
-
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAT_METHOD="${ss_method}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-XRAY_LINK="${link}"
-XRAY_OUTBOUND="${outbound}"
-EOF
 }
 
 shadowsocket-2022-config() {
@@ -1059,131 +460,6 @@ shadowsocket-2022-config() {
 }
 
 # outbound start
-
-vless-reality-grpc-outbound-config() {
-    outbound=" {
-    \"protocol\": \"vless\",
-    \"settings\": {
-        \"vnext\": [
-            {
-                \"address\": \"${ip}\",
-                \"port\": ${port},
-                \"users\": [
-                    {
-                        \"id\": \"${password}\",
-                        \"encryption\": \"none\"
-                    }
-                ]
-            }
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"grpc\",
-        \"security\": \"reality\",
-        \"realitySettings\": {
-            \"fingerprint\": \"chrome\",
-            \"serverName\": \"${domain}\",
-            \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\"
-        },
-        \"grpcSettings\": {
-            \"serviceName\": \"${ws_path}\",
-            \"multiMode\": true,
-            \"idle_timeout\": 60,
-            \"health_check_timeout\": 20
-        }
-    }
-}"
-}
-
-vless-reality-tcp-outbound-config() {
-    outbound="{
-    \"protocol\": \"vless\",
-    \"settings\": {
-        \"vnext\": [
-            {
-                \"address\": \"${ip}\",
-                \"port\": ${port},
-                \"users\": [
-                    {
-                        \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
-                        \"encryption\": \"none\"
-                    }
-                ]
-            }\
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"tcp\",
-        \"security\": \"reality\",
-        \"realitySettings\": {
-            \"show\": false,\
-            \"fingerprint\": \"chrome\",
-            \"serverName\": \"${domain}\",
-            \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\",
-            \"spiderX\": \"/\"
-        }
-    }
-}"
-}
-
-trojan-tcp-tls-outbound-config() {
-    outbound="{
-    \"sendThrough\": \"0.0.0.0\",
-    \"protocol\": \"trojan\",
-    \"settings\": {
-        \"servers\": [
-            {
-                \"address\": \"${domain}\",
-                \"password\": \"${password}\",
-                \"port\": \"${port}\"
-            }
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"tcp\",
-        \"security\": \"tls\",
-        \"tlsSettings\": {
-            \"serverName\": \"${domain}\"
-        }
-    }
-}"
-}
-
-vless-reality-h2-outbound-config() {
-    outbound="{
-    \"protocol\": \"vless\",
-    \"settings\": {
-        \"vnext\": [
-            {
-                \"address\": \"${ip}\",
-                \"port\": ${port},
-                \"users\": [
-                    {
-                        \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
-                        \"encryption\": \"none\"
-                    }
-                ]
-            }
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"h2\",
-        \"security\": \"reality\",
-        \"realitySettings\": {
-            \"show\": false,
-            \"fingerprint\": \"chrome\",
-            \"serverName\": \"${domain}\",
-            \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\",
-            \"spiderX\": \"/\"
-        }
-    }
-}"
-}
 
 trojan-outbound-config() {
     outbound="{
@@ -1217,112 +493,6 @@ shadowsocket-2022-outbound-config() {
 }
 
 # outbound end
-
-routing_set() {
-    echo -e "是否配置Routing路由"
-    read -rp "请输入(y/n): " set_routing
-    case $set_routing in
-    [yY])
-      wget -Nq ${ukonw_url} -O uknow.tmp
-
-      sed -i '4 r uknow.tmp' ${xray_cfg}
-
-      rm uknow.tmp
-      ;;
-    [nN])
-      ;;
-    *)
-      ;;
-    esac
-
-}
-
-hysteria2() {
-    is_root
-    get_system
-    # adjust_date
-    ${INS} curl
-    judge "curl 安装"
-
-    bash <(curl -fsSL https://get.hy2.sh/)
-
-    echo -e "------------------------------------------"
-    read -rp "是否使用域名(Y/N): " hasDmain
-    case $hasDmain in
-    [yY])
-      hysteria2_domain
-      ;;
-    [nN])
-      hysteria2_without_domain
-      ;;
-    *)
-      hysteria2_without_domain
-      ;;
-    esac
-    
-}
-
-hysteria2_without_domain() {
-    set_port
-    ${INS} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout /etc/hysteria/server.key -out /etc/hysteria/server.crt -subj "/CN=live.qq.com" -days 36500 && chown hysteria /etc/hysteria/server.key &&  chown hysteria /etc/hysteria/server.crt && chmod +775 /etc/hysteria/server*
-
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    domain=$(curl -s https://ip.me)
-
-    wget -N ${hysteria2_nodomain_config_url} -O config.yaml
-
-    sed -i "s/\${password}/$password/" config.yaml
-    sed -i "s/\${domain}/$domain/" config.yaml
-    sed -i "s/\${port}/$port/" config.yaml
-
-    mv config.yaml /etc/hysteria/config.yaml
-
-    systemctl start hysteria-server.service
-    systemctl enable hysteria-server.service
-    
-    xray_type="hysteria2_nodomain"
-
-    clash_config
-    mkdir -p ${xray_path}
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
-    info_return
-}
-
-hysteria2_domain() {
-    domain_handle
-    set_port
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    wget -N ${hysteria2_config_url} -O config.yaml
-
-    sed -i "s/\${password}/$password/" config.yaml
-    sed -i "s/\${port}/$port/" config.yaml
-    sed -i "s/\${domain}/$domain/" config.yaml
-
-    mv config.yaml /etc/hysteria/config.yaml
-
-    systemctl start hysteria-server.service
-    systemctl enable hysteria-server.service
-    xray_type="hysteria2"
-
-    clash_config
-
-    mkdir -p ${xray_path}
-    cat>${xray_info}<<EOF
-XRAY_TYPE="${xray_type}"
-XRAY_ADDR="${domain}"
-XRAY_PWORD="${password}"
-XRAY_PORT="${port}"
-CLASH_CONFIG="${clash_cfg}"
-EOF
-    info_return
-}
 
 set_port() {
     echo -e "------------------------------------------"
@@ -1392,12 +562,6 @@ open_bbr() {
     fi
 }
 
-show_path() {
-    echo -e "${Green}xray配置文件地址:${Font} ${xray_cfg}"
-    echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
-    echo -e "${Green}分享链接文件地址:${Font} ${xray_info}"
-}
-
 info_return() {
     echo -e "${Green}安装成功!${Font}"
     echo -e "${Green}链接:${Font} ${link}"
@@ -1422,32 +586,6 @@ show_info() {
     bash -c "$(curl -sL https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ xray
 }
 
-server_check() {
-
-    info "开始检测 Xray 服务"
-
-    xray_active=`systemctl is-active xray`
-
-    # result: active or inactive
-    if [[ $xray_active = "active" ]]; then
-        ok "Xray 服务正常"
-    else
-        error "Xray 服务异常"
-    fi
-
-    info "开始检测 Nginx 服务"
-
-    nginx_active=`systemctl is-active nginx`
-
-    # result: active or inactive
-    if [[ $nginx_active = "active" ]]; then
-        ok "Nginx 服务正常"
-    else
-        error "Nginx 服务异常"
-    fi
-
-}
-
 update_script() {
     script_path=$(cd `dirname $0`; pwd)
     wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy-cn.sh"
@@ -1455,188 +593,22 @@ update_script() {
 }
 
 xray_upgrade() {
-    echo -e "------------------------------------------"
-    read -rp "是否安装指定版本(Y/N): " input
-    case $input in
-    [yY])
-      read -rp "输入指定版本(eq: 1.7.5): " version
-      bash -c "$(curl -L ${xray_install_url})" @ install --version ${version}
-      judge "Xray 更新"
-      ;;
-    [nN])
-      bash -c "$(curl -L ${xray_install_url})" @ install
-      judge "Xray 更新"
-      ;;
-    *)
-      bash -c "$(curl -L ${xray_install_url})" @ install
-      judge "Xray 更新"
-      ;;
-    esac
-    
-}
-
-uninstall_nginx() {
-    info "Nginx 卸载"
-    apt purge -y nginx nginx-common nginx-core
-    apt autoremove -y
+    bash -c "$(curl -L ${xray_install_url})"
+    judge "Xray 更新"
 }
 
 uninstall_xray() {
     info "Xray 卸载"
-    bash -c "$(curl -L ${xray_install_url})" @ remove --purge
-    # rm -rf /home/xray
-    rm -rf ${xray_path}
-}
-
-uninstall_acme() {
-    info "Acme 卸载"
-    /root/.acme.sh/acme.sh --uninstall
-    rm -r  ~/.acme.sh
-    (
-        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
-    ) | crontab -
-}
-
-uninstall_hysteria2() {
-
-    bash <(curl -fsSL https://get.hy2.sh/) --remove
-}
-
-uninstall() {
-    uninstall_xray
-    uninstall_nginx
-    uninstall_acme
-    uninstall_hysteria2
-}
-
-restart_nginx() {
-    info "开始启动 Nginx 服务"
-    service nginx restart
-    judge "Nginx 启动"
-}
-
-close_nginx() {
-    info "开始关闭 Nginx 服务"
-    service nginx stop
-    judge "Nginx 关闭"
-}
-
-restart_xray() {
-    info "开始启动 Xray 服务"
-    systemctl restart xray
-    judge "Xray 启动"
-}
-
-close_xray() {
-    info "开始关闭 Xray 服务"
     systemctl stop xray
-    judge "Xray 关闭"
-}
-
-renew_ca() {
-    read -rp "输入新的域名: " domain
-    apply_certificate
-    flush_certificate
-}
-
-hysteria_operation() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  启动 Hysteria${Font}"
-    echo -e "${Yellow}2)  关闭 Hysteria${Font}"
-    echo -e "${Green}3)  重启 Hysteria${Font}"
-    echo -e "${Green}4)  查看 Hysteria 状态${Font}"
-    echo -e "${Red}q)  退出${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-      case $opt_num in
-      1)
-          systemctl start hysteria-server.service
-          ;;
-      2)
-          systemctl stop hysteria-server.service
-          ;;
-      3)
-          systemctl restart hysteria-server.service
-          ;;
-      4)
-          systemctl status hysteria-server.service
-          ;;
-      q)
-          exit
-          ;;
-      *)
-          error "请输入正确的数字"
-          ;;
-      esac
-      hysteria_operation
-}
-
-server_operation() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  重启/启动 Nginx${Font}"
-    echo -e "${Yellow}2)  关闭 Nginx${Font}"
-    echo -e "${Green}3)  重启/启动 Xray${Font}"
-    echo -e "${Yellow}4)  关闭 Xray${Font}"
-    echo -e "${Red}q)  结束操作${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-      case $opt_num in
-      1)
-          restart_nginx
-          ;;
-      2)
-          close_nginx
-          ;;
-      3)
-          restart_xray
-          ;;
-      4)
-          close_xray
-          ;;
-      q)
-          exit
-          ;;
-      *)
-          error "请输入正确的数字"
-          ;;
-      esac
-      server_operation
-}
-
-question_answer() {
-    echo -e "${Red}1.我啥都不懂${Font}"
-    echo -e "${Green}https://github.com/uerax/taffy-onekey/issues 去 New Issue 问${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}2.Nginx 启动失败${Font}"
-    echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}3.Xray 启动失败${Font}"
-    echo -e "${Green}执行\"systemctl status xray\"查看日志${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}4.一键安装失败${Font}"
-    echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}5.ChatGPT访问不了${Font}"
-    echo -e "${Green}可能性1): 你的VPS是大陆、香港或美国LA地区  ${Font}"
-    echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
+    rm /etc/systemd/system/xray.service
+    rm /usr/local/bin/xray
 }
 
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Green}3)  vless-reality-h2(推荐)${Font}"
-    echo -e "${Cyan}4)  vless-ws-tls${Font}"
-    echo -e "${Cyan}5)  vless-grpc${Font}"
-    echo -e "${Cyan}6)  vless-tcp-xtls-vision${Font}"
-    echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
-    echo -e "${Cyan}12)  trojan-grpc${Font}"
-    echo -e "${Cyan}21)  vmess-ws-tls${Font}"
-    echo -e "${Cyan}31)  shadowsocket-2022${Font}"
-    echo -e "${Cyan}32)  trojan${Font}"
+    echo -e "${Cyan}1)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}2)  trojan${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -1644,36 +616,9 @@ select_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        vless_reality_tcp
-        ;;
-    2)
-        vless_reality_grpc
-        ;;
-    3)
-        vless_reality_h2
-        ;;
-    4)
-        vless_ws_tls
-        ;;
-    5)
-        vless_grpc
-        ;;
-    6)
-        vless_tcp_xtls_vision
-        ;;
-    11)
-        trojan_tcp_tls
-        ;;
-    12)
-        trojan_grpc
-        ;;
-    21)
-        vmess_ws_tls
-        ;;
-    31)
         shadowsocket-2022
         ;;
-    32)
+    2)
         trojan
         ;;
     q)
@@ -1695,23 +640,11 @@ menu() {
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
-    echo -e "${Green}3)   安装/更新/回退 Xray${Font}"
-    echo -e "${Yellow}4)   卸载 Xray${Font}"
-    echo -e "${Green}5)   安装 Nginx${Font}"
-    echo -e "${Yellow}6)   卸载 Nginx${Font}"
-    echo -e "${Purple}7)   启动 / 关闭 / 重启服务${Font}"
-    echo -e "${Cyan}8)   Xray 协议更换${Font}"
-    echo -e "${Yellow}9)   完全卸载${Font}"
-    echo -e "${Purple}10)  配置文件路径${Font}"
+    echo -e "${Green}3)   安装/更新 Xray${Font}"
+    echo -e "${Cyan}4)   Xray 协议更换${Font}"
     echo -e "${Purple}11)  查看配置链接${Font}"
-    echo -e "${Green}12)  检测服务状态${Font}"
-    echo -e "${Blue}20)  更新伪装站${Font}"
-    echo -e "${Cyan}21)  更换域名证书${Font}"
-    echo -e "${Green}30)  安装 Hysteria${Font}"
-    echo -e "${Yellow}31)  卸载 Hysteria${Font}"
-    echo -e "${Purple}32)  操作 Hysteria${Font}"
-    echo -e "${Red}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
+    echo -e "${Red}999) 卸载 Xray${Font}"
     echo -e "${Red}q)   退出${Font}"
     echo -e "${Cyan}————————————————————————————————————————${Font}\n"
 
@@ -1728,53 +661,17 @@ menu() {
     xray_upgrade
     ;;
     4)
-    uninstall_xray
-    ;;
-    5)
-    nginx_install
-    ;;
-    6)
-    uninstall_nginx
-    ;;
-    7)
-    server_operation
-    ;;
-    8)
     select_type
-    info_return 
-    ;;
-    9)
-    uninstall
-    ;;
-    10)
-    show_path
+    info_return
     ;;
     11)
     show_info
     ;;
-    12)
-    server_check
-    ;;
-    20)
-    update_web
-    ;;
-    21)
-    renew_ca
-    ;;
-    30)
-    hysteria2
-    ;;
-    31)
-    uninstall_hysteria2
-    ;;
-    32)
-    hysteria_operation
-    ;;
-    99)
-    question_answer
-    ;;
     100)
     open_bbr
+    ;;
+    999)
+    uninstall_xray
     ;;
     q)
     ;;
@@ -1787,9 +684,6 @@ menu() {
 case $1 in
     install)
         install
-        ;;
-    uninstall)
-        uninstall
         ;;
     *)
         menu
