@@ -2,7 +2,7 @@
 mkdir -p /root/xray
 cd /root/xray
 
-wget https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip 
+wget https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
 
 unzip Xray-linux-64.zip
 

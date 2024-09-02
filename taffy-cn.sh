@@ -24,7 +24,7 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-release-cn.sh"
+xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-xray-cn.sh"
 ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
