@@ -634,9 +634,9 @@ select_type() {
 menu() {
     echo -e "${Cyan}——————————————— 脚本信息 ———————————————${Font}"
     echo -e "\t\t${Yellow}Taffy 脚本${Font}"
-    echo -e "\t${Yellow}---authored by uerax---${Font}"
-    echo -e "\t${Yellow}https://github.com/uerax${Font}"
-    echo -e "\t\t${Yellow}版本号：${version}${Font}"
+    echo -e "\t${Yellow}---Authored By uerax---${Font}"
+    echo -e "   ${Yellow}https://github.com/uerax/taffy-onekey${Font}"
+    echo -e "\t      ${Yellow}版本号：${version}${Font}"
     echo -e "${Cyan}——————————————— 安装向导 ———————————————${Font}"
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
