@@ -77,10 +77,8 @@ get_system() {
     source '/etc/os-release'
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        apt update
     elif [[ "${ID}"=="ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        apt update
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
