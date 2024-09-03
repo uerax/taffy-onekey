@@ -8,7 +8,8 @@ unzip Xray-linux-64.zip
 
 mv xray /usr/local/bin/
 rm -r /root/xray
-mkdir /usr/local/etc/xray
+mkdir -p /usr/local/etc/xray
+mkdir -p /var/log/xray
 
 cat > /etc/systemd/system/xray.service << EOF
 [Unit]

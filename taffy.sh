@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.0.4"
+version="v2.0.5"
 
 #fonts color
 Green="\033[32m"
@@ -31,8 +31,8 @@ ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.tx
 
 socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
 
-ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
-ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/append.json"
+ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
+ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
 
 bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
@@ -75,8 +75,8 @@ singbox_path="/opt/singbox/"
 
 singbox_outbound=""
 
-singbox_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/singbox.json"
-singbox_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/singbox_ap.json"
+singbox_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/singbox.json"
+singbox_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/singbox_ap.json"
 
 singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
@@ -498,7 +498,7 @@ clash_config() {
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: safari"
     ;;
-    "shadowsocket2022")
+    "shadowsocket")
     clash_cfg="  - name: $domain
     type: ss
     server: '$domain'
@@ -522,7 +522,7 @@ qx_config() {
     "trojan")
     qx_cfg="trojan=$ip:$port, password=$password, tag=$ip"
     ;;
-    "shadowsocket2022")
+    "shadowsocket")
     qx_cfg="shadowsocks=$domain:$port, method=$ss_method, password=$password, tag=$domain"
     ;;
     esac
@@ -1014,7 +1014,7 @@ trojan-append() {
     qx_config
 }
 
-shadowsocket-2022() {
+shadowsocket() {
     
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
     close_nginx()
@@ -1063,7 +1063,7 @@ shadowsocket-2022() {
       ;;
     esac
 
-    shadowsocket-2022-config
+    shadowsocket-config
     systemctl restart xray && systemctl enable xray
 
     tmp="${ss_method}:${password}"
@@ -1072,14 +1072,14 @@ shadowsocket-2022() {
     ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket2022"
-    shadowsocket-2022-outbound-config
+    xray_type="shadowsocket"
+    shadowsocket_outbound_config
     clash_config
     qx_config
 
 }
 
-shadowsocket-2022-config() {
+shadowsocket-config() {
     wget -N ${ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -1087,7 +1087,7 @@ shadowsocket-2022-config() {
     mv config.json ${xray_cfg}
 }
 
-shadowsocket-2022-append() {
+shadowsocket-append() {
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -1150,8 +1150,8 @@ shadowsocket-2022-append() {
     ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket2022"
-    shadowsocket-2022-outbound-config
+    xray_type="shadowsocket"
+    shadowsocket_outbound_config
     clash_config
     qx_config
 }
@@ -1367,7 +1367,7 @@ trojan-outbound-config() {
     \"password\": \"${password}\"\n}"
 }
 
-shadowsocket-2022-outbound-config() {
+shadowsocket_outbound_config() {
     outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
@@ -1731,8 +1731,8 @@ singbox_shadowsocket() {
     ipv6=$(curl -6 ip.me)
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket2022"
-    shadowsocket-2022-outbound-config
+    xray_type="shadowsocket"
+    shadowsocket_outbound_config
     clash_config
     qx_config
 }
@@ -1870,8 +1870,8 @@ singbox_shadowsocket_append() {
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket2022"
-    shadowsocket-2022-outbound-config
+    xray_type="shadowsocket"
+    shadowsocket_outbound_config
     clash_config
     qx_config
 }
@@ -2230,7 +2230,7 @@ question_answer() {
 select_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket-2022${Font}"
+    echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Green}2)  trojan${Font}"
     echo -e "${Green}3)  socks5${Font}"
     echo -e "${Cyan}4)  vless-reality-tcp${Font}"
@@ -2242,7 +2242,7 @@ select_append_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        shadowsocket-2022-append
+        shadowsocket-append
         ;;
     2)
         trojan-append
@@ -2269,7 +2269,7 @@ select_append_type() {
 select_singbox_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket-2022${Font}"
+    echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Green}2)  hysteria2${Font}"
     echo -e "${Green}3)  vless-reality-grpc${Font}"
     echo -e "${Red}q)  不装了${Font}"
@@ -2353,7 +2353,7 @@ select_type() {
     echo -e "${Green}3)  vless-reality-h2${Font}"
     echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
     echo -e "${Cyan}21)  vmess-ws-tls${Font}"
-    echo -e "${Cyan}31)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}31)  shadowsocket${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2376,7 +2376,7 @@ select_type() {
         vmess_ws_tls
         ;;
     31)
-        shadowsocket-2022
+        shadowsocket
         ;;
     q)
         exit

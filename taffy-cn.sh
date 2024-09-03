@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.0.0"
+version="v2.0.1"
 
 #fonts color
 Green="\033[32m"
@@ -27,7 +27,7 @@ Error="${Red}[错误]${Font}"
 xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-xray-cn.sh"
 ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket2022/config.json"
+ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
 
 bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
@@ -35,15 +35,13 @@ trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/
 
 
 xray_cfg="/usr/local/etc/xray/config.json"
-xray_path="/opt/xray/"
-xray_info="${xray_path}xray_info"
-xray_log="${xray_path}xray_log"
+xray_log="/var/log/xray"
 xray_type=""
 
 ss_method=""
 
 outbound_method=""
-outbound='{"protocol": "freedom"}\n'
+outbound=''
 
 INS="apt install -y"
 password=""
@@ -82,13 +80,6 @@ get_system() {
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
-    #    INS = "yum install -y"
-    # RedHat 系发行版关闭 SELinux
-    #if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
-    #  sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    #  setenforce 0
-    #fi
-    #    env_install
     else
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1
@@ -134,22 +125,6 @@ close_firewall() {
         iptables -F
         ok "关闭防火墙"
     fi
-}
-
-nginx_install() {
-    # 判断是否有 nginx 命令
-    if ! command -v nginx >/dev/null 2>&1; then
-        ${INS} nginx cron
-        judge "Nginx 安装"
-    else
-        ok "Nginx 已存在"
-    fi
-
-    mkdir -p ${web_path} && cd ${web_path}
-
-    wget -O web.zip --no-check-certificate ${website_url}
-    judge "伪装站 下载"
-    unzip web.zip && mv -f bakasine.github.io-master ${web_dir} && rm web.zip
 }
 
 domain_handle() {
@@ -329,7 +304,7 @@ clash_config() {
       short-id: 8eb7bab5a41eb27d
     client-fingerprint: chrome"
     ;;
-    "shadowsocket2022")
+    "shadowsocket")
     clash_cfg="  - name: $domain
     type: ss
     server: '$domain'
@@ -353,7 +328,7 @@ qx_config() {
     "trojan")
     qx_cfg="trojan=$ip:$port, password=$password, tag=$ip"
     ;;
-    "shadowsocket2022")
+    "shadowsocket")
     qx_cfg="shadowsocks=$domain:$port, method=$ss_method, password=$password, tag=$domain"
     ;;
     esac
@@ -363,7 +338,6 @@ trojan() {
     xray_type="trojan"
     ip=`curl ipinfo.io/ip`
     info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
-    close_nginx()
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -374,7 +348,7 @@ trojan() {
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
-    trojan-outbound-config
+    trojan_outbound_config
 }
 
 trojan-config() {
@@ -386,10 +360,9 @@ trojan-config() {
     systemctl restart xray && systemctl enable xray
 }
 
-shadowsocket-2022() {
+shadowsocket() {
     
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
-    close_nginx()
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -434,7 +407,7 @@ shadowsocket-2022() {
       password=$(openssl rand -base64 16)
       ;;
     esac
-    shadowsocket-2022-config
+    shadowsocket_config
     systemctl restart xray && systemctl enable xray
 
     tmp="${ss_method}:${password}"
@@ -442,14 +415,14 @@ shadowsocket-2022() {
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket2022"
-    shadowsocket-2022-outbound-config
+    xray_type="shadowsocket"
+    shadowsocket_outbound_config
 
     clash_config
     qx_config
 }
 
-shadowsocket-2022-config() {
+shadowsocket_config() {
     wget -N ${ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -459,7 +432,7 @@ shadowsocket-2022-config() {
 
 # outbound start
 
-trojan-outbound-config() {
+trojan_outbound_config() {
     outbound="{
     \"protocol\": \"trojan\",
     \"settings\": {
@@ -474,7 +447,7 @@ trojan-outbound-config() {
 }"
 }
 
-shadowsocket-2022-outbound-config() {
+shadowsocket_outbound_config() {
     outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
@@ -597,15 +570,19 @@ xray_upgrade() {
 
 uninstall_xray() {
     info "Xray 卸载"
-    systemctl stop xray
-    rm /etc/systemd/system/xray.service
-    rm /usr/local/bin/xray
+    systemctl is-active --quiet xray
+    if [ $? -eq 0 ]; then
+        systemctl stop xray
+    fi
+    [ -f "/etc/systemd/system/xray.service" ] && rm /etc/systemd/system/xray.service
+    [ -f "/usr/local/bin/xray" ] && rm /usr/local/bin/xray
+    [ -d "/var/log/xray" ] && rm /var/log/xray
 }
 
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Cyan}1)  shadowsocket-2022${Font}"
+    echo -e "${Cyan}1)  shadowsocket${Font}"
     echo -e "${Cyan}2)  trojan${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
@@ -614,7 +591,7 @@ select_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        shadowsocket-2022
+        shadowsocket
         ;;
     2)
         trojan
