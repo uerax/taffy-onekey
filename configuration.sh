@@ -145,6 +145,8 @@ singbox_trojan() {
     local clash_cfg="  - name: $domain\n    type: trojan\n    server: '$domain'\n    port: $port\n    password: $password\n    alpn:\n      - h2\n      - http/1.1"
 
     local qx_cfg="trojan=$domain:$port, password=$password, over-tls=true, tls-host=$domain, tls-verification=true, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+
+    show_info
 }
 # trojan end
 
