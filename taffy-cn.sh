@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.0.1"
+version="v2.0.2"
 
 #fonts color
 Green="\033[32m"
@@ -337,7 +337,6 @@ qx_config() {
 trojan() {
     xray_type="trojan"
     ip=`curl ipinfo.io/ip`
-    info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -362,7 +361,6 @@ trojan-config() {
 
 shadowsocket() {
     
-    info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -378,7 +376,7 @@ shadowsocket() {
     echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
     echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
     echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+    read -rp "选择加密方法(默认为4)：" encrypt
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
@@ -507,8 +505,6 @@ open_bbr() {
     info "过于老的系统版本会导致开启失败"
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
-        #apt update && apt -t buster-backports install linux-image-amd64
         wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
@@ -520,13 +516,6 @@ open_bbr() {
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
-    #    INS = "yum install -y"
-    # RedHat 系发行版关闭 SELinux
-    #if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
-    #  sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    #  setenforce 0
-    #fi
-    #    env_install
     else
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1
@@ -588,7 +577,6 @@ select_type() {
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
-    mkdir -p ${xray_path}
     case $menu_num in
     1)
         shadowsocket
