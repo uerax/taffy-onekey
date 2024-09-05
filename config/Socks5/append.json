@@ -4,6 +4,7 @@
             "listen": "0.0.0.0",
             "port": "${port}",
             "protocol": "socks",
+            "tag": "${port}",
             "settings": {
                 "auth": "password",
                 "accounts": [

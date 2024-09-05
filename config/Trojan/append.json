@@ -3,6 +3,7 @@
         {
             "port": "${port}",
             "protocol": "trojan",
+            "tag": "${port}",
             "settings": {
                 "clients": [
                     {
