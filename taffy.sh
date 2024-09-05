@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.1.0"
+version="v2.1.1"
 
 #fonts color
 Green="\033[32m"
@@ -324,11 +324,8 @@ EOF
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        wget --no-check-certificate ${xray_install_url}
-        judge "Xray安装脚本 下载"
-        bash install-release.sh install
+        bash <(curl -fsSL $xray_install_url)
         judge "Xray 安装"
-        rm install-release.sh
     else
         ok "Xray 已安装"
     fi
