@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.0.5"
+version="v2.1.0"
 
 #fonts color
 Green="\033[32m"
@@ -564,20 +564,21 @@ vless_reality_h2_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    wget -Nq ${vless_reality_h2_append_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${privateKey}~$private_key~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${vless_reality_h2_append_url} -O append.json
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
 
     vless_reality_h2_outbound_config
-    systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
+    systemctl restart xray 
 }
 
 vless_reality_tcp() {
@@ -626,20 +627,22 @@ vless_reality_tcp_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    wget -Nq ${vless_reality_tcp_append_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${privateKey}~$private_key~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${vless_reality_tcp_append_url} -O appenjson
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+
+    rm append.json
 
     vless_reality_tcp_outbound_config
-    systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
+    systemctl restart xray
 }
 
 vless_reality_grpc() {
@@ -686,21 +689,23 @@ vless_reality_grpc_append() {
     # short_id=$(openssl rand -hex 8)
     ip=$(curl ipinfo.io/ip)
 
-    wget -Nq ${vless_reality_grpc_append_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${privateKey}~$private_key~" append.tmp
-    sed -i "s~\${ws_path}~$ws_path~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${vless_reality_grpc_append_url} -O append.json
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${ws_path}~$ws_path~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
 
     vless_reality_grpc_outbound_config
-    systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
+
+    systemctl restart xray 
 }
 
 trojan_grpc() {
@@ -989,22 +994,23 @@ trojan_append() {
     set_port
     password=$(openssl rand -base64 16)
 
-    wget -Nq ${trojan_append_config_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${trojan_append_config_url} -O append.json
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${port}~$port~" append.json
 
-    systemctl restart xray
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
     trojan_outbound_config
     clash_config
     qx_config
+
+    systemctl restart xray
 }
 
 shadowsocket() {
@@ -1086,7 +1092,8 @@ shadowsocket_append() {
           judge "openssl 安装"
     fi
     encrypt=1
-    ss_method="2022-blake3-aes-128-gcm"
+    xray_type="shadowsocket"
+    ss_method="aes-128-gcm"
     set_port
     echo -e "选择加密方法"
     echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
@@ -1096,7 +1103,7 @@ shadowsocket_append() {
     echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
     echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
     echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+    read -rp "选择加密方法(默认为4)：" encrypt
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
@@ -1126,16 +1133,16 @@ shadowsocket_append() {
       ;;
     esac
 
-    wget -Nq ${ss_append_config_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${method}~$ss_method~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${ss_append_config_url} -O append.json
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${method}~$ss_method~" append.json
+    sed -i "s~\${port}~$port~" append.json
 
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
@@ -1143,10 +1150,11 @@ shadowsocket_append() {
     ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket"
     shadowsocket_outbound_config
     clash_config
     qx_config
+
+    systemctl restart xray
 }
 
 # outbound start
@@ -1396,15 +1404,16 @@ socks5_append() {
     echo -e "------------------------------------------"
     read -rp "设置你的密码: " password
 
-    wget -Nq ${socks5_append_config_url} -O append.tmp
+    cd /usr/local/etc/xray
 
-    sed -i "s~\${password}~$password~" append.tmp
-    sed -i "s~\${user}~$user~" append.tmp
-    sed -i "s~\${port}~$port~" append.tmp
-    echo "," >> append.tmp
+    wget -Nq ${socks5_append_config_url} -O append.json
 
-    sed -i '/inbounds/ r append.tmp' ${xray_cfg}
-    rm append.tmp
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${user}~$user~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
 
     systemctl restart xray
 

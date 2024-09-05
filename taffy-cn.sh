@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.0.2"
+version="v2.1.0"
 
 #fonts color
 Green="\033[32m"
@@ -28,11 +28,12 @@ xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw
 ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
+ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
 
 bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
 trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
-
+trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_log="/var/log/xray"
@@ -343,14 +344,44 @@ trojan() {
     fi
     set_port
     password=$(openssl rand -base64 16)
-    trojan-config
+    trojan_config
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
     trojan_outbound_config
 }
 
-trojan-config() {
+trojan_append() {
+    xray_type="trojan"
+    ip=`curl ipinfo.io/ip`
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    set_port
+    password=$(openssl rand -base64 16)
+
+    cd /usr/local/etc/xray
+
+    wget -Nq ${trojan_append_config_url} -O append.json
+
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
+
+    link="trojan://${password}@${ip}:${port}#${domain}"
+
+    trojan_outbound_config
+    clash_config
+    qx_config
+
+    systemctl restart xray
+    info_return
+}
+
+trojan_config() {
     wget -N ${trojan_config_url} -O config.json
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -418,6 +449,78 @@ shadowsocket() {
 
     clash_config
     qx_config
+}
+
+shadowsocket_append() {
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    encrypt=1
+    xray_type="shadowsocket"
+    ss_method="aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为4)：" encrypt
+    case $encrypt in
+    1)
+      password=$(openssl rand -base64 16)
+      ;;
+    2)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(openssl rand -base64 16)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="xchacha20-ietf-poly1305"
+      ;;
+    *)
+      password=$(openssl rand -base64 16)
+      ;;
+    esac
+
+    cd /usr/local/etc/xray
+
+    wget -Nq ${ss_append_config_url} -O append.json
+
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${method}~$ss_method~" append.json
+    sed -i "s~\${port}~$port~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
+
+    tmp="${ss_method}:${password}"
+    tmp=$( base64 <<< $tmp)
+    domain=`curl ipinfo.io/ip`
+    ipv6=`curl -6 ip.me`
+    link="ss://$tmp@${domain}:${port}"
+
+    shadowsocket_outbound_config
+    clash_config
+    qx_config
+
+    systemctl restart xray
+    info_return
 }
 
 shadowsocket_config() {
@@ -568,6 +671,30 @@ uninstall_xray() {
     [ -d "/var/log/xray" ] && rm /var/log/xray
 }
 
+select_append_type() {
+    echo -e "${Green}选择插入的模式 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Cyan}1)  shadowsocket${Font}"
+    echo -e "${Cyan}2)  trojan${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+        shadowsocket_append
+        ;;
+    2)
+        trojan_append
+        ;;
+    q)
+        ;;
+    *)
+        error "请输入正确的数字"
+        ;;
+    esac
+}
+
 select_type() {
     echo -e "${Green}选择安装的模式 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
@@ -605,6 +732,7 @@ menu() {
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   安装/更新 Xray${Font}"
     echo -e "${Cyan}4)   Xray 协议更换${Font}"
+    echo -e "${Cyan}5)   插入 Xray 其他协议${Font}"
     echo -e "${Purple}11)  查看配置链接${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}999) 卸载 Xray${Font}"

@@ -1,12 +1,16 @@
 {
-    "port": "${port}",
-    "protocol": "trojan",
-    "settings": {
-        "clients": [
-            {
-                "password": "${password}",
-                "email": "bakasine@email.com"
+    "inbounds": [
+        {
+            "port": "${port}",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password": "${password}",
+                        "email": "bakasine@email.com"
+                    }
+                ]
             }
-        ]
-    }
+        }
+    ]
 }

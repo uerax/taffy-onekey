@@ -1,16 +1,20 @@
 {
-    "listen": "0.0.0.0",
-    "port": "${port}",
-    "protocol": "socks",
-    "settings": {
-        "auth": "password",
-        "accounts": [
-            {
-                "user": "${user}",
-                "pass": "${password}"
+    "inbounds": [  
+        {
+            "listen": "0.0.0.0",
+            "port": "${port}",
+            "protocol": "socks",
+            "settings": {
+                "auth": "password",
+                "accounts": [
+                    {
+                        "user": "${user}",
+                        "pass": "${password}"
+                    }
+                ],
+                "udp": true,
+                "ip": "127.0.0.1"
             }
-        ],
-        "udp": true,
-        "ip": "127.0.0.1"
-    }
+        }
+    ]
 }

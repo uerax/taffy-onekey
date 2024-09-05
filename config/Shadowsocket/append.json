@@ -1,3 +1,5 @@
+{
+    "inbounds": [     
         {
             "port": "${port}",
             "protocol": "shadowsocks",
@@ -9,3 +11,5 @@
                 "network": "udp,tcp"
             }
         }
+    ]
+}
