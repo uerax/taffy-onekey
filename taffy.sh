@@ -26,7 +26,7 @@ Error="${Red}[错误]${Font}"
 
 website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
 website_git="https://github.com/bakasine/bakasine.github.io.git"
-xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-release.sh"
+xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-xray.sh"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
@@ -67,7 +67,7 @@ vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/maste
 vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/append.json"
 
 # SINGBOX URL START
-singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-sing-box.sh"
+singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-singbox.sh"
 tcp_brutal_install_url="https://tcp.hy2.sh/"
 singbox_cfg_path="/etc/sing-box"
 singbox_cfg="${singbox_cfg_path}/config.json"
@@ -150,13 +150,6 @@ get_system() {
     elif [[ "${ID}"=="centos" ]]; then
         error "centos fuck out!"
         exit 1
-    #    INS = "yum install -y"
-    # RedHat 系发行版关闭 SELinux
-    #if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
-    #  sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    #  setenforce 0
-    #fi
-    #    env_install
     else
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1
@@ -549,7 +542,7 @@ vless_reality_h2() {
     sed -i "s~\${port}~$port~" ${xray_cfg}
     
     routing_set
-    vless-reality-h2-outbound-config
+    vless_reality_h2_outbound_config
     systemctl restart xray 
 
     systemctl enable xray
@@ -581,7 +574,7 @@ vless_reality_h2_append() {
     sed -i '/inbounds/ r append.tmp' ${xray_cfg}
     rm append.tmp
 
-    vless-reality-h2-outbound-config
+    vless_reality_h2_outbound_config
     systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
@@ -608,7 +601,7 @@ vless_reality_tcp() {
     sed -i "s~\${port}~$port~" ${xray_cfg}
 
     routing_set
-    vless-reality-tcp-outbound-config
+    vless_reality_tcp_outbound_config
 
     systemctl restart xray 
 
@@ -643,7 +636,7 @@ vless_reality_tcp_append() {
     sed -i '/inbounds/ r append.tmp' ${xray_cfg}
     rm append.tmp
 
-    vless-reality-tcp-outbound-config
+    vless_reality_tcp_outbound_config
     systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
@@ -670,7 +663,7 @@ vless_reality_grpc() {
     sed -i "s~\${port}~$port~" ${xray_cfg}
 
     routing_set
-    vless-reality-grpc-outbound-config
+    vless_reality_grpc_outbound_config
 
     systemctl restart xray 
 
@@ -704,7 +697,7 @@ vless_reality_grpc_append() {
     sed -i '/inbounds/ r append.tmp' ${xray_cfg}
     rm append.tmp
 
-    vless-reality-grpc-outbound-config
+    vless_reality_grpc_outbound_config
     systemctl restart xray 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
@@ -771,7 +764,7 @@ trojan_tcp_tls() {
     sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
 
     routing_set
-    trojan-tcp-tls-outbound-config
+    trojan_tcp_tls_outbound_config
 
     systemctl restart xray
 
@@ -836,7 +829,7 @@ vmess_ws_tls() {
 
     clash_config
     qx_config
-    vmess-ws-tls-outbound-config
+    vmess_ws_tls_outbound_config
 }
 
 vless_ws_tls() {
@@ -967,17 +960,17 @@ trojan() {
     fi
     set_port
     password=$(openssl rand -base64 16)
-    trojan-config
+    trojan_config
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
-    trojan-outbound-config
+    trojan_outbound_config
     clash_config
     qx_config
 
 }
 
-trojan-config() {
+trojan_config() {
     wget -N ${trojan_config_url} -O config.json
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -986,7 +979,7 @@ trojan-config() {
     systemctl restart xray && systemctl enable xray
 }
 
-trojan-append() {
+trojan_append() {
     xray_type="trojan"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
@@ -1009,7 +1002,7 @@ trojan-append() {
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
-    trojan-outbound-config
+    trojan_outbound_config
     clash_config
     qx_config
 }
@@ -1063,7 +1056,7 @@ shadowsocket() {
       ;;
     esac
 
-    shadowsocket-config
+    shadowsocket_config
     systemctl restart xray && systemctl enable xray
 
     tmp="${ss_method}:${password}"
@@ -1079,7 +1072,7 @@ shadowsocket() {
 
 }
 
-shadowsocket-config() {
+shadowsocket_config() {
     wget -N ${ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -1087,7 +1080,7 @@ shadowsocket-config() {
     mv config.json ${xray_cfg}
 }
 
-shadowsocket-append() {
+shadowsocket_append() {
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -1158,7 +1151,7 @@ shadowsocket-append() {
 
 # outbound start
 
-vmess-ws-tls-outbound-config() {
+vmess_ws_tls_outbound_config() {
     outbound="{
     \"protocol\": \"vmess\",
     \"settings\": {
@@ -1227,7 +1220,7 @@ vmess-ws-tls-outbound-config() {
 	\"connect_timeout\": \"5s\"\n}"
 }
 
-vless-reality-grpc-outbound-config() {
+vless_reality_grpc_outbound_config() {
     outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
@@ -1262,7 +1255,7 @@ vless-reality-grpc-outbound-config() {
     }\n}"
 }
 
-vless-reality-tcp-outbound-config() {
+vless_reality_tcp_outbound_config() {
     outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
@@ -1294,7 +1287,7 @@ vless-reality-tcp-outbound-config() {
     }\n}"
 }
 
-trojan-tcp-tls-outbound-config() {
+trojan_tcp_tls_outbound_config() {
     outbound="{
     \"sendThrough\": \"0.0.0.0\",
     \"protocol\": \"trojan\",
@@ -1316,7 +1309,7 @@ trojan-tcp-tls-outbound-config() {
     }\n}"
 }
 
-vless-reality-h2-outbound-config() {
+vless_reality_h2_outbound_config() {
     outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
@@ -1348,7 +1341,7 @@ vless-reality-h2-outbound-config() {
     }\n}"
 }
 
-trojan-outbound-config() {
+trojan_outbound_config() {
     outbound="{
     \"protocol\": \"trojan\",
     \"settings\": {
@@ -1390,7 +1383,7 @@ shadowsocket_outbound_config() {
 }"
 }
 
-socks5-append() {
+socks5_append() {
     xray_type="socks5"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
@@ -1646,7 +1639,7 @@ singbox_vmess_ws_tls() {
 
     clash_config
     qx_config
-    vmess-ws-tls-outbound-config
+    vmess_ws_tls_outbound_config
 
 }
 
@@ -1800,7 +1793,7 @@ singbox_reality_append() {
 
     systemctl restart sing-box
 
-    vless-reality-grpc-outbound-config
+    vless_reality_grpc_outbound_config
     clash_config
     qx_config
 }
@@ -2242,13 +2235,13 @@ select_append_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        shadowsocket-append
+        shadowsocket_append
         ;;
     2)
-        trojan-append
+        trojan_append
         ;;
     3)
-        socks5-append
+        socks5_append
         ;;
     4)
         vless_reality_tcp_append

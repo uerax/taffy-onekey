@@ -1,10 +1,22 @@
+amd="https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip"
+arm="https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-arm64-v8a.zip"
+link=""
+
+case "$(uname -m)" in
+    'armv8' | 'aarch64')
+      link=${arm}
+      ;;
+    *)
+      link=${amd}
+      ;;
+esac
 
 mkdir -p /root/xray
 cd /root/xray
 
-wget https://gh-proxy.com/https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+wget ${link} -O Xray-linux.zip
 
-unzip Xray-linux-64.zip
+unzip Xray-linux.zip
 
 mv xray /usr/local/bin/
 rm -r /root/xray
