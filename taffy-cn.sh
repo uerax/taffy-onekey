@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.1.0"
+version="v2.1.1"
 
 #fonts color
 Green="\033[32m"
@@ -731,10 +731,10 @@ menu() {
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   安装/更新 Xray${Font}"
-    echo -e "${Cyan}4)   Xray 协议更换${Font}"
-    echo -e "${Cyan}5)   插入 Xray 其他协议${Font}"
+    echo -e "${Cyan}4)   更换 Xray 协议${Font}"
+    echo -e "${Cyan}5)   插入 Xray 协议${Font}"
     echo -e "${Purple}11)  查看配置链接${Font}"
-    echo -e "${Green}100) 开启bbr${Font}"
+    echo -e "${Green}100) 开启 BBR${Font}"
     echo -e "${Red}999) 卸载 Xray${Font}"
     echo -e "${Red}q)   退出${Font}"
     echo -e "${Cyan}————————————————————————————————————————${Font}\n"

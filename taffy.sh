@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.2.1"
+version="v2.2.2"
 
 #fonts color
 Green="\033[32m"
@@ -2384,12 +2384,10 @@ menu() {
     echo -e "${Green}1)   一键安装 Xray${Font}"
     echo -e "${Blue}2)   更新脚本${Font}"
     echo -e "${Green}3)   一键安装 Singbox${Font}"
-    echo -e "${Cyan}5)   插入 Singbox 其他协议${Font}"
-    echo -e "${Cyan}6)   插入 Xray 其他协议${Font}"
-    echo -e "${Cyan}7)   Singbox 协议更换${Font}"
-    echo -e "${Cyan}8)   Xray 协议更换${Font}"
-    echo -e "${Cyan}9)   Singbox 出站配置添加${Font}"
-    echo -e "${Cyan}10)   Xray 出站配置添加${Font}"
+    echo -e "${Cyan}5)   插入 Singbox 协议${Font}"
+    echo -e "${Cyan}6)   插入 Xray 协议${Font}"
+    echo -e "${Cyan}7)   更换 Singbox 协议${Font}"
+    echo -e "${Cyan}8)   更换 Xray 协议${Font}"
     echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
     echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
@@ -2399,7 +2397,7 @@ menu() {
     echo -e "${Purple}33)  Singbox 操作面板${Font}"
     echo -e "${Green}34)  安装 / 卸载 Nginx${Font}"
     echo -e "${Yellow}99)  常见问题${Font}"
-    echo -e "${Green}100) 开启bbr${Font}"
+    echo -e "${Green}100) 开启 BBR${Font}"
     echo -e "${Red}999) 完全卸载${Font}"
     echo -e "${Red}q)   退出${Font}"
     echo -e "${Cyan}————————————————————————————————————————${Font}\n"
@@ -2427,12 +2425,6 @@ menu() {
     ;;
     8)
     select_type
-    ;;
-    9)
-    singbox_outbound_append
-    ;;
-    10)
-    xray_outbound_append
     ;;
     11)
     show_info
