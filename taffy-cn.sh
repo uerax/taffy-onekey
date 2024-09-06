@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.1.1"
+version="v2.1.2"
 
 #fonts color
 Green="\033[32m"
@@ -37,12 +37,11 @@ trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/m
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_log="/var/log/xray"
-xray_type=""
+protocol_type=""
 
 ss_method=""
 
-outbound_method=""
-outbound=''
+xray_outbound=''
 
 INS="apt install -y"
 password=""
@@ -158,7 +157,7 @@ xray_configure() {
 }
 
 clash_config() {
-    case $xray_type in
+    case $protocol_type in
     "hysteria2_nodomain")
     clash_cfg="  - name: $domain
     type: hysteria2
@@ -319,7 +318,7 @@ clash_config() {
 }
 
 qx_config() {
-    case $xray_type in
+    case $protocol_type in
     "vmess_ws")
     qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=/${ws_path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
     ;;
@@ -336,7 +335,7 @@ qx_config() {
 }
 
 trojan() {
-    xray_type="trojan"
+    protocol_type="trojan"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
@@ -352,7 +351,7 @@ trojan() {
 }
 
 trojan_append() {
-    xray_type="trojan"
+    protocol_type="trojan"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
@@ -444,7 +443,7 @@ shadowsocket() {
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     shadowsocket_outbound_config
 
     clash_config
@@ -457,7 +456,7 @@ shadowsocket_append() {
           judge "openssl 安装"
     fi
     encrypt=1
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     ss_method="aes-128-gcm"
     set_port
     echo -e "选择加密方法"
@@ -534,7 +533,7 @@ shadowsocket_config() {
 # outbound start
 
 trojan_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"trojan\",
     \"settings\": {
         \"servers\": [
@@ -544,12 +543,17 @@ trojan_outbound_config() {
                 \"password\": \"${password}\"
             }
         ]
-    }
-}"
+    }\n}"
+
+    singbox_outbound="{
+    \"type\": \"trojan\",
+    \"server\": \"${ip}\",
+    \"server_port\": ${port},
+    \"password\": \"${password}\"\n}"
 }
 
 shadowsocket_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
         \"servers\": [
@@ -561,6 +565,14 @@ shadowsocket_outbound_config() {
             }
         ]
     }
+}"
+
+    singbox_outbound="{
+    \"type\": \"shadowsocks\",
+    \"server\": \"${domain}\",
+    \"server_port\": ${port},
+    \"method\": \"${ss_method}\",
+    \"password\": \"${password}\"
 }"
 }
 
@@ -638,8 +650,11 @@ info_return() {
     echo -e "${Green}QuantumultX配置: ${Font}"
     echo -e "${qx_cfg}"
     echo -e "------------------------------------------------"
-    echo -e "${Green}Outbounds配置:${Font}"
-    echo -e "${outbound}"
+    echo -e "${Green}Xray Outbounds配置:${Font}"
+    echo -e "${xray_outbound}"
+    echo -e "------------------------------------------------"
+    echo -e "${Green}Singbox Outbounds配置:${Font}"
+    echo -e "${singbox_outbound}"
     echo -e "------------------------------------------------"
 
     echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"

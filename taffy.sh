@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.2.2"
+version="v2.2.3"
 
 #fonts color
 Green="\033[32m"
@@ -24,28 +24,27 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
-website_url="https://github.com/bakasine/bakasine.github.io/archive/refs/heads/master.zip"
 website_git="https://github.com/bakasine/bakasine.github.io.git"
 xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-xray.sh"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
-
-ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
-ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
-
 bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
-trojan_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
-trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
+xray_socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
 
-trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
+xray_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
+xray_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
+
+xray_trojan_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
+xray_trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
+
+xray_trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
 trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
 
-trojan_tcp_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
+xray_trojan_tcp_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
 trojan_tcp_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
 
-vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
+xray_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
 vmess_ws_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
 
 vless_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
@@ -57,13 +56,13 @@ vless_grpc_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/maste
 vless_vision_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
 vless_vision_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
 
-vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
-vless_reality_tcp_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/append.json"
+xray_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
+xray_vless_reality_tcp_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/append.json"
 
-vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
-vless_reality_grpc_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/append.json"
+xray_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/config.json"
+xray_vless_reality_grpc_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/append.json"
 
-vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
+xray_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
 vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/append.json"
 
 # SINGBOX URL START
@@ -94,7 +93,7 @@ xray_path="/opt/xray/"
 xray_log="${xray_path}xray_log"
 nginx_cfg="/etc/nginx/conf.d/taffy.conf"
 web_dir="blog"
-xray_type=""
+protocol_type=""
 web_path="/opt/web"
 ca_path="/opt/cert"
 ca_crt="${ca_path}/taffy.crt"
@@ -102,8 +101,7 @@ ca_key="${ca_path}/taffy.key"
 ws_path="crayfish"
 ss_method=""
 
-outbound_method=""
-outbound=""
+xray_outbound=""
 
 INS="apt install -y"
 password=""
@@ -337,7 +335,7 @@ xray_configure() {
 }
 
 clash_config() {
-    case $xray_type in
+    case $protocol_type in
     "hysteria2_nodomain")
     clash_cfg="  - name: $domain
     type: hysteria2
@@ -502,7 +500,7 @@ clash_config() {
 }
 
 qx_config() {
-    case $xray_type in
+    case $protocol_type in
     "vmess_ws")
     qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=/${ws_path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
     ;;
@@ -524,7 +522,7 @@ vless_reality_h2() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_h2"
+    protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -532,7 +530,7 @@ vless_reality_h2() {
     ip=$(curl ipinfo.io/ip)
     ipv6=$(curl -6 ip.me)
 
-    wget -N ${vless_reality_h2_url} -O ${xray_cfg}
+    wget -N ${xray_vless_reality_h2_url} -O ${xray_cfg}
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -554,7 +552,7 @@ vless_reality_h2_append() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_h2"
+    protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -584,7 +582,7 @@ vless_reality_tcp() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_tcp"
+    protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -592,7 +590,7 @@ vless_reality_tcp() {
     ip=$(curl ipinfo.io/ip)
     ipv6=$(curl -6 ip.me)
 
-    wget -N ${vless_reality_tcp_url} -O ${xray_cfg}
+    wget -N ${xray_vless_reality_tcp_url} -O ${xray_cfg}
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -617,7 +615,7 @@ vless_reality_tcp_append() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_tcp"
+    protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -626,7 +624,7 @@ vless_reality_tcp_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${vless_reality_tcp_append_url} -O append.json
+    wget -Nq ${xray_vless_reality_tcp_append_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -647,7 +645,7 @@ vless_reality_grpc() {
     set_port
     port_check $port
 
-    xray_type="reality_grpc"
+    protocol_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -655,7 +653,7 @@ vless_reality_grpc() {
     ip=$(curl ipinfo.io/ip)
     ipv6=$(curl -6 ip.me)
 
-    wget -N ${vless_reality_grpc_url} -O ${xray_cfg}
+    wget -N ${xray_vless_reality_grpc_url} -O ${xray_cfg}
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -679,7 +677,7 @@ vless_reality_grpc_append() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_grpc"
+    protocol_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
@@ -688,7 +686,7 @@ vless_reality_grpc_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${vless_reality_grpc_append_url} -O append.json
+    wget -Nq ${xray_vless_reality_grpc_append_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -713,11 +711,11 @@ trojan_grpc() {
     apply_certificate
     flush_certificate
     
-    xray_type="trojan_grpc"
+    protocol_type="trojan_grpc"
     password=$(xray uuid)
     port=443
     
-    wget -N ${trojan_grpc_config_url} -O ${xray_cfg}
+    wget -N ${xray_trojan_grpc_config_url} -O ${xray_cfg}
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
@@ -754,11 +752,11 @@ trojan_tcp_tls() {
     apply_certificate
     flush_certificate
     
-    xray_type="trojan_tcp"
+    protocol_type="trojan_tcp"
     password=$(xray uuid)
     set_port
     
-    wget -N ${trojan_tcp_tls_config_url} -O ${xray_cfg}
+    wget -N ${xray_trojan_tcp_tls_config_url} -O ${xray_cfg}
 
     sed -i "s~${port}~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -796,10 +794,10 @@ vmess_ws_tls() {
     apply_certificate
     flush_certificate
 
-    xray_type="vmess_ws"
+    protocol_type="vmess_ws"
     password=$(xray uuid)
 
-    wget -N ${vmess_ws_config_url} -O ${xray_cfg}
+    wget -N ${xray_vmess_ws_config_url} -O ${xray_cfg}
 
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -842,7 +840,7 @@ vless_ws_tls() {
     apply_certificate
     flush_certificate
 
-    xray_type="vless_ws"
+    protocol_type="vless_ws"
     password=$(xray uuid)
 
     wget -N ${vless_ws_config_url} -O ${xray_cfg}
@@ -882,7 +880,7 @@ vless_grpc() {
     apply_certificate
     flush_certificate
 
-    xray_type="vless_grpc"
+    protocol_type="vless_grpc"
     password=$(xray uuid)
 
     wget -N ${vless_grpc_config_url} -O ${xray_cfg}
@@ -920,7 +918,7 @@ vless_tcp_xtls_vision() {
     apply_certificate
     flush_certificate
 
-    xray_type="vless_vison"
+    protocol_type="vless_vison"
     password=$(xray uuid)
     vless_tcp_xtls_vision_xray_cfg
     systemctl restart xray && systemctl enable xray
@@ -952,7 +950,7 @@ vless_tcp_xtls_vision_xray_cfg() {
 }
 
 trojan() {
-    xray_type="trojan"
+    protocol_type="trojan"
     ip=`curl ipinfo.io/ip`
     info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
     close_nginx()
@@ -973,7 +971,7 @@ trojan() {
 }
 
 trojan_config() {
-    wget -N ${trojan_config_url} -O config.json
+    wget -N ${xray_trojan_config_url} -O config.json
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
     
@@ -982,7 +980,7 @@ trojan_config() {
 }
 
 trojan_append() {
-    xray_type="trojan"
+    protocol_type="trojan"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
@@ -993,7 +991,7 @@ trojan_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${trojan_append_config_url} -O append.json
+    wget -Nq ${xray_trojan_append_config_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${port}~$port~" append.json
@@ -1068,7 +1066,7 @@ shadowsocket() {
     ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     shadowsocket_outbound_config
     clash_config
     qx_config
@@ -1076,7 +1074,7 @@ shadowsocket() {
 }
 
 shadowsocket_config() {
-    wget -N ${ss_config_url} -O config.json
+    wget -N ${xray_ss_config_url} -O config.json
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~\${port}~$port~" config.json
@@ -1089,7 +1087,7 @@ shadowsocket_append() {
           judge "openssl 安装"
     fi
     encrypt=1
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     ss_method="aes-128-gcm"
     set_port
     echo -e "选择加密方法"
@@ -1132,7 +1130,7 @@ shadowsocket_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${ss_append_config_url} -O append.json
+    wget -Nq ${xray_ss_append_config_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${method}~$ss_method~" append.json
@@ -1157,7 +1155,7 @@ shadowsocket_append() {
 # outbound start
 
 vmess_ws_tls_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"vmess\",
     \"settings\": {
         \"vnext\": [
@@ -1226,7 +1224,7 @@ vmess_ws_tls_outbound_config() {
 }
 
 vless_reality_grpc_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
         \"vnext\": [
@@ -1261,7 +1259,7 @@ vless_reality_grpc_outbound_config() {
 }
 
 vless_reality_tcp_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
         \"vnext\": [
@@ -1293,7 +1291,7 @@ vless_reality_tcp_outbound_config() {
 }
 
 trojan_tcp_tls_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"sendThrough\": \"0.0.0.0\",
     \"protocol\": \"trojan\",
     \"settings\": {
@@ -1315,7 +1313,7 @@ trojan_tcp_tls_outbound_config() {
 }
 
 vless_reality_h2_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"vless\",
     \"settings\": {
         \"vnext\": [
@@ -1347,7 +1345,7 @@ vless_reality_h2_outbound_config() {
 }
 
 trojan_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"trojan\",
     \"settings\": {
         \"servers\": [
@@ -1366,7 +1364,7 @@ trojan_outbound_config() {
 }
 
 shadowsocket_outbound_config() {
-    outbound="{
+    xray_outbound="{
     \"protocol\": \"shadowsocks\",
     \"settings\": {
         \"servers\": [
@@ -1389,7 +1387,7 @@ shadowsocket_outbound_config() {
 }
 
 socks5_append() {
-    xray_type="socks5"
+    protocol_type="socks5"
     ip=`curl ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
@@ -1403,7 +1401,7 @@ socks5_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${socks5_append_config_url} -O append.json
+    wget -Nq ${xray_socks5_append_config_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${user}~$user~" append.json
@@ -1519,7 +1517,7 @@ singbox_hy2() {
 
     systemctl restart sing-box
     
-    xray_type="hysteria2_nodomain"
+    protocol_type="hysteria2_nodomain"
     link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
     clash_config
@@ -1535,7 +1533,7 @@ singbox_vless_reality_h2() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_h2"
+    protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1564,7 +1562,7 @@ singbox_vless_reality_grpc() {
     set_port
     port_check $port
 
-    xray_type="reality_grpc"
+    protocol_type="reality_grpc"
     domain="www.fate-go.com.tw"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1596,7 +1594,7 @@ singbox_vless_reality_tcp() {
     port_check $port
 
     domain="www.fate-go.com.tw"
-    xray_type="reality_tcp"
+    protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1625,7 +1623,7 @@ singbox_vmess_ws_tls() {
     port_check 443
     domain_handle
 
-    xray_type="vmess_ws"
+    protocol_type="vmess_ws"
     password=$(sing-box generate uuid)
 
     wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
@@ -1653,7 +1651,7 @@ singbox_trojan_tls_tcp() {
     port_check 443
     domain_handle
 
-    xray_type="trojan_tcp"
+    protocol_type="trojan_tcp"
     password=$(sing-box generate uuid)
 
     wget -N ${singbox_trojan_tls_config_url} -O ${singbox_cfg}
@@ -1730,7 +1728,7 @@ singbox_shadowsocket() {
     ipv6=$(curl -6 ip.me)
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     shadowsocket_outbound_config
     clash_config
     qx_config
@@ -1762,7 +1760,7 @@ singbox_hy2_append() {
 
     systemctl restart sing-box
     
-    xray_type="hysteria2_nodomain"
+    protocol_type="hysteria2_nodomain"
 
     clash_config
 }
@@ -1772,7 +1770,7 @@ singbox_reality_append() {
     set_port
     port_check $port
 
-    xray_type="reality_grpc"
+    protocol_type="reality_grpc"
     domain="www.fate-go.com.tw"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1869,7 +1867,7 @@ singbox_shadowsocket_append() {
     domain=`curl ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
-    xray_type="shadowsocket"
+    protocol_type="shadowsocket"
     shadowsocket_outbound_config
     clash_config
     qx_config
@@ -1977,10 +1975,10 @@ info_return() {
         echo -e "${Green}QuantumultX配置: ${Font}"
         echo -e "${qx_cfg}"
     fi
-    if [ -n "$outbound" ]; then
+    if [ -n "$xray_outbound" ]; then
         echo -e "------------------------------------------------"
         echo -e "${Green}Outbounds配置:${Font}"
-        echo -e "${outbound}"
+        echo -e "${xray_outbound}"
     fi
     if [ -n "$singbox_outbound" ]; then
         echo -e "------------------------------------------------"
@@ -1993,7 +1991,7 @@ info_return() {
         echo -e "${clash_cfg}"
     fi
     echo -e "------------------------------------------------"
-    if [ "$xray_type" = "vmess_ws" ]; then
+    if [ "$protocol_type" = "vmess_ws" ]; then
         echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
     fi
     
