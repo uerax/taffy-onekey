@@ -24,11 +24,11 @@ Warn="${Yellow}[警告]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
+bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 website_git="https://github.com/bakasine/bakasine.github.io.git"
-xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-xray.sh"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
-bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
+xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-xray.sh"
 
 xray_socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Socks5/append.json"
 
@@ -67,10 +67,8 @@ vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-oneke
 
 # SINGBOX URL START
 singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-singbox.sh"
-tcp_brutal_install_url="https://tcp.hy2.sh/"
 singbox_cfg_path="/etc/sing-box"
 singbox_cfg="${singbox_cfg_path}/config.json"
-singbox_path="/opt/singbox/"
 
 singbox_outbound=""
 
@@ -109,13 +107,11 @@ domain=""
 link=""
 port="1991"
 
-install() {
+xray_onekey_install() {
     is_root
     get_system
     if ! command -v xray >/dev/null 2>&1; then
-        # adjust_date
         env_install
-        # increase_max_handle
         close_firewall
         xray_install
     fi
@@ -124,7 +120,7 @@ install() {
         exit 1
     fi
     xray_configure
-    select_type
+    xray_select
 }
 
 is_root() {
@@ -516,7 +512,7 @@ qx_config() {
     esac
 }
 
-vless_reality_h2() {
+xray_vless_reality_h2() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -546,7 +542,7 @@ vless_reality_h2() {
     clash_config
 }
 
-vless_reality_h2_append() {
+xray_vless_reality_h2_append() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -576,7 +572,7 @@ vless_reality_h2_append() {
     systemctl restart xray 
 }
 
-vless_reality_tcp() {
+xray_vless_reality_tcp() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -609,7 +605,7 @@ vless_reality_tcp() {
     clash_config
 }
 
-vless_reality_tcp_append() {
+xray_vless_reality_tcp_append() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -640,7 +636,7 @@ vless_reality_tcp_append() {
     systemctl restart xray
 }
 
-vless_reality_grpc() {
+xray_vless_reality_grpc() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -671,7 +667,7 @@ vless_reality_grpc() {
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 }
 
-vless_reality_grpc_append() {
+xray_vless_reality_grpc_append() {
     password=$(xray uuid)
     set_port
     port_check $port
@@ -744,7 +740,7 @@ trojan_grpc() {
     clash_config
 }
 
-trojan_tcp_tls() {
+xray_trojan_tcp_tls() {
     port_check 80
     port_check 443
     nginx_install
@@ -786,7 +782,7 @@ trojan_tcp_tls() {
     qx_config
 }
 
-vmess_ws_tls() {
+xray_vmess_ws_tls() {
     port_check 80
     port_check 443
     nginx_install
@@ -949,7 +945,7 @@ vless_tcp_xtls_vision_xray_cfg() {
     mv config.json ${xray_cfg}
 }
 
-trojan() {
+xray_trojan() {
     protocol_type="trojan"
     ip=`curl ipinfo.io/ip`
     info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
@@ -960,7 +956,13 @@ trojan() {
     fi
     set_port
     password=$(openssl rand -base64 16)
-    trojan_config
+
+    wget -N ${xray_trojan_config_url} -O config.json
+    sed -i "s~\${port}~$port~" config.json
+    sed -i "s~\${password}~$password~" config.json
+    
+    mv config.json ${xray_cfg}
+    systemctl restart xray && systemctl enable xray
 
     link="trojan://${password}@${ip}:${port}#${domain}"
 
@@ -968,15 +970,6 @@ trojan() {
     clash_config
     qx_config
 
-}
-
-trojan_config() {
-    wget -N ${xray_trojan_config_url} -O config.json
-    sed -i "s~\${port}~$port~" config.json
-    sed -i "s~\${password}~$password~" config.json
-    
-    mv config.json ${xray_cfg}
-    systemctl restart xray && systemctl enable xray
 }
 
 trojan_append() {
@@ -1008,7 +1001,7 @@ trojan_append() {
     systemctl restart xray
 }
 
-shadowsocket() {
+xray_shadowsocket() {
     
     info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
     close_nginx()
@@ -1081,7 +1074,7 @@ shadowsocket_config() {
     mv config.json ${xray_cfg}
 }
 
-shadowsocket_append() {
+xray_shadowsocket_append() {
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -1521,8 +1514,6 @@ singbox_hy2() {
     link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
     clash_config
-
-    mkdir -p ${singbox_path}
 
     info_return
 }
@@ -1997,7 +1988,7 @@ info_return() {
     
 }
 
-show_info() {
+show_xray_info() {
     bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ xray
 }
 
@@ -2211,7 +2202,7 @@ question_answer() {
     echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
 }
 
-select_append_type() {
+select_xray_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket${Font}"
@@ -2226,7 +2217,7 @@ select_append_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        shadowsocket_append
+        xray_shadowsocket_append
         ;;
     2)
         trojan_append
@@ -2235,10 +2226,10 @@ select_append_type() {
         socks5_append
         ;;
     4)
-        vless_reality_tcp_append
+        xray_vless_reality_tcp_append
         ;;
     5)
-        vless_reality_grpc_append
+        xray_vless_reality_grpc_append
         ;;
     q)
         exit
@@ -2260,7 +2251,6 @@ select_singbox_append_type() {
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
-    mkdir -p ${singbox_path}
     case $menu_num in
     1)
         singbox_shadowsocket_append
@@ -2295,7 +2285,6 @@ singbox_select() {
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
-    mkdir -p ${singbox_path}
     case $menu_num in
     1)
         singbox_hy2
@@ -2329,13 +2318,14 @@ singbox_select() {
     info_return
 }
 
-select_type() {
+xray_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc(推荐)${Font}"
     echo -e "${Green}3)  vless-reality-h2${Font}"
     echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
+    echo -e "${Green}12)  trojan${Font}"
     echo -e "${Cyan}21)  vmess-ws-tls${Font}"
     echo -e "${Cyan}31)  shadowsocket${Font}"
     echo -e "${Red}q)  不装了${Font}"
@@ -2345,22 +2335,25 @@ select_type() {
     mkdir -p ${xray_path}
     case $menu_num in
     1)
-        vless_reality_tcp
+        xray_vless_reality_tcp
         ;;
     2)
-        vless_reality_grpc
+        xray_vless_reality_grpc
         ;;
     3)
-        vless_reality_h2
+        xray_vless_reality_h2
         ;;
     11)
-        trojan_tcp_tls
+        xray_trojan_tcp_tls
+        ;;
+    12)
+        xray_trojan
         ;;
     21)
-        vmess_ws_tls
+        xray_vmess_ws_tls
         ;;
     31)
-        shadowsocket
+        xray_shadowsocket
         ;;
     q)
         exit
@@ -2404,7 +2397,7 @@ menu() {
     echo -e ""
     case $menu_num in
     1)
-    install
+    xray_onekey_install
     ;;
     2)
     update_script
@@ -2416,16 +2409,16 @@ menu() {
     select_singbox_append_type
     ;;
     6)
-    select_append_type
+    select_xray_append_type
     ;;
     7)
     singbox_select
     ;;
     8)
-    select_type
+    xray_select
     ;;
     11)
-    show_info
+    show_xray_info
     ;;
     12)
     show_singbox_info
@@ -2467,7 +2460,7 @@ menu() {
 
 case $1 in
     install)
-        install
+        xray_onekey_install
         ;;
     singbox)
         singbox_onekey_install
