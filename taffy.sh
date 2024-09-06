@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.1.1"
+version="v2.2.1"
 
 #fonts color
 Green="\033[32m"
@@ -626,7 +626,7 @@ vless_reality_tcp_append() {
 
     cd /usr/local/etc/xray
 
-    wget -Nq ${vless_reality_tcp_append_url} -O appenjson
+    wget -Nq ${vless_reality_tcp_append_url} -O append.json
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -1282,7 +1282,7 @@ vless_reality_tcp_outbound_config() {
         \"network\": \"tcp\",
         \"security\": \"reality\",
         \"realitySettings\": {
-            \"show\": false,\
+            \"show\": false,
             \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
@@ -1874,8 +1874,40 @@ singbox_shadowsocket_append() {
     clash_config
     qx_config
 }
-
 # SINGBOX END
+
+# OUTBOUNDS ADDPEND START
+singbox_outbound_append() {
+    echo -e "输入要插入的Outbound配置:"
+    read -r outbound
+
+    echo "{"outbounds":[$outbound]}" > ${singbox_cfg_path}/append.json
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    systemctl restart sing-box
+}
+
+xray_outbound_append() {
+    echo -e "输入要插入的Outbound配置:"
+    read -r outbound
+
+    echo "{"outbounds":[$outbound]}" > /usr/local/etc/xray/append.json
+
+    cp /usr/local/etc/xray/config.json /usr/local/etc/xray/config.json.bak
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+
+    rm /usr/local/etc/xray/append.json
+
+    systemctl restart sing-box
+
+}
+# OUTBOUNDS ADDPEND END
 
 info() {
     echo -e "${Info} ${Green} $1 ${Font}"
@@ -1931,14 +1963,6 @@ open_bbr() {
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1
     fi
-}
-
-show_path() {
-    echo -e "${Green}xray 配置文件地址:${Font} ${xray_cfg}"
-    echo -e "${Green}singbox 配置文件地址:${Font} ${singbox_cfg}"
-    echo -e "${Green}hysteria 配置文件地址:${Font} ${hysteria_cfg}"
-    echo -e "${Green}nginx配置文件地址:${Font} ${nginx_cfg}"
-    echo -e "${Green}分享链接文件地址:${Font} ${xray_info}"
 }
 
 info_return() {
@@ -2171,43 +2195,6 @@ singbox_operation() {
       esac
 }
 
-server_operation() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  重启/启动 Nginx${Font}"
-    echo -e "${Yellow}2)  关闭 Nginx${Font}"
-    echo -e "${Green}3)  重启/启动 Xray${Font}"
-    echo -e "${Yellow}4)  关闭 Xray${Font}"
-    echo -e "${Gree}5)  操作 Hysteria${Font}"
-    echo -e "${Red}q)  结束操作${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-      case $opt_num in
-      1)
-          restart_nginx
-          ;;
-      2)
-          close_nginx
-          ;;
-      3)
-          restart_xray
-          ;;
-      4)
-          close_xray
-          ;;
-      5)
-          hysteria_operation
-          ;;
-      q)
-          exit
-          ;;
-      *)
-          error "请输入正确的数字"
-          ;;
-      esac
-      server_operation
-}
-
 question_answer() {
     echo -e "${Red}1.我啥都不懂${Font}"
     echo -e "${Green}https://github.com/uerax/taffy-onekey/issues 去 New Issue 问${Font}"
@@ -2401,7 +2388,8 @@ menu() {
     echo -e "${Cyan}6)   插入 Xray 其他协议${Font}"
     echo -e "${Cyan}7)   Singbox 协议更换${Font}"
     echo -e "${Cyan}8)   Xray 协议更换${Font}"
-    echo -e "${Purple}10)  配置文件路径${Font}"
+    echo -e "${Cyan}9)   Singbox 出站配置添加${Font}"
+    echo -e "${Cyan}10)   Xray 出站配置添加${Font}"
     echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
     echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
     echo -e "${Blue}20)  更新伪装站${Font}"
@@ -2410,7 +2398,6 @@ menu() {
     echo -e "${Yellow}32)  卸载 Xray${Font}"
     echo -e "${Purple}33)  Singbox 操作面板${Font}"
     echo -e "${Green}34)  安装 / 卸载 Nginx${Font}"
-    echo -e "${Purple}40)  启动 / 关闭 / 重启服务${Font}"
     echo -e "${Yellow}99)  常见问题${Font}"
     echo -e "${Green}100) 开启bbr${Font}"
     echo -e "${Red}999) 完全卸载${Font}"
@@ -2436,13 +2423,16 @@ menu() {
     select_append_type
     ;;
     7)
-    singbox_select 
+    singbox_select
     ;;
     8)
     select_type
     ;;
+    9)
+    singbox_outbound_append
+    ;;
     10)
-    show_path
+    xray_outbound_append
     ;;
     11)
     show_info
@@ -2467,9 +2457,6 @@ menu() {
     ;;
     34)
     nginx_select
-    ;;
-    40)
-    server_operation
     ;;
     99)
     question_answer
