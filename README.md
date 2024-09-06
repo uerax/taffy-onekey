@@ -27,13 +27,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 `一键安装 Xray`
 
 ```
-bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ install
-```
-
-`一键安装 Hysteria`
-
-```
-bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ hysteria
+bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh)" @ xray
 ```
 
 `完全卸载`
@@ -53,6 +47,8 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 - vless-grpc-reality
 - vless-h2-reality
 - vmess-ws-tls
+- trojan-tls-tcp
+- trojan
 - shadowsocket-2022
 
 
