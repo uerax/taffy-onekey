@@ -1514,8 +1514,6 @@ singbox_hy2() {
     link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
     clash_config
-
-    info_return
 }
 
 singbox_vless_reality_h2() {
@@ -2236,6 +2234,7 @@ select_xray_append_type() {
         ;;
     *)
         error "请输入正确的数字"
+        exit
         ;;
     esac
     info_return
@@ -2266,6 +2265,7 @@ select_singbox_append_type() {
         ;;
     *)
         error "请输入正确的数字"
+        exit
         ;;
     esac
     info_return
@@ -2360,6 +2360,7 @@ xray_select() {
         ;;
     *)
         error "请输入正确的数字"
+        exit
         ;;
     esac
     info_return

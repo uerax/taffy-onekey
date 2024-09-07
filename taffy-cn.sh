@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.1.2"
+version="v2.1.3"
 
 #fonts color
 Green="\033[32m"
@@ -57,7 +57,6 @@ install() {
     xray_install
     xray_configure
     select_type
-    info_return
 }
 
 is_root() {
@@ -377,7 +376,6 @@ trojan_append() {
     qx_config
 
     systemctl restart xray
-    info_return
 }
 
 trojan_config() {
@@ -519,7 +517,6 @@ shadowsocket_append() {
     qx_config
 
     systemctl restart xray
-    info_return
 }
 
 shadowsocket_config() {
@@ -703,11 +700,14 @@ select_append_type() {
         trojan_append
         ;;
     q)
+        exit
         ;;
     *)
         error "请输入正确的数字"
+        exit
         ;;
     esac
+    info_return
 }
 
 select_type() {
@@ -731,9 +731,10 @@ select_type() {
         ;;
     *)
         error "请输入正确的数字"
-        select_type
+        exit
         ;;
     esac
+    info_return
 }
 
 menu() {
@@ -768,7 +769,6 @@ menu() {
     ;;
     4)
     select_type
-    info_return
     ;;
     11)
     show_info
