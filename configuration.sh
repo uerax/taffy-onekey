@@ -230,7 +230,6 @@ singbox_vless() {
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_tcp_outbound_config
         fi
-        show_info
     else
         echo ""
     fi
@@ -251,15 +250,17 @@ xray_vless() {
             local servName=$(echo "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_grpc_outbound_config
         elif [ "$protocol" = "h2" ]; then
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"        
+            vless_reality_h2_outbound_config
         else
             # reality+tcp
             local link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=$reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_tcp_outbound_config
         fi
-        show_info
     else
         echo ""
     fi
@@ -295,6 +296,8 @@ vless_reality_h2_outbound_config() {
             \"spiderX\": \"/\"
         }
     }\n}"
+
+    show_info
 }
 
 vless_reality_tcp_outbound_config() {
@@ -327,6 +330,8 @@ vless_reality_tcp_outbound_config() {
             \"spiderX\": \"/\"
         }
     }\n}"
+
+    show_info
 }
 
 vless_reality_grpc_outbound_config() {
@@ -362,6 +367,8 @@ vless_reality_grpc_outbound_config() {
             \"health_check_timeout\": 20
         }
     }\n}"
+
+    show_info
 }
 # vless end
 
