@@ -218,14 +218,17 @@ singbox_vless() {
             local servName=$(echo "$reality" | jq -r '.transport.service_name')
             local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_grpc_outbound_config
         elif [ "$protocol" = "http" ]; then
             # reality+h2
             local link="vless://$password@$ip:$port?encryption=none&security=reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_h2_outbound_config
         else
             # reality+tcp
             local link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    flow: xtls-rprx-vision\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_tcp_outbound_config
         fi
         show_info
     else
@@ -260,6 +263,105 @@ xray_vless() {
     else
         echo ""
     fi
+}
+
+vless_reality_h2_outbound_config() {
+    local xray_outbound="{
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${ip}\",
+                \"port\": ${port},
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+                        \"flow\": \"xtls-rprx-vision\",
+                        \"encryption\": \"none\"
+                    }
+                ]
+            }
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"h2\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"show\": false,
+            \"fingerprint\": \"safari\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${pubkey}\",
+            \"shortId\": \"${shortId}\",
+            \"spiderX\": \"/\"
+        }
+    }\n}"
+}
+
+vless_reality_tcp_outbound_config() {
+    local xray_outbound="{
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${ip}\",
+                \"port\": ${port},
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+                        \"flow\": \"xtls-rprx-vision\",
+                        \"encryption\": \"none\"
+                    }
+                ]
+            }\
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"tcp\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"show\": false,
+            \"fingerprint\": \"safari\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${pubkey}\",
+            \"shortId\": \"${shortId}\",
+            \"spiderX\": \"/\"
+        }
+    }\n}"
+}
+
+vless_reality_grpc_outbound_config() {
+    local xray_outbound="{
+    \"protocol\": \"vless\",
+    \"settings\": {
+        \"vnext\": [
+            {
+                \"address\": \"${ip}\",
+                \"port\": ${port},
+                \"users\": [
+                    {
+                        \"id\": \"${password}\",
+                        \"encryption\": \"none\"
+                    }
+                ]
+            }
+        ]
+    },
+    \"streamSettings\": {
+        \"network\": \"grpc\",
+        \"security\": \"reality\",
+        \"realitySettings\": {
+            \"fingerprint\": \"safari\",
+            \"serverName\": \"${domain}\",
+            \"publicKey\": \"${pubkey}\",
+            \"shortId\": \"${shortId}\"
+        },
+        \"grpcSettings\": {
+            \"serviceName\": \"${servName}\",
+            \"multiMode\": true,
+            \"idle_timeout\": 60,
+            \"health_check_timeout\": 20
+        }
+    }\n}"
 }
 # vless end
 
