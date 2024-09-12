@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.0"
+version="v2.2.1"
 
 #fonts color
 Green="\033[32m"
@@ -824,6 +824,9 @@ menu() {
     ;;
     4)
     select_type
+    ;;
+    5)
+    select_append_type
     ;;
     11)
     show_info
