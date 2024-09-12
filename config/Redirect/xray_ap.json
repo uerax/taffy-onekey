@@ -1,0 +1,17 @@
+{
+    "inbounds": [
+        {
+            "port": 114514,
+            "protocol": "dokodemo-door",
+            "settings": {
+              "address": "${ip}",
+              "port": 1919810,
+              "network": "tcp,udp",
+              "timeout": 0,
+              "followRedirect": false,
+              "userLevel": 0
+            },
+            "tag": "${port}"
+        }
+    ]
+}

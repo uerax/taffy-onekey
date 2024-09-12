@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.1.3"
+version="v2.2.0"
 
 #fonts color
 Green="\033[32m"
@@ -34,6 +34,10 @@ bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taf
 
 trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
 trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
+
+
+redirect_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray.json"
+redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray_ap.json"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_log="/var/log/xray"
@@ -527,6 +531,49 @@ shadowsocket_config() {
     mv config.json ${xray_cfg}
 }
 
+redirect() {
+    protocol_type="redirect"
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -N ${redirect_config_url} -O config.json
+    sed -i "s~114514~$port~" config.json
+    sed -i "s~1919810~$re_port~" config.json
+    sed -i "s~\${ip}~$re_ip~" config.json
+    
+    mv config.json ${xray_cfg}
+
+    systemctl restart xray && systemctl enable xray
+
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
+}
+
+redirect_append() {
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    cd /usr/local/etc/xray
+
+    wget -Nq ${redirect_append_config_url} -O append.json
+
+    sed -i "s~114514~$port~" append.json
+    sed -i "s~1919810~$re_port~" append.json
+    sed -i "s~\${ip}~$re_ip~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
+
+    systemctl restart xray
+
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
+}
+
 # outbound start
 
 trojan_outbound_config() {
@@ -561,16 +608,14 @@ shadowsocket_outbound_config() {
                 \"password\": \"${password}\"
             }
         ]
-    }
-}"
+    }\n}"
 
     singbox_outbound="{
     \"type\": \"shadowsocks\",
     \"server\": \"${domain}\",
     \"server_port\": ${port},
     \"method\": \"${ss_method}\",
-    \"password\": \"${password}\"
-}"
+    \"password\": \"${password}\"\n}"
 }
 
 # outbound end
@@ -688,6 +733,7 @@ select_append_type() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Cyan}1)  shadowsocket${Font}"
     echo -e "${Cyan}2)  trojan${Font}"
+    echo -e "${Cyan}3)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -698,6 +744,10 @@ select_append_type() {
         ;;
     2)
         trojan_append
+        ;;
+    3)
+        redirect_append
+        exit
         ;;
     q)
         exit
@@ -715,6 +765,7 @@ select_type() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Cyan}1)  shadowsocket${Font}"
     echo -e "${Cyan}2)  trojan${Font}"
+    echo -e "${Cyan}3)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -725,6 +776,10 @@ select_type() {
         ;;
     2)
         trojan
+        ;;
+    3)
+        redirect
+        exit
         ;;
     q)
         exit
