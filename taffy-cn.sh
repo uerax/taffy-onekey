@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.1"
+version="v2.2.2"
 
 #fonts color
 Green="\033[32m"
@@ -365,6 +365,7 @@ trojan_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${trojan_append_config_url} -O append.json
+    judge 配置文件下载
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${port}~$port~" append.json
@@ -383,6 +384,7 @@ trojan_append() {
 
 trojan_config() {
     wget -N ${trojan_config_url} -O config.json
+    judge 配置文件下载
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
     
@@ -501,6 +503,7 @@ shadowsocket_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${ss_append_config_url} -O append.json
+    judge 配置文件下载
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${method}~$ss_method~" append.json
@@ -524,6 +527,7 @@ shadowsocket_append() {
 
 shadowsocket_config() {
     wget -N ${ss_config_url} -O config.json
+    judge 配置文件下载
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~\${port}~$port~" config.json
@@ -538,6 +542,7 @@ redirect() {
     read -rp "输入转发的目标端口: " re_port
 
     wget -N ${redirect_config_url} -O config.json
+    judge 配置文件下载
     sed -i "s~114514~$port~" config.json
     sed -i "s~1919810~$re_port~" config.json
     sed -i "s~\${ip}~$re_ip~" config.json
@@ -559,6 +564,7 @@ redirect_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${redirect_append_config_url} -O append.json
+    judge 配置文件下载
 
     sed -i "s~114514~$port~" append.json
     sed -i "s~1919810~$re_port~" append.json
@@ -662,11 +668,13 @@ open_bbr() {
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
         wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        judge 配置文件下载
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
         wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        judge 配置文件下载
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then

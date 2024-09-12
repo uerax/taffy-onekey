@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.1"
+version="v2.3.3"
 
 #fonts color
 Green="\033[32m"
@@ -533,6 +533,7 @@ xray_vless_reality_h2() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${xray_vless_reality_h2_url} -O ${xray_cfg}
+    judge "Xray Reality H2配置文件下载"
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -564,6 +565,7 @@ xray_vless_reality_h2_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${vless_reality_h2_append_url} -O append.json
+    judge "Xray Reality H2配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -571,6 +573,7 @@ xray_vless_reality_h2_append() {
 
     echo -e "$(xray run -confdir=./ -dump)"  > config.json
     rm append.json
+    
 
     vless_reality_h2_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
@@ -593,6 +596,7 @@ xray_vless_reality_tcp() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${xray_vless_reality_tcp_url} -O ${xray_cfg}
+    judge "Xray Reality 配置文件下载"
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -627,6 +631,7 @@ xray_vless_reality_tcp_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_vless_reality_tcp_append_url} -O append.json
+    judge "Xray Reality 配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -656,6 +661,7 @@ xray_vless_reality_grpc() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${xray_vless_reality_grpc_url} -O ${xray_cfg}
+    judge "Xray Reality 配置文件下载"
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
@@ -689,6 +695,7 @@ xray_vless_reality_grpc_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_vless_reality_grpc_append_url} -O append.json
+    judge "Xray Reality 配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -718,6 +725,7 @@ trojan_grpc() {
     port=443
     
     wget -N ${xray_trojan_grpc_config_url} -O ${xray_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
@@ -731,6 +739,7 @@ trojan_grpc() {
     sleep 3
 
     wget -N ${trojan_grpc_nginx_url} -O ${nginx_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -759,6 +768,7 @@ xray_trojan_tcp_tls() {
     set_port
     
     wget -N ${xray_trojan_tcp_tls_config_url} -O ${xray_cfg}
+    judge "配置文件下载"
 
     sed -i "s~${port}~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -775,6 +785,7 @@ xray_trojan_tcp_tls() {
     sleep 3
 
     wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -800,6 +811,7 @@ xray_vmess_ws_tls() {
     password=$(xray uuid)
 
     wget -N ${xray_vmess_ws_config_url} -O ${xray_cfg}
+    judge "配置文件下载"
 
     sed -i "s~19191~$port~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -814,6 +826,7 @@ xray_vmess_ws_tls() {
     sleep 3
 
     wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -846,6 +859,7 @@ vless_ws_tls() {
     password=$(xray uuid)
 
     wget -N ${vless_ws_config_url} -O ${xray_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${password}~$password~" ${xray_cfg}
@@ -857,6 +871,7 @@ vless_ws_tls() {
     sleep 3
 
     wget -N ${vless_ws_nginx_url} -O ${nginx_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -886,6 +901,7 @@ vless_grpc() {
     password=$(xray uuid)
 
     wget -N ${vless_grpc_config_url} -O ${xray_cfg}
+    judge "配置文件下载"
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
 
@@ -896,6 +912,7 @@ vless_grpc() {
     sleep 3
 
     wget -N ${vless_grpc_nginx_url} -O ${nginx_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${domain}~$domain~" ${nginx_cfg}
     sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
@@ -938,10 +955,12 @@ vless_tcp_xtls_vision() {
 
 vless_tcp_xtls_vision_nginx_cfg() {
     cd /etc/nginx/ && wget -N ${vless_vision_nginx_url} -O /etc/nginx/nginx.conf
+    judge "配置文件下载"
 }
 
 vless_tcp_xtls_vision_xray_cfg() {
     wget -N ${vless_vision_config_url} -O config.json
+    judge "配置文件下载"
     sed -i "s/\${password}/$password/" config.json
     sed -i "s~\${ca_crt}~$ca_crt~" config.json
     sed -i "s~\${ca_key}~$ca_key~" config.json
@@ -964,6 +983,7 @@ xray_trojan() {
     password=$(openssl rand -base64 16)
 
     wget -N ${xray_trojan_config_url} -O config.json
+    judge "配置文件下载"
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
     
@@ -991,6 +1011,7 @@ trojan_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_trojan_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${port}~$port~" append.json
@@ -1074,6 +1095,7 @@ xray_shadowsocket() {
 
 shadowsocket_config() {
     wget -N ${xray_ss_config_url} -O config.json
+    judge "配置文件下载"
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~\${port}~$port~" config.json
@@ -1088,6 +1110,7 @@ xray_redirect() {
     read -rp "输入转发的目标端口: " re_port
 
     wget -N ${xray_redirect_config_url} -O config.json
+    judge "配置文件下载"
     sed -i "s~114514~$port~" config.json
     sed -i "s~1919810~$re_port~" config.json
     sed -i "s~\${ip}~$re_ip~" config.json
@@ -1150,6 +1173,7 @@ xray_shadowsocket_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_ss_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${method}~$ss_method~" append.json
@@ -1180,6 +1204,7 @@ xray_redirect_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_redirect_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~114514~$port~" append.json
     sed -i "s~1919810~$re_port~" append.json
@@ -1444,6 +1469,7 @@ socks5_append() {
     cd /usr/local/etc/xray
 
     wget -Nq ${xray_socks5_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${user}~$user~" append.json
@@ -1548,6 +1574,7 @@ singbox_hy2() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_hysteria2_url} -O config.yaml
+    judge "配置文件下载"
 
     sed -i "s/\${password}/$password/" config.yaml
     sed -i "s/\${domain}/$domain/" config.yaml
@@ -1580,6 +1607,7 @@ singbox_vless_reality_h2() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
@@ -1610,6 +1638,7 @@ singbox_vless_reality_grpc() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
@@ -1641,6 +1670,7 @@ singbox_vless_reality_tcp() {
     ipv6=$(curl -6 ip.me)
 
     wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
@@ -1665,6 +1695,7 @@ singbox_vmess_ws_tls() {
     password=$(sing-box generate uuid)
 
     wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
+    judge "配置文件下载"
 
     sed -i "s~114514~443~" ${singbox_cfg}
     sed -i "s~\${password}~$password~" ${singbox_cfg}
@@ -1693,6 +1724,7 @@ singbox_trojan_tls_tcp() {
     password=$(sing-box generate uuid)
 
     wget -N ${singbox_trojan_tls_config_url} -O ${singbox_cfg}
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${domain}~$domain~" ${singbox_cfg}
@@ -1754,6 +1786,7 @@ singbox_shadowsocket() {
     esac
 
     wget -N ${singbox_ss_config_url} -O config.json
+    judge "配置文件下载"
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~114514~$port~" config.json
@@ -1779,6 +1812,7 @@ singbox_redirect() {
     read -rp "输入转发的目标端口: " re_port
 
     wget -N ${singbox_redirect_config_url} -O config.json
+    judge "配置文件下载"
 
     sed -i "s~\${ip}~$re_ip~" config.json
     sed -i "s~114514~$port~" config.json
@@ -1800,6 +1834,7 @@ singbox_hy2_append() {
     domain=$(curl -s https://ip.me)
 
     wget -N ${singbox_hysteria2_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s/\${password}/$password/" append.json
     sed -i "s/\${domain}/$domain/" append.json
@@ -1836,6 +1871,7 @@ singbox_reality_append() {
     ip=$(curl ipinfo.io/ip)
 
     wget -N ${singbox_vless_reality_grpc_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
@@ -1902,6 +1938,7 @@ singbox_shadowsocket_append() {
     esac
 
     wget -Nq ${singbox_ss_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${method}~$ss_method~" append.json
@@ -1937,6 +1974,7 @@ singbox_redirect_append() {
     read -rp "输入转发的目标端口: " re_port
 
     wget -Nq ${singbox_redirect_append_config_url} -O append.json
+    judge "配置文件下载"
 
     sed -i "s~\${ip}~$re_ip~" append.json
     sed -i "s~114514~$port~" append.json
@@ -2009,7 +2047,6 @@ judge() {
     # $? 上一次命令成功为0 失败为随机值
     if [[ 0 -eq $? ]]; then
         ok "$1 完成"
-        sleep 1
     else
         error "$1 失败"
         exit 1
@@ -2025,11 +2062,13 @@ open_bbr() {
         #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
         #apt update && apt -t buster-backports install linux-image-amd64
         wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        judge "配置文件下载"
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
         wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        judge "配置文件下载"
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then
@@ -2119,6 +2158,7 @@ server_check() {
 update_script() {
     script_path=$(cd `dirname $0`; pwd)
     wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh"
+    judge "更新"
     exit
 }
 
