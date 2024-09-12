@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.0"
+version="v2.3.1"
 
 #fonts color
 Green="\033[32m"
@@ -1782,7 +1782,7 @@ singbox_redirect() {
 
     sed -i "s~\${re_ip}~$re_ip~" config.json
     sed -i "s~114514~$port~" config.json
-    sed -i "s~1919810~$re_ip~" config.json
+    sed -i "s~1919810~$re_port~" config.json
 
     mv config.json ${singbox_cfg}
     systemctl restart sing-box
@@ -1940,7 +1940,7 @@ singbox_redirect_append() {
 
     sed -i "s~\${re_ip}~$re_ip~" append.json
     sed -i "s~114514~$port~" append.json
-    sed -i "s~1919810~$re_ip~" append.json
+    sed -i "s~1919810~$re_port~" append.json
     
     systemctl stop sing-box
 
