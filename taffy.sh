@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.3"
+version="v2.3.4"
 
 #fonts color
 Green="\033[32m"
@@ -529,8 +529,8 @@ xray_vless_reality_h2() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${xray_vless_reality_h2_url} -O ${xray_cfg}
     judge "Xray Reality H2配置文件下载"
@@ -560,7 +560,7 @@ xray_vless_reality_h2_append() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
+    ip=$(curl -sS ipinfo.io/ip)
 
     cd /usr/local/etc/xray
 
@@ -592,8 +592,8 @@ xray_vless_reality_tcp() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${xray_vless_reality_tcp_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -626,7 +626,7 @@ xray_vless_reality_tcp_append() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
+    ip=$(curl -sS ipinfo.io/ip)
 
     cd /usr/local/etc/xray
 
@@ -657,8 +657,8 @@ xray_vless_reality_grpc() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${xray_vless_reality_grpc_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -690,7 +690,7 @@ xray_vless_reality_grpc_append() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
+    ip=$(curl -sS ipinfo.io/ip)
 
     cd /usr/local/etc/xray
 
@@ -972,7 +972,7 @@ vless_tcp_xtls_vision_xray_cfg() {
 
 xray_trojan() {
     protocol_type="trojan"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
     close_nginx()
     if ! command -v openssl >/dev/null 2>&1; then
@@ -1000,7 +1000,7 @@ xray_trojan() {
 
 trojan_append() {
     protocol_type="trojan"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -1082,8 +1082,8 @@ xray_shadowsocket() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
-    ipv6=`curl -6 ip.me`
+    domain=`curl -sS ipinfo.io/ip`
+    ipv6=`curl -sS6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1104,7 +1104,7 @@ shadowsocket_config() {
 
 xray_redirect() {
     protocol_type="redirect"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -1184,8 +1184,8 @@ xray_shadowsocket_append() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
-    ipv6=`curl -6 ip.me`
+    domain=`curl -sS ipinfo.io/ip`
+    ipv6=`curl -sS6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     shadowsocket_outbound_config
@@ -1196,7 +1196,7 @@ xray_shadowsocket_append() {
 }
 
 xray_redirect_append() {
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -1210,7 +1210,9 @@ xray_redirect_append() {
     sed -i "s~1919810~$re_port~" append.json
     sed -i "s~\${ip}~$re_ip~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    jq '.inbounds += [input]' config.json append.json > tmp.json
+    judge 插入配置文件
+    mv tmp.json config.json
     rm append.json
 
     systemctl restart xray
@@ -1455,7 +1457,7 @@ shadowsocket_outbound_config() {
 
 socks5_append() {
     protocol_type="socks5"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -1571,7 +1573,7 @@ singbox_hy2() {
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
-    ipv6=$(curl -6 ip.me)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${singbox_hysteria2_url} -O config.yaml
     judge "配置文件下载"
@@ -1603,8 +1605,8 @@ singbox_vless_reality_h2() {
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1634,8 +1636,8 @@ singbox_vless_reality_grpc() {
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1666,8 +1668,8 @@ singbox_vless_reality_tcp() {
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
-    ipv6=$(curl -6 ip.me)
+    ip=$(curl -sS ipinfo.io/ip)
+    ipv6=$(curl -sS6 ip.me)
 
     wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1795,8 +1797,8 @@ singbox_shadowsocket() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
-    ipv6=$(curl -6 ip.me)
+    domain=`curl -sS ipinfo.io/ip`
+    ipv6=$(curl -sS6 ip.me)
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1806,7 +1808,7 @@ singbox_shadowsocket() {
 }
 
 singbox_redirect() {
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -1868,7 +1870,7 @@ singbox_reality_append() {
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl ipinfo.io/ip)
+    ip=$(curl -sS ipinfo.io/ip)
 
     wget -N ${singbox_vless_reality_grpc_url} -O append.json
     judge "配置文件下载"
@@ -1958,7 +1960,7 @@ singbox_shadowsocket_append() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
+    domain=`curl -sS ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1968,7 +1970,7 @@ singbox_shadowsocket_append() {
 }
 
 singbox_redirect_append() {
-    ip=`curl ipinfo.io/ip`
+    ip=`curl -sS ipinfo.io/ip`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -2168,15 +2170,15 @@ xray_upgrade() {
     case $input in
     [yY])
       read -rp "输入指定版本(eq: 1.7.5): " version
-      bash -c "$(curl -L ${xray_install_url})" @ install --version ${version}
+      bash -c "$(curl -sSL ${xray_install_url})" @ install --version ${version}
       judge "Xray 更新"
       ;;
     [nN])
-      bash -c "$(curl -L ${xray_install_url})" @ install
+      bash -c "$(curl -sSL ${xray_install_url})" @ install
       judge "Xray 更新"
       ;;
     *)
-      bash -c "$(curl -L ${xray_install_url})" @ install
+      bash -c "$(curl -sSL ${xray_install_url})" @ install
       judge "Xray 更新"
       ;;
     esac
@@ -2214,7 +2216,7 @@ uninstall_nginx() {
 
 uninstall_xray() {
     info "Xray 卸载"
-    bash -c "$(curl -L ${xray_install_url})" @ remove --purge
+    bash -c "$(curl -sSL ${xray_install_url})" @ remove --purge
     # rm -rf /home/xray
     rm -rf ${xray_path}
 }

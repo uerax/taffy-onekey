@@ -16,7 +16,7 @@
               "followRedirect": false,
               "userLevel": 0
             },
-            "tag": "${port}"
+            "tag": "114514"
         }
     ],
     "outbounds": [

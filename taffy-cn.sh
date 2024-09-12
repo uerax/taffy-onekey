@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.3"
+version="v2.2.4"
 
 #fonts color
 Green="\033[32m"
@@ -338,7 +338,7 @@ qx_config() {
 
 trojan() {
     protocol_type="trojan"
-    ip=`curl ip.me`
+    ip=`curl -sS ip.me`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -354,7 +354,7 @@ trojan() {
 
 trojan_append() {
     protocol_type="trojan"
-    ip=`curl ip.me`
+    ip=`curl -sS ip.me`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -383,7 +383,7 @@ trojan_append() {
 }
 
 trojan_config() {
-    wget -N ${trojan_config_url} -O config.json
+    wget -Nq ${trojan_config_url} -O config.json
     judge 配置文件下载
     sed -i "s~\${port}~$port~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -443,7 +443,7 @@ shadowsocket() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ip.me`
+    domain=`curl -sS ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -514,8 +514,8 @@ shadowsocket_append() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ip.me`
-    ipv6=`curl -6 ip.me`
+    domain=`curl -sS ip.me`
+    ipv6=`curl -sS6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     shadowsocket_outbound_config
@@ -526,7 +526,7 @@ shadowsocket_append() {
 }
 
 shadowsocket_config() {
-    wget -N ${ss_config_url} -O config.json
+    wget -Nq ${ss_config_url} -O config.json
     judge 配置文件下载
     sed -i "s~\${method}~$ss_method~" config.json
     sed -i "s~\${password}~$password~" config.json
@@ -536,12 +536,12 @@ shadowsocket_config() {
 
 redirect() {
     protocol_type="redirect"
-    ip=`curl ip.me`
+    ip=`curl -sS ip.me`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
 
-    wget -N ${redirect_config_url} -O config.json
+    wget -Nq ${redirect_config_url} -O config.json
     judge 配置文件下载
     sed -i "s~114514~$port~" config.json
     sed -i "s~1919810~$re_port~" config.json
@@ -556,7 +556,7 @@ redirect() {
 }
 
 redirect_append() {
-    ip=`curl ip.me`
+    ip=`curl -sS ip.me`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -570,7 +570,10 @@ redirect_append() {
     sed -i "s~1919810~$re_port~" append.json
     sed -i "s~\${ip}~$re_ip~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    jq '.inbounds += [input]' config.json append.json > tmp.json
+    judge 插入配置文件
+    
+    mv tmp.json config.json
     rm append.json
 
     systemctl restart xray
@@ -667,13 +670,13 @@ open_bbr() {
     info "过于老的系统版本会导致开启失败"
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
         judge 配置文件下载
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
         judge 配置文件下载
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
@@ -720,7 +723,7 @@ update_script() {
 }
 
 xray_upgrade() {
-    bash -c "$(curl -L ${xray_install_url})"
+    bash -c "$(curl -sSL ${xray_install_url})"
     judge "Xray 更新"
 }
 
