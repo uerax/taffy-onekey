@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.2"
+version="v2.2.3"
 
 #fonts color
 Green="\033[32m"
@@ -338,7 +338,7 @@ qx_config() {
 
 trojan() {
     protocol_type="trojan"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl ip.me`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -354,7 +354,7 @@ trojan() {
 
 trojan_append() {
     protocol_type="trojan"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl ip.me`
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
           judge "openssl 安装"
@@ -443,7 +443,7 @@ shadowsocket() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
+    domain=`curl ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -514,7 +514,7 @@ shadowsocket_append() {
 
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
-    domain=`curl ipinfo.io/ip`
+    domain=`curl ip.me`
     ipv6=`curl -6 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
@@ -536,7 +536,7 @@ shadowsocket_config() {
 
 redirect() {
     protocol_type="redirect"
-    ip=`curl ipinfo.io/ip`
+    ip=`curl ip.me`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
@@ -556,7 +556,7 @@ redirect() {
 }
 
 redirect_append() {
-    ip=`curl ipinfo.io/ip`
+    ip=`curl ip.me`
     set_port
     read -rp "输入转发的目标地址: " re_ip
     read -rp "输入转发的目标端口: " re_port
