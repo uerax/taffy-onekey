@@ -1780,7 +1780,7 @@ singbox_redirect() {
 
     wget -N ${singbox_redirect_config_url} -O config.json
 
-    sed -i "s~\${re_ip}~$re_ip~" config.json
+    sed -i "s~\${ip}~$re_ip~" config.json
     sed -i "s~114514~$port~" config.json
     sed -i "s~1919810~$re_port~" config.json
 
@@ -1938,7 +1938,7 @@ singbox_redirect_append() {
 
     wget -Nq ${singbox_redirect_append_config_url} -O append.json
 
-    sed -i "s~\${re_ip}~$re_ip~" append.json
+    sed -i "s~\${ip}~$re_ip~" append.json
     sed -i "s~114514~$port~" append.json
     sed -i "s~1919810~$re_port~" append.json
     
