@@ -28,16 +28,15 @@ xray_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw
 ukonw_url="https://gh-proxy.com/https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
-ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
+ss_append_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
 
 bbr_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
 
 trojan_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
-trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
-
+trojan_append_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
 
 redirect_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray.json"
-redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray_ap.json"
+redirect_append_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray_ap.json"
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_log="/var/log/xray"

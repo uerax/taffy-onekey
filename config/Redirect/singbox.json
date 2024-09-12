@@ -1,0 +1,16 @@
+{
+    "inbounds": [
+        {
+            "type": "direct",
+            "listen": "::",
+            "listen_port": 114514,
+            "override_address": "${ip}",
+            "override_port": 1919810
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "direct"
+        }
+    ]
+}

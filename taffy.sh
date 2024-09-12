@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.2.3"
+version="v2.3.0"
 
 #fonts color
 Green="\033[32m"
@@ -65,6 +65,9 @@ xray_vless_reality_grpc_append_url="https://raw.githubusercontent.com/uerax/taff
 xray_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/config.json"
 vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/append.json"
 
+xray_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray.json"
+xray_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/xray_ap.json"
+
 # SINGBOX URL START
 singbox_install_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/install-singbox.sh"
 singbox_cfg_path="/etc/sing-box"
@@ -82,6 +85,9 @@ singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-one
 singbox_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/singbox.json"
 singbox_trojan_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/singbox.json"
 singbox_trojan_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/taffy.conf"
+
+singbox_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox.json"
+singbox_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox_ap.json"
 
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
@@ -1074,6 +1080,26 @@ shadowsocket_config() {
     mv config.json ${xray_cfg}
 }
 
+xray_redirect() {
+    protocol_type="redirect"
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -N ${xray_redirect_config_url} -O config.json
+    sed -i "s~114514~$port~" config.json
+    sed -i "s~1919810~$re_port~" config.json
+    sed -i "s~\${ip}~$re_ip~" config.json
+    
+    mv config.json ${xray_cfg}
+
+    systemctl restart xray && systemctl enable xray
+
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
+}
+
 xray_shadowsocket_append() {
     if ! command -v openssl >/dev/null 2>&1; then
           ${INS} openssl
@@ -1143,6 +1169,29 @@ xray_shadowsocket_append() {
     qx_config
 
     systemctl restart xray
+}
+
+xray_redirect_append() {
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    cd /usr/local/etc/xray
+
+    wget -Nq ${xray_redirect_append_config_url} -O append.json
+
+    sed -i "s~114514~$port~" append.json
+    sed -i "s~1919810~$re_port~" append.json
+    sed -i "s~\${ip}~$re_ip~" append.json
+
+    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    rm append.json
+
+    systemctl restart xray
+
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
 }
 
 # outbound start
@@ -1723,6 +1772,25 @@ singbox_shadowsocket() {
     qx_config
 }
 
+singbox_redirect() {
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -N ${singbox_redirect_config_url} -O config.json
+
+    sed -i "s~\${re_ip}~$re_ip~" config.json
+    sed -i "s~114514~$port~" config.json
+    sed -i "s~1919810~$re_ip~" config.json
+
+    mv config.json ${singbox_cfg}
+    systemctl restart sing-box
+    
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
+}
+
 singbox_hy2_append() {
     set_port
     ${INS} openssl
@@ -1860,6 +1928,34 @@ singbox_shadowsocket_append() {
     shadowsocket_outbound_config
     clash_config
     qx_config
+}
+
+singbox_redirect_append() {
+    ip=`curl ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -Nq ${singbox_redirect_append_config_url} -O append.json
+
+    sed -i "s~\${re_ip}~$re_ip~" append.json
+    sed -i "s~114514~$port~" append.json
+    sed -i "s~1919810~$re_ip~" append.json
+    
+    systemctl stop sing-box
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
+
+    rm append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    systemctl restart sing-box
+
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
 }
 # SINGBOX END
 
@@ -2206,8 +2302,9 @@ select_xray_append_type() {
     echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Green}2)  trojan${Font}"
     echo -e "${Green}3)  socks5${Font}"
-    echo -e "${Cyan}4)  vless-reality-tcp${Font}"
-    echo -e "${Cyan}5)  vless-reality-grpc${Font}"
+    echo -e "${Green}4)  redirect${Font}"
+    echo -e "${Cyan}5)  vless-reality-tcp${Font}"
+    echo -e "${Cyan}6)  vless-reality-grpc${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2224,9 +2321,13 @@ select_xray_append_type() {
         socks5_append
         ;;
     4)
-        xray_vless_reality_tcp_append
+        xray_redirect_append
+        exit
         ;;
     5)
+        xray_vless_reality_tcp_append
+        ;;
+    6)
         xray_vless_reality_grpc_append
         ;;
     q)
@@ -2246,6 +2347,7 @@ select_singbox_append_type() {
     echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Green}2)  hysteria2${Font}"
     echo -e "${Green}3)  vless-reality-grpc${Font}"
+    echo -e "${Green}4)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2259,6 +2361,10 @@ select_singbox_append_type() {
         ;;
     3)
         singbox_reality_append
+        ;;
+    4)
+        singbox_redirect_append
+        exit
         ;;
     q)
         exit
@@ -2281,6 +2387,7 @@ singbox_select() {
     echo -e "${Green}5)  shadowsocket${Font}"
     echo -e "${Green}6)  vmess-tls-ws${Font}"
     echo -e "${Green}7)  trojan-tls-tcp${Font}"
+    echo -e "${Green}10) redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2307,6 +2414,10 @@ singbox_select() {
     7)
         singbox_trojan_tls_tcp
         ;;
+    7)
+        singbox_redirect
+        exit
+        ;;
     q)
         exit
         ;;
@@ -2321,10 +2432,11 @@ singbox_select() {
 xray_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  vless-reality-tcp(推荐)${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc(推荐)${Font}"
+    echo -e "${Green}1)  vless-reality-tcp${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
     echo -e "${Green}3)  vless-reality-h2${Font}"
-    echo -e "${Green}11)  trojan-tcp-tls(推荐)${Font}"
+    echo -e "${Green}4)  redirect${Font}"
+    echo -e "${Green}11)  trojan-tcp-tls${Font}"
     echo -e "${Green}12)  trojan${Font}"
     echo -e "${Cyan}21)  vmess-ws-tls${Font}"
     echo -e "${Cyan}31)  shadowsocket${Font}"
@@ -2342,6 +2454,10 @@ xray_select() {
         ;;
     3)
         xray_vless_reality_h2
+        ;;
+    4)
+        xray_redirect
+        exit
         ;;
     11)
         xray_trojan_tcp_tls
