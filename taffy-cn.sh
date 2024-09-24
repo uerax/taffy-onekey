@@ -90,16 +90,7 @@ get_system() {
 
 env_install() {
 
-    ${INS} wget
-    judge "wget 安装"
-    ${INS} zip
-    judge "zip 安装"
-    ${INS} lsof
-    judge "lsof 安装"
-    ${INS} curl
-    judge "curl 安装"
-    ${INS} jq
-    judge "jq 安装"
+    ${INS} wget zip lsof curl jq base64
 }
 
 port_check() {
@@ -670,14 +661,16 @@ open_bbr() {
     info "过于老的系统版本会导致开启失败"
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf
         judge 配置文件下载
+        sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf
         judge 配置文件下载
+        sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then

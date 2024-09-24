@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.4"
+version="v2.3.5"
 
 #fonts color
 Green="\033[32m"
@@ -2063,14 +2063,16 @@ open_bbr() {
         info "检测系统为 debian"
         #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
         #apt update && apt -t buster-backports install linux-image-amd64
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -N ${bbr_config_url} -O /etc/sysctl.conf
         judge "配置文件下载"
+        sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf && sysctl -p
+        wget -N ${bbr_config_url} -O /etc/sysctl.conf
         judge "配置文件下载"
+        sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then
