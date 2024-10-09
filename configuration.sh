@@ -396,8 +396,8 @@ xray_range() {
         exit 1  # 非零的退出状态表示异常退出
     fi
 
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
+    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
+    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
     if [ ! -n "$ip" ]; then
         ip=$ipv6
     fi
@@ -428,8 +428,8 @@ singbox_range() {
         exit 1  # 非零的退出状态表示异常退出
     fi
 
-    ip=$(curl -s4 https://ip.me)
-    ipv6=$(curl -s6 https://ip.me)
+    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
+    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
     if [ ! -n "$ip" ]; then
         ip=$ipv6
     fi

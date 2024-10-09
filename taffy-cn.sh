@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.4"
+version="v2.2.5"
 
 #fonts color
 Green="\033[32m"
@@ -506,7 +506,7 @@ shadowsocket_append() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl -sS ip.me`
-    ipv6=`curl -sS6 ip.me`
+    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     shadowsocket_outbound_config

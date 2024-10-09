@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.5"
+version="v2.3.6"
 
 #fonts color
 Green="\033[32m"
@@ -529,8 +529,8 @@ xray_vless_reality_h2() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${xray_vless_reality_h2_url} -O ${xray_cfg}
     judge "Xray Reality H2配置文件下载"
@@ -560,7 +560,7 @@ xray_vless_reality_h2_append() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
     cd /usr/local/etc/xray
 
@@ -592,8 +592,8 @@ xray_vless_reality_tcp() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${xray_vless_reality_tcp_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -626,7 +626,7 @@ xray_vless_reality_tcp_append() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
     cd /usr/local/etc/xray
 
@@ -657,8 +657,8 @@ xray_vless_reality_grpc() {
     private_key=$(echo $keys | awk -F " " '{print $3}')
     public_key=$(echo $keys | awk -F " " '{print $6}')
     # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${xray_vless_reality_grpc_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -1083,7 +1083,7 @@ xray_shadowsocket() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
-    ipv6=`curl -sS6 ip.me`
+    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1185,7 +1185,7 @@ xray_shadowsocket_append() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
-    ipv6=`curl -sS6 ip.me`
+    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
 
     shadowsocket_outbound_config
@@ -1573,7 +1573,7 @@ singbox_hy2() {
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
-    ipv6=$(curl -sS6 ip.me)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${singbox_hysteria2_url} -O config.yaml
     judge "配置文件下载"
@@ -1606,7 +1606,7 @@ singbox_vless_reality_h2() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1637,7 +1637,7 @@ singbox_vless_reality_grpc() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1669,7 +1669,7 @@ singbox_vless_reality_tcp() {
     public_key=$(echo $keys | awk -F " " '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 ip.me)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1798,7 +1798,7 @@ singbox_shadowsocket() {
     tmp="${ss_method}:${password}"
     tmp=$( base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
-    ipv6=$(curl -sS6 ip.me)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
