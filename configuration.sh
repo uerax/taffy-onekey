@@ -27,6 +27,7 @@ xray_vmess() {
     local port=443
     local path=$(echo "$item" | jq -r '.streamSettings.wsSettings.path')
     local domain=$ip
+    local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     local encode_link=$(base64 <<< $tmp)
@@ -36,6 +37,7 @@ xray_vmess() {
 
     local qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
 
+    
     vmess_info
     show_info
 }
@@ -48,14 +50,15 @@ singbox_vmess() {
     local domain=$(echo "$item" | jq -r '.tls.server_name')
     local method=$(echo "$item" | jq -r '.transport.type')
     local path=$(echo "$item" | jq -r '.transport.path')
+    local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     local encode_link=$(base64 <<< $tmp)
     local link="vmess://$encode_link"
 
-    clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
+    local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
 
-    qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
+    local qx_cfg="vmess=$domain:443, method=chacha20-poly1305, password=$password, obfs=wss, obfs-host=$domain, obfs-uri=${path}, tls13=true, fast-open=false, udp-relay=false, tag=$domain"
 
     vmess_info
     show_info
@@ -467,6 +470,9 @@ show_info() {
     echo -e "${Green}地址:${Font} ${ip}"
     if [ -n "$ipv6" ]; then
         echo -e "${Green}地址IPv6:${Font} ${ipv6}"
+    fi
+    if [ -n "$hq_ip" ]; then
+        echo -e "${Green}cloudflare优选地址:${Font} ${hq_ip}"
     fi
     echo -e "${Green}密码:${Font} ${password}"
     echo -e "${Green}端口:${Font} ${port}"
