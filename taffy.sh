@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.3.6"
+version="v2.4.0"
 
 #fonts color
 Green="\033[32m"
@@ -2527,61 +2527,64 @@ xray_select() {
 }
 
 menu() {
-    echo -e "${Cyan}———————————————— 脚本信息 ————————————————${Font}"
-    echo -e "\t\t${Yellow}Taffy 脚本${Font}"
-    echo -e "\t${Yellow}---Authored By uerax---${Font}"
-    echo -e "   ${Yellow}https://github.com/uerax/taffy-onekey${Font}"
-    echo -e "\t      ${Yellow}版本号：${version}${Font}"
-    echo -e "${Cyan}———————————————— 安装向导 ————————————————${Font}"
-    echo -e "${Green}1)   一键安装 Xray${Font}"
-    echo -e "${Blue}2)   更新脚本${Font}"
-    echo -e "${Green}3)   一键安装 Singbox${Font}"
-    echo -e "${Cyan}5)   插入 Singbox 协议${Font}"
-    echo -e "${Cyan}6)   插入 Xray 协议${Font}"
-    echo -e "${Cyan}7)   更换 Singbox 协议${Font}"
-    echo -e "${Cyan}8)   更换 Xray 协议${Font}"
-    echo -e "${Purple}11)  查看 Xray 配置链接${Font}"
-    echo -e "${Purple}12)  查看 Singbox 配置链接${Font}"
-    echo -e "${Blue}20)  更新伪装站${Font}"
-    echo -e "${Cyan}21)  更换域名证书${Font}"
-    echo -e "${Purple}31)  安装 / 更新 / 回退 Xray${Font}"
-    echo -e "${Yellow}32)  卸载 Xray${Font}"
-    echo -e "${Purple}33)  Singbox 操作面板${Font}"
-    echo -e "${Green}34)  安装 / 卸载 Nginx${Font}"
-    echo -e "${Yellow}99)  常见问题${Font}"
-    echo -e "${Green}100) 开启 BBR${Font}"
-    echo -e "${Red}999) 完全卸载${Font}"
-    echo -e "${Red}q)   退出${Font}"
-    echo -e "${Cyan}————————————————————————————————————————${Font}\n"
+    echo -e "${Cyan}——————————————————————————————————— 脚本信息 ———————————————————————————————————${Font}
+\t\t\t\t${Yellow}Taffy 脚本${Font}
+\t\t\t${Yellow}--- Authored By uerax ---${Font}
+\t\t  ${Yellow}https://github.com/uerax/taffy-onekey${Font}
+\t\t\t      ${Yellow}版本号：${version}${Font}
+${Cyan}——————————————————————————————————— 安装向导 ———————————————————————————————————${Font}
+${Blue}0)   更新脚本${Font}
+${Green}1)   一键安装 Xray${Font}\t\t${Green}11)  一键安装 Singbox${Font}\t\t
+${Cyan}2)   插入 Xray 协议${Font}\t\t${Cyan}12)  插入 Singbox 协议${Font}
+${Cyan}3)   更换 Xray 协议${Font}\t\t${Cyan}13)  更换 Singbox 协议${Font}
+${Purple}4)   安装 / 更新 / 回退 Xray${Font}\t${Purple}14)  展示Singbox 操作面板${Font}
+${Yellow}5)   卸载 Xray${Font}\t\t\t${Purple}15)  查看 Singbox 配置链接${Font}
+${Purple}6)   查看 Xray 配置链接${Font}
+${Cyan}————————————————————————————————————————————————————————————————————————————————
+${Blue}20)  更新伪装站${Font}\t\t\t${Green}30)  安装 / 卸载 Nginx${Font}
+${Cyan}21)  更换域名证书${Font}
+${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
+${Yellow}99)  常见问题${Font}\t\t\t${Green}100) 开启 BBR${Font}
+${Red}999) 完全卸载${Font}\t\t\t${Red}q)   退出${Font}
+${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
 
     read -rp "输入数字(回车确认)：" menu_num
     echo -e ""
     case $menu_num in
+    0)
+    update_script
+    ;;
     1)
     xray_onekey_install
     ;;
     2)
-    update_script
-    ;;
-    3)
-    singbox_onekey_install
-    ;;
-    5)
-    select_singbox_append_type
-    ;;
-    6)
     select_xray_append_type
     ;;
-    7)
-    singbox_select
-    ;;
-    8)
+    3)
     xray_select
     ;;
-    11)
+    4)
+    xray_upgrade
+    ;;
+    5)
+    uninstall_xray
+    ;;
+    6)
     show_xray_info
     ;;
+    11)
+    singbox_onekey_install
+    ;;
     12)
+    select_singbox_append_type
+    ;;
+    13)
+    singbox_select
+    ;;
+    14)
+    singbox_operation
+    ;;
+    15)
     show_singbox_info
     ;;
     20)
@@ -2590,16 +2593,7 @@ menu() {
     21)
     renew_ca
     ;;
-    31)
-    xray_upgrade
-    ;;
-    32)
-    uninstall_xray
-    ;;
-    33)
-    singbox_operation
-    ;;
-    34)
+    30)
     nginx_select
     ;;
     99)
