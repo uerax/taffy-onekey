@@ -1877,6 +1877,7 @@ singbox_reality_append() {
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~114514~$port~" append.json
 
