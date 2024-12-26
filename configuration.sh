@@ -212,7 +212,7 @@ singbox_vless() {
     local password=$(echo "$item" | jq -r '.users[0].uuid')
     local reality=$(echo "$item" | jq -r '.tls.reality')
     if [ -n "$reality" ]; then
-        local protocol=$(echo "$reality" | jq -r '.transport.type')
+        local protocol=$(echo "$item" | jq -r '.transport.type')
         local pubkey=$(echo "$item" | jq -r '.users[0].name')
         local domain=$(echo "$item" | jq -r '.tls.server_name')
         local shortId=$(echo "$reality" | jq -r '.short_id[0]')
