@@ -30,7 +30,7 @@ xray_vmess() {
     local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    local encode_link=$(base64 <<< $tmp)
+    local encode_link=$(openssl base64 <<< $tmp)
     local link="vmess://$encode_link"
 
     local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
@@ -53,7 +53,7 @@ singbox_vmess() {
     local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    local encode_link=$(base64 <<< $tmp)
+    local encode_link=$(openssl base64 <<< $tmp)
     local link="vmess://$encode_link"
 
     local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
@@ -196,7 +196,7 @@ shadowsocket_info() {
     local qx_cfg="shadowsocks=$ip:$port, method=$method, password=$password, tag=$ip"
     local clash_cfg="  - name: $ip\n    type: ss\n    server: '$ip'\n    port: $port\n    cipher: $method\n    password: $password\n    udp: true"
     local tmp="${method}:${password}"
-    tmp=$(base64 <<< $tmp)
+    tmp=$(openssl base64 <<< $tmp)
     local link="ss://$tmp@${ip}:${port}"
     
     show_info

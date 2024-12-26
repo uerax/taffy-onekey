@@ -171,14 +171,14 @@ adjust_date() {
 
 env_install() {
 
-    ${INS} wget lsof curl jq
-    judge "git wget lsof curl jq 安装"
+    ${INS} wget lsof curl jq openssl
+    judge "git wget lsof curl jq openssl 安装"
 }
 
 env_install_singbox() {
 
-    ${INS} wget lsof curl jq
-    judge "wget lsof curl jq 安装"
+    ${INS} wget lsof curl jq openssl
+    judge "wget lsof curl jq openssl 安装"
 }
 
 increase_max_handle() {
@@ -839,7 +839,7 @@ xray_vmess_ws_tls() {
     service nginx restart
 
     tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    encode_link=$(base64 <<< $tmp)
+    encode_link=$(openssl base64 <<< $tmp)
     link="vmess://$encode_link"
 
     clash_config
@@ -883,7 +883,7 @@ vless_ws_tls() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
+    encode_parts=$(openssl base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
 
     clash_config
@@ -925,7 +925,7 @@ vless_grpc() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
+    encode_parts=$(openssl base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
 }
 
@@ -947,7 +947,7 @@ vless_tcp_xtls_vision() {
     service nginx restart
 
     parts="auto:${password}@${domain}:443"
-    encode_parts=$(base64 <<< $parts)
+    encode_parts=$(openssl base64 <<< $parts)
     link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
 
     clash_config
@@ -1081,7 +1081,7 @@ xray_shadowsocket() {
     systemctl restart xray && systemctl enable xray
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
@@ -1183,7 +1183,7 @@ xray_shadowsocket_append() {
     rm append.json
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
@@ -1709,7 +1709,7 @@ singbox_vmess_ws_tls() {
     systemctl enable sing-box
 
     tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    encode_link=$(base64 <<< $tmp)
+    encode_link=$(openssl base64 <<< $tmp)
     link="vmess://$encode_link"
 
     clash_config
@@ -1796,7 +1796,7 @@ singbox_shadowsocket() {
     systemctl restart sing-box && systemctl enable sing-box
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
     link="ss://$tmp@${domain}:${port}"
@@ -1960,7 +1960,7 @@ singbox_shadowsocket_append() {
     systemctl restart sing-box
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 

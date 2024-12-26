@@ -90,7 +90,7 @@ get_system() {
 
 env_install() {
 
-    ${INS} wget zip lsof curl jq base64
+    ${INS} wget zip lsof curl jq openssl
 }
 
 port_check() {
@@ -433,7 +433,7 @@ shadowsocket() {
     systemctl restart xray && systemctl enable xray
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ip.me`
     link="ss://$tmp@${domain}:${port}"
 
@@ -504,7 +504,7 @@ shadowsocket_append() {
     rm append.json
 
     tmp="${ss_method}:${password}"
-    tmp=$( base64 <<< $tmp)
+    tmp=$( openssl base64 <<< $tmp)
     domain=`curl -sS ip.me`
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
