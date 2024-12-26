@@ -218,7 +218,7 @@ singbox_vless() {
         local shortId=$(echo "$reality" | jq -r '.short_id[0]')
         if [ "$protocol" = "grpc" ]; then
             # reality+grpc
-            local servName=$(echo "$reality" | jq -r '.transport.service_name')
+            local servName=$(echo "$item" | jq -r '.transport.service_name')
             local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_grpc_outbound_config
