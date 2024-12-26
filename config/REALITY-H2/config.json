@@ -26,9 +26,9 @@
                 "network": "h2",
                 "security": "reality",
                 "realitySettings": {
-                    "dest": "www.fate-go.com.tw:443",
+                    "dest": "www.lovelive-anime.jp:443",
                     "serverNames": [
-                        "www.fate-go.com.tw"
+                        "www.lovelive-anime.jp"
                     ],
                     "privateKey": "${privateKey}",
                     "shortIds": [

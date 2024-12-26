@@ -181,7 +181,7 @@ clash_config() {
     tls: true
     udp: true
     flow: xtls-rprx-vision
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -197,7 +197,7 @@ clash_config() {
     tls: true
     udp: true
     # skip-cert-verify: true
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -291,7 +291,7 @@ clash_config() {
     udp: true
     network: h2
     flow: ''
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d

@@ -15,11 +15,11 @@
             ],
             "tls": {
                 "enabled": true,
-                "server_name": "www.fate-go.com.tw",
+                "server_name": "www.lovelive-anime.jp",
                 "reality": {
                     "enabled": true,
                     "handshake": {
-                        "server": "www.fate-go.com.tw",
+                        "server": "www.lovelive-anime.jp",
                         "server_port": 443
                     },
                     "private_key": "${privateKey}",

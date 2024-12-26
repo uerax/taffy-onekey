@@ -372,7 +372,7 @@ clash_config() {
     tls: true
     udp: true
     flow: xtls-rprx-vision
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -388,7 +388,7 @@ clash_config() {
     tls: true
     udp: true
     # skip-cert-verify: true
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -482,7 +482,7 @@ clash_config() {
     udp: true
     network: h2
     flow: ''
-    servername: www.fate-go.com.tw
+    servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -523,7 +523,7 @@ xray_vless_reality_h2() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -554,7 +554,7 @@ xray_vless_reality_h2_append() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -586,7 +586,7 @@ xray_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -620,7 +620,7 @@ xray_vless_reality_tcp_append() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -684,7 +684,7 @@ xray_vless_reality_grpc_append() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F " " '{print $3}')
@@ -1599,7 +1599,7 @@ singbox_vless_reality_h2() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1631,7 +1631,7 @@ singbox_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1662,7 +1662,7 @@ singbox_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1865,7 +1865,7 @@ singbox_reality_append() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.fate-go.com.tw"
+    domain="www.lovelive-anime.jp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
