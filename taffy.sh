@@ -2459,7 +2459,7 @@ singbox_select() {
     7)
         singbox_trojan_tls_tcp
         ;;
-    7)
+    10)
         singbox_redirect
         exit
         ;;
