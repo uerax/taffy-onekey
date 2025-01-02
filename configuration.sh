@@ -388,6 +388,29 @@ singbox_hy2() {
 
     local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://live.qq.com\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
+    singbox_hy2_outbound_config
+}
+
+singbox_hy2_outbound_config() {
+    local singbox_outbound="{
+    \"type\": \"hysteria2\",
+    \"server\": \"${ip}\",
+    \"server_port\": ${port},
+    \"up_mbps\": 30,
+    \"down_mbps\": 100,
+    \"network\": \"tcp\",
+    \"tcp\": {
+      \"enabled\": true,
+      \"disable_sni\": false,
+      \"server_name\": \"https://live.qq.com\",
+      \"insecure\": true,
+      \"utls\": {
+        \"enabled\": false,
+        \"fingerprint\": \"chrome\"
+      },
+    }
+    \"password\": \"${password}\"\n}"
+    
     show_info
 }
 
