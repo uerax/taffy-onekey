@@ -396,10 +396,8 @@ singbox_hy2_outbound_config() {
     \"type\": \"hysteria2\",
     \"server\": \"${ip}\",
     \"server_port\": ${port},
-    \"up_mbps\": 30,
-    \"down_mbps\": 100,
     \"network\": \"tcp\",
-    \"tcp\": {
+    \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
       \"server_name\": \"https://live.qq.com\",
