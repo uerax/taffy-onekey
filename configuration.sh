@@ -407,8 +407,8 @@ singbox_hy2_outbound_config() {
       \"utls\": {
         \"enabled\": false,
         \"fingerprint\": \"chrome\"
-      },
-    }
+      }
+    },
     \"password\": \"${password}\"\n}"
     
     show_info
