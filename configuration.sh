@@ -371,6 +371,30 @@ vless_reality_grpc_outbound_config() {
         }
     }\n}"
 
+    local singbox_outbound="{
+      \"type\": \"vless\",
+      \"server\": \"${ip}\",
+      \"server_port\": ${port},
+      \"uuid\": \"${password}\",
+      \"network\": \"tcp\",
+      \"tls\": {
+        \"enabled\": true,
+        \"server_name\": \"${domain}\",
+        \"utls\": {
+          \"enabled\": true,
+          \"fingerprint\": \"chrome\"
+        },
+        \"reality\": {
+          \"enabled\": true,
+          \"public_key\": \"${pubkey}\",
+          \"short_id\": \"${shortId}\"
+        }
+      },
+      \"transport\": {
+        \"type\": \"grpc\",
+        \"service_name\": \"${servName}\"
+      }\n}"
+
     show_info
 }
 # vless end
