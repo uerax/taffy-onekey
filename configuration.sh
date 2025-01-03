@@ -416,7 +416,7 @@ singbox_hy2() {
 }
 
 singbox_hy2_outbound_config() {
-    local singbox_outbound="{
+    local singbox_outbound="  {
     \"type\": \"hysteria2\",
     \"server\": \"${ip}\",
     \"server_port\": ${port},
@@ -431,7 +431,7 @@ singbox_hy2_outbound_config() {
         \"fingerprint\": \"chrome\"
       }
     },
-    \"password\": \"${password}\"\n}"
+    \"password\": \"${password}\"\n  }"
     
     show_info
 }

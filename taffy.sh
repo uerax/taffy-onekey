@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.0"
+version="v2.4.1"
 
 #fonts color
 Green="\033[32m"
@@ -1222,6 +1222,25 @@ xray_redirect_append() {
 }
 
 # outbound start
+singbox_hy2_outbound_config() {
+    singbox_outbound="{
+    \"type\": \"hysteria2\",
+    \"server\": \"${ip}\",
+    \"server_port\": ${port},
+    \"network\": \"tcp\",
+    \"tls\": {
+      \"enabled\": true,
+      \"disable_sni\": false,
+      \"server_name\": \"https://live.qq.com\",
+      \"insecure\": true,
+      \"utls\": {
+        \"enabled\": false,
+        \"fingerprint\": \"chrome\"
+      }
+    },
+    \"password\": \"${password}\"\n}"   
+}
+
 
 vmess_ws_tls_outbound_config() {
     xray_outbound="{
@@ -1591,6 +1610,7 @@ singbox_hy2() {
     protocol_type="hysteria2_nodomain"
     link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
 
+    singbox_hy2_outbound_config
     clash_config
 }
 
@@ -1855,6 +1875,10 @@ singbox_hy2_append() {
     systemctl restart sing-box
     
     protocol_type="hysteria2_nodomain"
+
+    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
+
+    singbox_hy2_outbound_config
 
     clash_config
 }
