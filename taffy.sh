@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.3"
+version="v2.4.4"
 
 #fonts color
 Green="\033[32m"
@@ -371,7 +371,6 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
-    flow: xtls-rprx-vision
     servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
@@ -611,7 +610,7 @@ xray_vless_reality_tcp() {
 
     service nginx stop
 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 }
 
@@ -642,7 +641,7 @@ xray_vless_reality_tcp_append() {
     rm append.json
 
     vless_reality_tcp_outbound_config
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
     systemctl restart xray
 }
@@ -1410,7 +1409,6 @@ vless_reality_h2_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
                         \"encryption\": \"none\"
                     }
                 ]
@@ -1702,7 +1700,7 @@ singbox_vless_reality_tcp() {
 
     systemctl enable sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
 
@@ -1954,7 +1952,7 @@ singbox_reality_tcp_append() {
 
     systemctl restart sing-box 
 
-    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     vless_reality_tcp_outbound_config
     clash_config

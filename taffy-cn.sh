@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.5"
+version="v2.2.6"
 
 #fonts color
 Green="\033[32m"
@@ -180,7 +180,6 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
-    flow: xtls-rprx-vision
     servername: www.lovelive-anime.jp
     reality-opts:
       public-key: $public_key
