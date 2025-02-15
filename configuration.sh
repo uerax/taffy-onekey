@@ -280,7 +280,6 @@ vless_reality_h2_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
                         \"encryption\": \"none\"
                     }
                 ]
@@ -314,7 +313,6 @@ vless_reality_tcp_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
                         \"encryption\": \"none\"
                     }
                 ]

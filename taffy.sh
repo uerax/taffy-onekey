@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.2"
+version="v2.4.3"
 
 #fonts color
 Green="\033[32m"
@@ -1357,7 +1357,6 @@ vless_reality_tcp_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"flow\": \"xtls-rprx-vision\",
                         \"encryption\": \"none\"
                     }
                 ]
