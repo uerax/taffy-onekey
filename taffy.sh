@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.1"
+version="v2.4.2"
 
 #fonts color
 Green="\033[32m"
@@ -1883,7 +1883,7 @@ singbox_hy2_append() {
     clash_config
 }
 
-singbox_reality_append() {
+singbox_reality_grpc_append() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
@@ -1918,6 +1918,46 @@ singbox_reality_append() {
     systemctl restart sing-box
 
     vless_reality_grpc_outbound_config
+    clash_config
+    qx_config
+}
+
+singbox_reality_tcp_append() {
+    password=$(sing-box generate uuid)
+    set_port
+    port_check $port
+
+    domain="www.lovelive-anime.jp"
+    protocol_type="reality_tcp"
+    keys=$(sing-box generate reality-keypair)
+    private_key=$(echo $keys | awk -F " " '{print $2}')
+    public_key=$(echo $keys | awk -F " " '{print $4}')
+    # short_id=$(openssl rand -hex 8)
+    ip=$(curl -sS ipinfo.io/ip)
+
+    wget -N ${singbox_vless_reality_tcp_url} -O append.json
+    judge "配置文件下载"
+
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~114514~$port~" append.json
+
+    systemctl stop sing-box
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
+
+    rm append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    systemctl restart sing-box 
+
+    link="vless://$password@$ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+
+    vless_reality_tcp_outbound_config
     clash_config
     qx_config
 }
@@ -2415,8 +2455,9 @@ select_singbox_append_type() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Green}2)  hysteria2${Font}"
-    echo -e "${Green}3)  vless-reality-grpc${Font}"
-    echo -e "${Green}4)  redirect${Font}"
+    echo -e "${Green}3)  vless-reality-tcp${Font}"
+    echo -e "${Green}4)  vless-reality-grpc${Font}"
+    echo -e "${Green}5)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2429,9 +2470,12 @@ select_singbox_append_type() {
         singbox_hy2_append
         ;;
     3)
-        singbox_reality_append
+        singbox_reality_tcp_append
         ;;
     4)
+        singbox_reality_grpc_append
+        ;;
+    5)
         singbox_redirect_append
         exit
         ;;
