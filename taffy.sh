@@ -92,6 +92,10 @@ singbox_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taff
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
 
+# CLASH URL START
+clash_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-clash.sh"
+# CLASH URL END
+
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_log="${xray_path}xray_log"
@@ -179,6 +183,17 @@ env_install_singbox() {
 
     ${INS} wget lsof curl jq openssl
     judge "wget lsof curl jq openssl 安装"
+}
+env_install_clash() {
+    ${INS} wget lsof curl openssl
+    judge "wget lsof curl openssl 安装"
+    yq_install
+    judge "yq 安装"
+}
+
+yq_install() {
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+    chmod +x /usr/local/bin/yq
 }
 
 increase_max_handle() {
@@ -334,6 +349,15 @@ xray_install() {
 
 xray_configure() {
     mkdir -p ${xray_log} && touch ${xray_log}/access.log && touch ${xray_log}/error.log && chmod a+w ${xray_log}/*.log
+}
+
+clash_install() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        bash <(curl -fsSL $xray_install_url)
+        judge "Xray 安装"
+    else
+        ok "Xray 已安装"
+    fi
 }
 
 clash_config() {
