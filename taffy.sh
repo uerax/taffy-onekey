@@ -549,8 +549,8 @@ xray_vless_reality_h2() {
     domain="www.lovelive-anime.jp"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -580,8 +580,8 @@ xray_vless_reality_h2_append() {
     domain="www.lovelive-anime.jp"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -612,8 +612,8 @@ xray_vless_reality_tcp() {
     domain="www.lovelive-anime.jp"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -646,8 +646,8 @@ xray_vless_reality_tcp_append() {
     domain="www.lovelive-anime.jp"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -677,8 +677,8 @@ xray_vless_reality_grpc() {
 
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -710,8 +710,8 @@ xray_vless_reality_grpc_append() {
     domain="www.lovelive-anime.jp"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F " " '{print $3}')
-    public_key=$(echo $keys | awk -F " " '{print $6}')
+    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
