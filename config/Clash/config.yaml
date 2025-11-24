@@ -1,12 +1,12 @@
 log-level: debug
 mixed-port: 44553
-allow-lan: true
+allow-lan: false
 mode: rule
 ipv6: true
 #inbounds
 listeners:
-#outbounds
+outbounds:
 proxies: 
 rules:
-  - 'MATCH,DIRECT'
-  #- IN-NAME,ss-in-warp,PROXY-WARP
+- 'MATCH,DIRECT'
+#- IN-NAME,ss-in-warp,PROXY-WARP

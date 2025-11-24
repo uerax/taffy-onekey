@@ -5,6 +5,7 @@
             "port": "${port}",
             "tag": "${port}",
             "protocol": "vless",
+            "key": "${pubicKey}",
             "settings": {
                 "clients": [
                     {

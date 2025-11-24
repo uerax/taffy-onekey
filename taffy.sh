@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.5"
+version="v2.4.6"
 
 #fonts color
 Green="\033[32m"
@@ -560,6 +560,7 @@ xray_vless_reality_h2() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
     
     routing_set
@@ -592,6 +593,7 @@ xray_vless_reality_h2_append() {
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
     echo -e "$(xray run -confdir=./ -dump)"  > config.json
@@ -623,6 +625,7 @@ xray_vless_reality_tcp() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
 
     routing_set
@@ -658,6 +661,7 @@ xray_vless_reality_tcp_append() {
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
     echo -e "$(xray run -confdir=./ -dump)"  > config.json
@@ -688,6 +692,7 @@ xray_vless_reality_grpc() {
 
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
+    sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
 
@@ -722,6 +727,7 @@ xray_vless_reality_grpc_append() {
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
+    sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~\${port}~$port~" append.json
 
