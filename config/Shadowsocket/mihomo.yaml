@@ -1,0 +1,8 @@
+listeners:
+- name: "ss-in-${name}"
+  type: shadowsocks
+  port: ${port}
+  listen: "::"
+  cipher: ${method}
+  password: ${password}
+  udp: true

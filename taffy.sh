@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v2.4.6"
+version="v3.0.0"
 
 #fonts color
 Green="\033[32m"
@@ -92,9 +92,11 @@ singbox_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taff
 singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singbox/singbox.txt"
 # SINGBOX URL END
 
-# CLASH URL START
-clash_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-clash.sh"
-# CLASH URL END
+# MIHOMO URL START
+mihomo_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-mihomo.sh"
+
+mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
+# MIHOMO URL END
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
@@ -349,15 +351,6 @@ xray_install() {
 
 xray_configure() {
     mkdir -p ${xray_log} && touch ${xray_log}/access.log && touch ${xray_log}/error.log && chmod a+w ${xray_log}/*.log
-}
-
-clash_install() {
-    if ! command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $xray_install_url)
-        judge "Xray 安装"
-    else
-        ok "Xray 已安装"
-    fi
 }
 
 clash_config() {
@@ -2091,6 +2084,110 @@ singbox_redirect_append() {
 }
 # SINGBOX END
 
+# MIHOMO START
+mihomo_install() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        bash <(curl -fsSL $mihomo_install_url)
+        judge "Mihomo 安装"
+    else
+        ok "Mihomo 已安装"
+    fi
+}
+
+mihomo_oneky_install() {
+    is_root
+    get_system
+    if ! command -v mihomo >/dev/null 2>&1; then
+        # adjust_date
+        env_install_mihomo
+        close_firewall
+        mihomo_install
+    fi
+    if ! command -v mihomo >/dev/null 2>&1; then
+        echo -e "${Red}mihomo 安装失败!!!${Font}"
+        exit 1
+    fi
+    mihomo_select
+}
+
+mihomo_shadowsocket() {
+    
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    encrypt=4
+    ss_method="aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(openssl rand -base64 16)
+      ;;
+    2)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(openssl rand -base64 16)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="xchacha20-ietf-poly1305"
+      ;;
+    *)
+      password=$(openssl rand -base64 16)
+      ;;
+    esac
+
+    domain=`curl -sS ipinfo.io/ip`
+    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
+
+    mihomo_shadowsocket_config
+    systemctl restart mihomo
+
+    tmp="${ss_method}:${password}"
+    tmp=$( openssl base64 <<< $tmp)
+
+    link="ss://$tmp@${domain}:${port}"
+
+    protocol_type="shadowsocket"
+    shadowsocket_outbound_config
+    clash_config
+    qx_config
+}
+
+mihomo_shadowsocket_config() {
+    wget -N ${mihomo_ss_config_url} -O tmp.yaml
+    judge "配置文件下载"
+    sed -i "s~\${method}~$ss_method~" tmp.yaml
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
+    sed -i "s~\${name}~$domain~" tmp.yaml
+    mv config.json ${xray_cfg}
+}
+
+
+
+# MIHOMO END
+
 # OUTBOUNDS ADDPEND START
 singbox_outbound_append() {
     echo -e "输入要插入的Outbound配置:"
@@ -2622,6 +2719,29 @@ xray_select() {
     info_return
 }
 
+mihomo_select() {
+    echo -e "${Green}选择安装的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  shadowsocket${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+        mihomo_shadowsocket
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        exit
+        ;;
+    esac
+    info_return
+}
+
 menu() {
     echo -e "${Cyan}——————————————————————————————————— 脚本信息 ———————————————————————————————————${Font}
 \t\t\t\t${Yellow}Taffy 脚本${Font}
@@ -2715,6 +2835,9 @@ case $1 in
         ;;
     singbox)
         singbox_onekey_install
+        ;;
+    mihomo)
+        mihomo_oneky_install
         ;;
     uninstall)
         uninstall
