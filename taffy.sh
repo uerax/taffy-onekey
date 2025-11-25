@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.0.0"
+version="v3.0.1"
 
 #fonts color
 Green="\033[32m"
@@ -93,6 +93,7 @@ singbox_route_url="https://raw.githubusercontent.com/bakasine/rules/master/singb
 # SINGBOX URL END
 
 # MIHOMO URL START
+mihomo_cfg="/etc/mihomo"
 mihomo_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-mihomo.sh"
 
 mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
@@ -186,11 +187,11 @@ env_install_singbox() {
     ${INS} wget lsof curl jq openssl
     judge "wget lsof curl jq openssl 安装"
 }
-env_install_clash() {
+env_install_mihomo() {
     ${INS} wget lsof curl openssl
     judge "wget lsof curl openssl 安装"
-    yq_install
-    judge "yq 安装"
+    #yq_install
+    #judge "yq 安装"
 }
 
 yq_install() {
@@ -2094,7 +2095,7 @@ mihomo_install() {
     fi
 }
 
-mihomo_oneky_install() {
+ mihomo_onekey_install() {
     is_root
     get_system
     if ! command -v mihomo >/dev/null 2>&1; then
@@ -2181,7 +2182,8 @@ mihomo_shadowsocket_config() {
     sed -i "s~\${password}~$password~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
     sed -i "s~\${name}~$domain~" tmp.yaml
-    mv config.json ${xray_cfg}
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    sed -i '/listeners:/ r tmp.yaml' ${mihomo_cfg}/config.yaml && rm tmp.yaml
 }
 
 
@@ -2756,9 +2758,15 @@ ${Cyan}3)   更换 Xray 协议${Font}\t\t${Cyan}13)  更换 Singbox 协议${Font
 ${Purple}4)   安装 / 更新 / 回退 Xray${Font}\t${Purple}14)  展示Singbox 操作面板${Font}
 ${Yellow}5)   卸载 Xray${Font}\t\t\t${Purple}15)  查看 Singbox 配置链接${Font}
 ${Purple}6)   查看 Xray 配置链接${Font}
-${Cyan}————————————————————————————————————————————————————————————————————————————————
-${Blue}20)  更新伪装站${Font}\t\t\t${Green}30)  安装 / 卸载 Nginx${Font}
-${Cyan}21)  更换域名证书${Font}
+${Cyan}
+————————————————————————————————————————————————————————————————————————————————
+${Font}
+${Green}21)   一键安装 Mihomo${Font}
+${Cyan}
+————————————————————————————————————————————————————————————————————————————————
+${Font}
+${Blue}70)  更新伪装站${Font}\t\t\t${Green}80)  安装 / 卸载 Nginx${Font}
+${Cyan}71)  更换域名证书${Font}
 ${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
 ${Yellow}99)  常见问题${Font}\t\t\t${Green}100) 开启 BBR${Font}
 ${Red}999) 完全卸载${Font}\t\t\t${Red}q)   退出${Font}
@@ -2803,13 +2811,16 @@ ${Cyan}————————————————————————�
     15)
     show_singbox_info
     ;;
-    20)
+    21)
+    mihomo_onekey_install
+    ;;
+    70)
     update_web
     ;;
-    21)
+    71)
     renew_ca
     ;;
-    30)
+    80)
     nginx_select
     ;;
     99)
@@ -2837,7 +2848,7 @@ case $1 in
         singbox_onekey_install
         ;;
     mihomo)
-        mihomo_oneky_install
+         mihomo_onekey_install
         ;;
     uninstall)
         uninstall

@@ -1,5 +1,4 @@
-listeners:
-- name: "ss-in-${name}"
+- name: "ss-${name}"
   type: shadowsocks
   port: ${port}
   listen: "::"
