@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v3.0.0"
+version="v3.0.1"
 
 #fonts color
 Green="\033[32m"
@@ -200,6 +200,7 @@ mihomo_redirect() {
     judge "配置文件下载"
 
     sed -i "s~\${ip}~$re_ip~" tmp.yaml
+    sed -i "s~\${name}~$re_ip~" tmp.yaml
     sed -i "s~114514~$port~" tmp.yaml
     sed -i "s~1919810~$re_port~" tmp.yaml
 
