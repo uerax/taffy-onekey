@@ -1,0 +1,17 @@
+- name: vless-${name}
+  type: vless
+  port: ${port} 
+  listen: "::"
+  users:
+    - username: ${pubicKey}
+      uuid: ${password}
+      flow: xtls-rprx-vision
+  grpc-service-name: "${ws_path}"
+  reality-config:
+    dest: www.lovelive-anime.jp:443
+    private-key: ${privateKey} # 可由 mihomo generate reality-keypair 命令生成
+    short-id:
+      - "8eb7bab5a41eb27d"
+      - ""
+    server-names:
+      - www.lovelive-anime.jp
