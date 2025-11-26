@@ -2,9 +2,8 @@ log-level: debug
 mixed-port: 7890
 allow-lan: false
 mode: rule
-inbounds: 
-outbounds: 
-proxies: 
 rules: 
+#- IN-NAME,ss,PROXY
 - 'MATCH,DIRECT'
+proxies: 
 listeners: 

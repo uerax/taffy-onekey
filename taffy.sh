@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.1.1"
+version="v3.2.0"
 
 #fonts color
 Green="\033[32m"
@@ -99,6 +99,8 @@ mihomo_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-mih
 mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
 
 mihomo_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/mihomo.yaml"
+
+mihomo_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
 
 # MIHOMO URL END
 
@@ -2195,7 +2197,6 @@ mihomo_shadowsocket_append() {
 }
 
 mihomo_vless_reality_grpc() {
-    
     password=$(mihomo generate uuid)
     set_port
     port_check $port
@@ -2225,11 +2226,31 @@ mihomo_vless_reality_grpc() {
 
     systemctl restart mihomo 
 
-    systemctl enable mihomo
-
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
+}
+
+mihomo_redirect() {
+    ip=`curl -sS ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -N ${mihomo_redirect_config_url} -O tmp.yaml
+    judge "配置文件下载"
+
+    sed -i "s~\${ip}~$re_ip~" tmp.yaml
+    sed -i "s~114514~$port~" tmp.yaml
+    sed -i "s~1919810~$re_port~" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
+    systemctl restart sing-box
+    
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
 }
 
 mihomo_clear_listeners() {
@@ -2779,6 +2800,7 @@ mihomo_select() {
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket${Font}"
     echo -e "${Cyan}2)  vless-reality-grpc${Font}"
+    echo -e "${Green}4)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2789,6 +2811,9 @@ mihomo_select() {
         ;;
     2)
         mihomo_vless_reality_grpc
+        ;;
+    4)
+        mihomo_redirect
         ;;
     q)
         exit
@@ -2805,13 +2830,21 @@ select_mihomo_append_type() {
     echo -e "${Green}选择要插入的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
+    echo -e "${Green}4)  redirect${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
     echo -e ""
     case $menu_num in
     1)
-        mihomo_shadowsocket_append
+        mihomo_shadowsocket
+        ;;
+    2)
+        mihomo_vless_reality_grpc
+        ;;
+    4)
+        mihomo_redirect
         ;;
     q)
         exit
