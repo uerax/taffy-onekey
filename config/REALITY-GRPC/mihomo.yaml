@@ -1,5 +1,5 @@
 
-- name: vless-${name}
+- name: 'vless-${name}'
   type: vless
   port: ${port} 
   listen: "::"

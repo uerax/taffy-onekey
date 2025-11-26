@@ -1,7 +1,7 @@
 
-- name: tunnel-${name}
+- name: 'tunnel-${name}'
   type: tunnel
   port: 114514
   listen: "::"
   network: [tcp, udp]
-  target: ${ip}:1919810
+  target: '${ip}:1919810'
