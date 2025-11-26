@@ -1,3 +1,4 @@
+
 - name: "ss-${name}"
   type: shadowsocks
   port: ${port}
