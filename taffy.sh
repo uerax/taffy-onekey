@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.2.1"
+version="v3.2.2"
 
 #fonts color
 Green="\033[32m"
@@ -2247,7 +2247,7 @@ mihomo_redirect() {
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
     rm tmp.yaml
-    systemctl restart sing-box
+    systemctl restart mihomo
     
     echo -e "${Green}IP为:${Font} ${ip}"
     echo -e "${Green}端口为:${Font} ${port}"
