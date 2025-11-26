@@ -3,7 +3,7 @@
   port: ${port} 
   listen: "::"
   users:
-    - username: ${pubicKey}
+    - username: ${publicKey}
       uuid: ${password}
       flow: xtls-rprx-vision
   grpc-service-name: "${ws_path}"

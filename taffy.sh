@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.0.2"
+version="v3.1.1"
 
 #fonts color
 Green="\033[32m"
@@ -2203,16 +2203,17 @@ mihomo_vless_reality_grpc() {
     protocol_type="reality_grpc"
     keys=$(mihomo generate reality-keypair)
     private_key=$(echo $keys | awk '/PrivateKey:/ {print $2}')
-    public_key=$(echo $keys | awk '/PublicKey:/ {print $2}')
+    public_key=$(echo $keys | awk '/PrivateKey:/ {print $4}')
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${mihomo_vless_reality_grpc_url} -O tmp.yaml
-    judge "Xray Reality 配置文件下载"
+    judge "Mihomo Reality 配置文件下载"
 
     sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${name}~$ip~" tmp.yaml
     sed -i "s~\${privateKey}~$private_key~" tmp.yaml
-    sed -i "s~\${pubicKey}~$public_key~" tmp.yaml
+    sed -i "s~\${publicKey}~$public_key~" tmp.yaml
     sed -i "s~\${ws_path}~$ws_path~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
 
@@ -2222,9 +2223,9 @@ mihomo_vless_reality_grpc() {
 
     vless_reality_grpc_outbound_config
 
-    systemctl restart xray 
+    systemctl restart mihomo 
 
-    systemctl enable xray
+    systemctl enable mihomo
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
@@ -2837,14 +2838,10 @@ ${Cyan}3)   更换 Xray 协议${Font}\t\t${Cyan}13)  更换 Singbox 协议${Font
 ${Purple}4)   安装 / 更新 / 回退 Xray${Font}\t${Purple}14)  展示Singbox 操作面板${Font}
 ${Yellow}5)   卸载 Xray${Font}\t\t\t${Purple}15)  查看 Singbox 配置链接${Font}
 ${Purple}6)   查看 Xray 配置链接${Font}
-${Cyan}
-————————————————————————————————————————————————————————————————————————————————
-${Font}
+${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
 ${Green}21)   一键安装 Mihomo${Font}
 ${Cyan}22)   插入 Mihomo 协议${Font}
-${Cyan}
-————————————————————————————————————————————————————————————————————————————————
-${Font}
+${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
 ${Blue}70)  更新伪装站${Font}\t\t\t${Green}80)  安装 / 卸载 Nginx${Font}
 ${Cyan}71)  更换域名证书${Font}
 ${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
