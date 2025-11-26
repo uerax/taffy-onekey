@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v2.2.6"
+version="v3.0.0"
 
 #fonts color
 Green="\033[32m"
@@ -46,6 +46,13 @@ ss_method=""
 
 xray_outbound=''
 
+# MIHOMO URL START
+mihomo_cfg="/etc/mihomo"
+mihomo_install_url="https://gh-proxy.com/https://github.com/uerax/taffy-onekey/raw/master/install-mihomo-cn.sh"
+mihomo_ss_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
+
+mihomo_redirect_config_url="https://gh-proxy.com/https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
+
 INS="apt install -y"
 password=""
 domain=""
@@ -61,6 +68,150 @@ install() {
     xray_configure
     select_type
 }
+
+mihomo_onekey() {
+    is_root
+    get_system
+    ${INS} wget zip lsof curl openssl
+    close_firewall
+    mihomo_install
+    mihomo_select
+}
+
+mihomo_install() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        bash <(curl -fsSL $mihomo_install_url)
+        judge "Mihomo 安装"
+    else
+        ok "Mihomo 已安装"
+    fi
+}
+
+mihomo_select() {
+    echo -e "${Green}选择安装的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  shadowsocket${Font}"
+    echo -e "${Green}2)  redirect${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+        mihomo_shadowsocket
+        ;;
+    2)
+        mihomo_redirect
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        exit
+        ;;
+    esac
+    info_return
+}
+
+mihomo_shadowsocket() {
+    
+    if ! command -v openssl >/dev/null 2>&1; then
+          ${INS} openssl
+          judge "openssl 安装"
+    fi
+    encrypt=4
+    ss_method="aes-128-gcm"
+    set_port
+    echo -e "选择加密方法"
+    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
+    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
+    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
+    echo -e "${Cyan}4) aes-128-gcm ${Font}"
+    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
+    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
+    echo -e ""
+    read -rp "选择加密方法(默认为1)：" encrypt
+    case $encrypt in
+    1)
+      password=$(openssl rand -base64 16)
+      ;;
+    2)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-aes-256-gcm"
+      ;;
+    3)
+      password=$(openssl rand -base64 32)
+      ss_method="2022-blake3-chacha20-poly1305"
+      ;;
+    4)
+      password=$(openssl rand -base64 16)
+      ss_method="aes-128-gcm"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="chacha20-ietf-poly1305"
+      ;;
+    5)
+      password=$(openssl rand -base64 16)
+      ss_method="xchacha20-ietf-poly1305"
+      ;;
+    *)
+      password=$(openssl rand -base64 16)
+      ;;
+    esac
+
+    domain=`curl -sS ipinfo.io/ip`
+    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
+
+    mihomo_shadowsocket_config
+    systemctl restart mihomo
+
+    tmp="${ss_method}:${password}"
+    tmp=$( openssl base64 <<< $tmp)
+
+    link="ss://$tmp@${domain}:${port}"
+
+    protocol_type="shadowsocket"
+    shadowsocket_outbound_config
+    clash_config
+    qx_config
+}
+
+mihomo_shadowsocket_config() {
+    wget -N ${mihomo_ss_config_url} -O tmp.yaml
+    judge "配置文件下载"
+    sed -i "s~\${method}~$ss_method~" tmp.yaml
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
+    sed -i "s~\${name}~$domain~" tmp.yaml
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
+}
+
+mihomo_redirect() {
+    ip=`curl -sS ipinfo.io/ip`
+    set_port
+    read -rp "输入转发的目标地址: " re_ip
+    read -rp "输入转发的目标端口: " re_port
+
+    wget -N ${mihomo_redirect_config_url} -O tmp.yaml
+    judge "配置文件下载"
+
+    sed -i "s~\${ip}~$re_ip~" tmp.yaml
+    sed -i "s~114514~$port~" tmp.yaml
+    sed -i "s~1919810~$re_port~" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
+    systemctl restart mihomo
+    
+    echo -e "${Green}IP为:${Font} ${ip}"
+    echo -e "${Green}端口为:${Font} ${port}"
+}
+
 
 is_root() {
     if [ $(id -u) == 0 ]; then
@@ -801,12 +952,14 @@ menu() {
     echo -e "   ${Yellow}https://github.com/uerax/taffy-onekey${Font}"
     echo -e "\t      ${Yellow}版本号：${version}${Font}"
     echo -e "${Cyan}———————————————— 安装向导 ————————————————${Font}"
+    echo -e "${Blue}0)   更新脚本${Font}"
     echo -e "${Green}1)   一键安装 Xray${Font}"
-    echo -e "${Blue}2)   更新脚本${Font}"
-    echo -e "${Green}3)   安装/更新 Xray${Font}"
-    echo -e "${Cyan}4)   更换 Xray 协议${Font}"
-    echo -e "${Cyan}5)   插入 Xray 协议${Font}"
-    echo -e "${Purple}11)  查看配置链接${Font}"
+    echo -e "${Green}2)   安装/更新 Xray${Font}"
+    echo -e "${Cyan}3)   更换 Xray 协议${Font}"
+    echo -e "${Cyan}4)   插入 Xray 协议${Font}"
+    echo -e "${Purple}5)  查看配置链接${Font}"
+    echo -e "${Green}11)  一键安装 Mihomo${Font}"
+    echo -e "${Cyan}12)   插入 Mihomo 协议${Font}"
     echo -e "${Green}100) 开启 BBR${Font}"
     echo -e "${Red}999) 卸载 Xray${Font}"
     echo -e "${Red}q)   退出${Font}"
@@ -815,23 +968,29 @@ menu() {
     read -rp "输入数字(回车确认)：" menu_num
     echo -e ""
     case $menu_num in
+    0)
+    update_script
+    ;;
     1)
     install
     ;;
     2)
-    update_script
-    ;;
-    3)
     xray_upgrade
     ;;
-    4)
+    3)
     select_type
     ;;
-    5)
+    4)
     select_append_type
     ;;
-    11)
+    5)
     show_info
+    ;;
+    11)
+    mihomo_onekey
+    ;;
+    12)
+    mihomo_select
     ;;
     100)
     open_bbr

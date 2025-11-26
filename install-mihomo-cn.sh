@@ -8,18 +8,20 @@ case "${ARCH_RAW}" in
     *)          echo "Unsupported architecture: ${ARCH_RAW}"; exit 1;;
 esac
 
-VERSION=$(curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases/latest \
+VERSION=$(curl -s https://gh-proxy.org/https://api.github.com/repos/MetaCubeX/mihomo/releases/latest
+
+ \
     | grep tag_name \
     | cut -d ":" -f2 \
     | sed 's/\"//g;s/\,//g;s/\ //g;s/v//')
 
 
-curl -Lo mihomo.deb "https://gh-proxy.com/https://github.com/MetaCubeX/mihomo/releases/download/v${VERSION}/mihomo-linux-${ARCH}-v${VERSION}.deb"
+curl -Lo mihomo.deb "https://gh-proxy.org/https://github.com/MetaCubeX/mihomo/releases/download/v${VERSION}/mihomo-linux-${ARCH}-v${VERSION}.deb"
 
 dpkg -i mihomo.deb
 rm mihomo.deb
 
-wget -O /etc/mihomo/config.yaml https://gh-proxy.com/https://github.com/uerax/taffy-onekey/blob/master/config/Clash/config.yaml
+wget -O /etc/mihomo/config.yaml https://gh-proxy.org/https://github.com/uerax/taffy-onekey/blob/master/config/Clash/config.yaml
 
 cat > /etc/systemd/system/mihomo.service <<EOF
 [Unit]
