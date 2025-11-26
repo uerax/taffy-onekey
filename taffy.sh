@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.0.1"
+version="v3.0.2"
 
 #fonts color
 Green="\033[32m"
@@ -97,6 +97,9 @@ mihomo_cfg="/etc/mihomo"
 mihomo_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-mihomo.sh"
 
 mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
+
+mihomo_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/mihomo.yaml"
+
 # MIHOMO URL END
 
 xray_cfg="/usr/local/etc/xray/config.json"
@@ -2183,9 +2186,54 @@ mihomo_shadowsocket_config() {
     sed -i "s~\${port}~$port~" tmp.yaml
     sed -i "s~\${name}~$domain~" tmp.yaml
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
-    sed -i '/listeners:/ r tmp.yaml' ${mihomo_cfg}/config.yaml && rm tmp.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
 }
 
+mihomo_shadowsocket_append() {
+    mihomo_shadowsocket
+}
+
+mihomo_vless_reality_grpc() {
+    
+    password=$(mihomo generate uuid)
+    set_port
+    port_check $port
+
+    protocol_type="reality_grpc"
+    keys=$(mihomo generate reality-keypair)
+    private_key=$(echo $keys | awk '/PrivateKey:/ {print $2}')
+    public_key=$(echo $keys | awk '/PublicKey:/ {print $2}')
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+
+    wget -N ${mihomo_vless_reality_grpc_url} -O tmp.yaml
+    judge "Xray Reality 配置文件下载"
+
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${privateKey}~$private_key~" tmp.yaml
+    sed -i "s~\${pubicKey}~$public_key~" tmp.yaml
+    sed -i "s~\${ws_path}~$ws_path~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
+
+    vless_reality_grpc_outbound_config
+
+    systemctl restart xray 
+
+    systemctl enable xray
+
+    clash_config
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+
+}
+
+mihomo_clear_listeners() {
+    sed -i '/listeners:/q' ${mihomo_cfg}/config.yaml
+}
 
 
 # MIHOMO END
@@ -2322,6 +2370,10 @@ show_xray_info() {
 
 show_singbox_info() {
     bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ singbox
+}
+
+show_mihomo_info() {
+    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ mihomo
 }
 
 server_check() {
@@ -2725,6 +2777,7 @@ mihomo_select() {
     echo -e "${Green}选择安装的协议 ${Font}"
     echo -e "${Purple}-------------------------------- ${Font}"
     echo -e "${Green}1)  shadowsocket${Font}"
+    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
     echo -e "${Red}q)  不装了${Font}"
     echo -e "${Purple}-------------------------------- ${Font}\n"
     read -rp "输入数字(回车确认): " menu_num
@@ -2732,6 +2785,32 @@ mihomo_select() {
     case $menu_num in
     1)
         mihomo_shadowsocket
+        ;;
+    2)
+        mihomo_vless_reality_grpc
+        ;;
+    q)
+        exit
+        ;;
+    *)
+        error "请输入正确的数字"
+        exit
+        ;;
+    esac
+    info_return
+}
+
+select_mihomo_append_type() {
+    echo -e "${Green}选择要插入的协议 ${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}"
+    echo -e "${Green}1)  shadowsocket${Font}"
+    echo -e "${Red}q)  不装了${Font}"
+    echo -e "${Purple}-------------------------------- ${Font}\n"
+    read -rp "输入数字(回车确认): " menu_num
+    echo -e ""
+    case $menu_num in
+    1)
+        mihomo_shadowsocket_append
         ;;
     q)
         exit
@@ -2762,6 +2841,7 @@ ${Cyan}
 ————————————————————————————————————————————————————————————————————————————————
 ${Font}
 ${Green}21)   一键安装 Mihomo${Font}
+${Cyan}22)   插入 Mihomo 协议${Font}
 ${Cyan}
 ————————————————————————————————————————————————————————————————————————————————
 ${Font}
@@ -2813,6 +2893,9 @@ ${Cyan}————————————————————————�
     ;;
     21)
     mihomo_onekey_install
+    ;;
+    22)
+    select_mihomo_append_type
     ;;
     70)
     update_web

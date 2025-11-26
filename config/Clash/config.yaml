@@ -3,8 +3,8 @@ mixed-port: 7890
 allow-lan: false
 mode: rule
 inbounds: 
-listeners:
 outbounds: 
 proxies: 
-rules:
+rules: 
 - 'MATCH,DIRECT'
+listeners: 
