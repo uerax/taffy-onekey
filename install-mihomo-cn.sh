@@ -21,7 +21,7 @@ curl -Lo mihomo.deb "https://gh-proxy.org/https://github.com/MetaCubeX/mihomo/re
 dpkg -i mihomo.deb
 rm mihomo.deb
 
-wget -O /etc/mihomo/config.yaml https://gh-proxy.org/https://github.com/uerax/taffy-onekey/blob/master/config/Clash/config.yaml
+wget -O /etc/mihomo/config.yaml https://raw.githubusercontent.com/uerax/taffy-onekey/refs/heads/master/config/Clash/config.yaml
 
 cat > /etc/systemd/system/mihomo.service <<EOF
 [Unit]

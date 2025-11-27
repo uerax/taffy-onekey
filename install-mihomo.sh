@@ -19,7 +19,7 @@ curl -Lo mihomo.deb "https://github.com/MetaCubeX/mihomo/releases/download/v${VE
 dpkg -i mihomo.deb
 rm mihomo.deb
 
-wget -O /etc/mihomo/config.yaml https://github.com/uerax/taffy-onekey/blob/master/config/Clash/config.yaml
+wget -O /etc/mihomo/config.yaml https://raw.githubusercontent.com/uerax/taffy-onekey/refs/heads/master/config/Clash/config.yaml
 
 cat > /etc/systemd/system/mihomo.service <<EOF
 [Unit]
