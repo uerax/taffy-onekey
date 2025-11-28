@@ -314,6 +314,7 @@ mihomo_vless() {
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_tcp_outbound_config
         fi
+    fi
 }
 
 vless_reality_h2_outbound_config() {
