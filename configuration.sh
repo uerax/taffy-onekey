@@ -422,7 +422,7 @@ vless_reality_grpc_outbound_config() {
       \"server\": \"${ip}\",
       \"server_port\": ${port},
       \"uuid\": \"${password}\",
-      \"network\": \"tcp\",
+      \"packet_encoding\": \"xudp\",
       \"tls\": {
         \"enabled\": true,
         \"server_name\": \"${domain}\",
