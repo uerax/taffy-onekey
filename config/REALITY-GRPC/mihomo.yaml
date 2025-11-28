@@ -10,7 +10,7 @@
   grpc-service-name: "${ws_path}"
   reality-config:
     dest: www.lovelive-anime.jp:443
-    private-key: ${privateKey} # 可由 mihomo generate reality-keypair 命令生成
+    private-key: ${privateKey}
     short-id:
       - "8eb7bab5a41eb27d"
       - ""
