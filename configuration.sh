@@ -14,9 +14,21 @@ Font="\033[0m"
 
 singbox_cfg="/etc/sing-box/config.json"
 xray_cfg="/usr/local/etc/xray/config.json"
+mihomo_cfg="/etc/mihomo/config.yaml"
+
+yq_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-yq.sh"
 
 xray_outbound=""
 singbox_outbound=""
+
+yq_install() {
+    if ! command -v yq >/dev/null 2>&1; then
+        bash <(curl -fsSL $yq_install_url)
+        judge "yq 安装"
+    else
+        ok "yq 已安装"
+    fi
+}
 
 # vmess start
 xray_vmess() {
@@ -174,6 +186,16 @@ singbox_shadowsocket() {
     shadowsocket_info
 }
 
+mihomo_shadowsocket() {
+    local item="$1"
+    local type=$(yq -r ".listeners[$item].type" $mihomo_cfg)
+    local port=$(yq -r ".listeners[$item].port" $mihomo_cfg)
+    local method=$(yq -r ".listeners[$item].cipher" $mihomo_cfg)
+    local password=$(yq -r ".listeners[$item].password" $mihomo_cfg)
+
+    shadowsocket_info
+}
+
 shadowsocket_info() {
     local xray_outbound="{
     \"protocol\": \"shadowsocks\",
@@ -267,6 +289,31 @@ xray_vless() {
     else
         echo ""
     fi
+}
+
+mihomo_vless() {
+    local i="$1"
+    local type=$(yq -r ".listeners[$i].type" $mihomo_cfg)
+    local port=$(yq -r ".listeners[$i].port" $mihomo_cfg)
+    local password=$(yq -r ".listeners[$i].users[0].uuid" $mihomo_cfg)
+    local reality=$(yq -r ".listeners[$i].reality-config" $mihomo_cfg)
+    if [ -n "$reality" ]; then
+        local grpc=$(yq -r ".listeners[$i].grpc-service-name" $mihomo_cfg)
+        local pubkey=$(yq -r ".listeners[$i].users[0].username" $mihomo_cfg)
+        local domain=$(yq -r ".listeners[$i].reality-config.server-names[0]" $mihomo_cfg)
+        local shortId=$(yq -r ".listeners[$i].reality-config.short-id[0]" $mihomo_cfg)
+        if [ -n "$grpc" ]; then
+            # reality+grpc
+            local servName=$(yq -r ".listeners[$i].grpc-service-name" $mihomo_cfg)
+            local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_grpc_outbound_config
+        } else {
+            # reality+tcp
+            local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            vless_reality_tcp_outbound_config
+        fi
 }
 
 vless_reality_h2_outbound_config() {
@@ -505,6 +552,64 @@ singbox_range() {
     done
 }
 
+mihomo_range() {
+    if [ ! -e "$mihomo_cfg" ]; then
+        echo "Mihomo Config does not exist. Exiting."
+        exit 1  # 非零的退出状态表示异常退出
+    fi
+
+    if ! command -v yq >/dev/null 2>&1; then
+        yq_install
+    fi
+
+    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
+    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
+    if [ ! -n "$ip" ]; then
+        ip=$ipv6
+    fi
+
+    for i in $(yq '.listeners | keys | .[]' $mihomo_cfg); do
+        type=$(yq -r ".listeners[$i].type" $mihomo_cfg)
+        case "$type" in
+            "shadowsocks")
+                mihomo_shadowsocket "$i"
+                ;;
+            "vless")
+                mihomo_vless "$i"
+                ;;
+            "hysteria2")
+                ;;
+            *)
+                ;;
+        esac
+
+    done
+    # 遍历 Yaml 数组并调用相应函数
+    yq -o=json '.' "$singbox_cfg" | jq -c '.inbounds[]'  | while read -r inbound; do
+        type=$(echo "$inbound" | jq -r '.type')
+
+        case "$type" in
+            "shadowsocks")
+                singbox_shadowsocket "$inbound"
+                ;;
+            "vless")
+                singbox_vless "$inbound"
+                ;;
+            "hysteria2")
+                singbox_hy2 "$inbound"
+                ;;
+            "vmess")
+                singbox_vmess "$inbound"
+                ;;
+            "trojan")
+                singbox_trojan "$inbound"
+                ;;
+            *)
+                ;;
+        esac
+    done
+}
+
 show_info() {
     echo -e "${Cyan}------------------------------------------------------------${Font}"
     echo -e "${Cyan}--------------------------配置开始--------------------------${Font}"
@@ -558,12 +663,19 @@ singbox_run() {
     singbox_range
 }
 
+mihomo_run() {
+    mihomo_range
+}
+
 case $1 in
     singbox)
         singbox_run
         ;;
     xray)
         xray_run
+        ;;
+    mihomo)
+        mihomo_range
         ;;
     *)
         singbox_run

@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?
 
-version="v3.2.3"
+version="v3.3.0"
 
 #fonts color
 Green="\033[32m"
@@ -2927,6 +2927,9 @@ ${Cyan}————————————————————————�
     ;;
     22)
     select_mihomo_append_type
+    ;;
+    25)
+    show_mihomo_info
     ;;
     70)
     update_web
