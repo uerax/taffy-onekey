@@ -585,30 +585,6 @@ mihomo_range() {
         esac
 
     done
-    # 遍历 Yaml 数组并调用相应函数
-    yq -o=json '.' "$singbox_cfg" | jq -c '.inbounds[]'  | while read -r inbound; do
-        type=$(echo "$inbound" | jq -r '.type')
-
-        case "$type" in
-            "shadowsocks")
-                singbox_shadowsocket "$inbound"
-                ;;
-            "vless")
-                singbox_vless "$inbound"
-                ;;
-            "hysteria2")
-                singbox_hy2 "$inbound"
-                ;;
-            "vmess")
-                singbox_vmess "$inbound"
-                ;;
-            "trojan")
-                singbox_trojan "$inbound"
-                ;;
-            *)
-                ;;
-        esac
-    done
 }
 
 show_info() {
