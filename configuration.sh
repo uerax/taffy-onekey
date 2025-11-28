@@ -23,10 +23,10 @@ singbox_outbound=""
 
 yq_install() {
     if ! command -v yq >/dev/null 2>&1; then
+        echo -e "正在安装 yq ..."
         bash <(curl -fsSL $yq_install_url)
-        judge "yq 安装"
     else
-        ok "yq 已安装"
+        echo -e "yq 已安装"
     fi
 }
 
