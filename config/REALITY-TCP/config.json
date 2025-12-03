@@ -27,9 +27,9 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "dest": "www.lovelive-anime.jp:443",
+                    "dest": "www.python.org:443",
                     "serverNames": [
-                        "www.lovelive-anime.jp"
+                        "www.python.org"
                     ],
                     "privateKey": "${privateKey}",
                     "shortIds": [

@@ -394,7 +394,8 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
-    servername: www.lovelive-anime.jp
+    packet-encoding: xudp
+    servername: www.python.org
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -409,8 +410,9 @@ clash_config() {
     network: grpc
     tls: true
     udp: true
+    packet-encoding: xudp
     # skip-cert-verify: true
-    servername: www.lovelive-anime.jp
+    servername: www.python.org
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -476,6 +478,7 @@ clash_config() {
     tls: true
     network: ws
     servername: $domain
+    packet-encoding: xudp
     # skip-cert-verify: true
     ws-opts:
       path: \"/${ws_path}\"
@@ -491,6 +494,7 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
+    packet-encoding: xudp
     flow: xtls-rprx-vision 
     client-fingerprint: safari"
     ;;
@@ -503,8 +507,9 @@ clash_config() {
     tls: true
     udp: true
     network: h2
+    packet-encoding: xudp
     flow: ''
-    servername: www.lovelive-anime.jp
+    servername: www.python.org
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -545,7 +550,7 @@ xray_vless_reality_h2() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
@@ -577,7 +582,7 @@ xray_vless_reality_h2_append() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
@@ -610,7 +615,7 @@ xray_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
@@ -645,7 +650,7 @@ xray_vless_reality_tcp_append() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
@@ -711,7 +716,7 @@ xray_vless_reality_grpc_append() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
@@ -1645,7 +1650,7 @@ singbox_vless_reality_h2() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1677,7 +1682,7 @@ singbox_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1708,7 +1713,7 @@ singbox_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
@@ -1915,7 +1920,7 @@ singbox_reality_grpc_append() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')
     public_key=$(echo $keys | awk -F " " '{print $4}')
@@ -1953,7 +1958,7 @@ singbox_reality_tcp_append() {
     set_port
     port_check $port
 
-    domain="www.lovelive-anime.jp"
+    domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(echo $keys | awk -F " " '{print $2}')

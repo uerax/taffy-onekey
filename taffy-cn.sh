@@ -332,7 +332,7 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
-    servername: www.lovelive-anime.jp
+    servername: www.python.org
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -348,7 +348,7 @@ clash_config() {
     tls: true
     udp: true
     # skip-cert-verify: true
-    servername: www.lovelive-anime.jp
+    servername: www.python.org
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -442,7 +442,7 @@ clash_config() {
     udp: true
     network: h2
     flow: ''
-    servername: www.lovelive-anime.jp
+    servername: www.python.org
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d

@@ -15,11 +15,11 @@
             ],
             "tls": {
                 "enabled": true,
-                "server_name": "www.lovelive-anime.jp",
+                "server_name": "www.python.org",
                 "reality": {
                     "enabled": true,
                     "handshake": {
-                        "server": "www.lovelive-anime.jp",
+                        "server": "www.python.org",
                         "server_port": 443
                     },
                     "private_key": "${privateKey}",
