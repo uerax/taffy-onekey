@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.0.0"
+version="v4.0.1"
 
 #fonts color
 Green="\033[32m"
@@ -1102,11 +1102,11 @@ socks5_append() {
     fi
     set_port
 
-    printf "------------------------------------------\n"
+    printf "%s\n" "------------------------------------------"
     # 拆分 read -rp：先用 printf 打印提示，再用 read 读取
     printf "设置你的用户名: "
     read -r user
-    printf "------------------------------------------\n"
+    printf "%s\n" "------------------------------------------"
     printf "设置你的密码: "
     read -r password
 
@@ -1153,7 +1153,7 @@ routing_set() {
 }
 
 set_port() {
-    printf "%b\n" "------------------------------------------"
+    printf "%s\n" "------------------------------------------"
     printf "%s" "设置你的端口(默认443): "
     read -r input
     case "$input" in
@@ -1188,8 +1188,8 @@ singbox_onekey_install() {
     singbox_select
 }
 
-singbox_install() {
-    bash <(curl -fsSL $singbox_install_url)
+singbox_install() { 
+    curl -fsSL "$singbox_install_url" | bash 
 }
 
 uninstall_singbox() {
@@ -1667,7 +1667,7 @@ singbox_redirect_append() {
 # MIHOMO START
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $mihomo_install_url)
+        curl -fsSL "$mihomo_install_url" | bash
         judge "Mihomo 安装"
     else
         ok "Mihomo 已安装"
@@ -1908,39 +1908,39 @@ open_bbr() {
 
 info_return() {
     # 统一使用 printf 格式化输出，保证跨系统兼容性
-    printf "------------------------------------------------\n"
+    printf "%s\n" "------------------------------------------------"
     printf "${Green}安装成功!!!!!!!!${Font}\n"
-    printf "------------------------------------------------\n"
+    printf "%s\n" "------------------------------------------------"
     printf "${Green}密码为:${Font} %s\n" "${password}"
     printf "${Green}端口为:${Font} %s\n" "${port}"
     printf "${Green}链接:${Font} %s\n" "${link}"
 
     # 使用 [ -n "$var" ] 判断变量是否非空
     if [ -n "$qx_cfg" ]; then
-        printf "------------------------------------------------\n"
+        printf "%s\n" "------------------------------------------------"
         printf "${Green}QuantumultX配置: ${Font}\n"
         printf "%s\n" "${qx_cfg}"
     fi
 
     if [ -n "$xray_outbound" ]; then
-        printf "------------------------------------------------\n"
+        printf "%s\n" "------------------------------------------------"
         printf "${Green}Outbounds配置:${Font}\n"
         printf "%s\n" "${xray_outbound}"
     fi
 
     if [ -n "$singbox_outbound" ]; then
-        printf "------------------------------------------------\n"
+        printf "%s\n" "------------------------------------------------"
         printf "${Green}Singbox Outbounds配置:${Font}\n"
         printf "%s\n" "${singbox_outbound}"
     fi
 
     if [ -n "$clash_cfg" ]; then
-        printf "------------------------------------------------\n"
+        printf "%s\n" "------------------------------------------------"
         printf "${Green}Clash配置: ${Font}\n"
         printf "%s\n" "${clash_cfg}"
     fi
 
-    printf "------------------------------------------------\n"
+    printf "%s\n" "------------------------------------------------"
 
     # 条件判断语句在 POSIX 中建议变量加双引号
     if [ "$protocol_type" = "vmess_ws" ]; then
@@ -1994,7 +1994,7 @@ update_script() {
 }
 
 xray_upgrade() {
-    printf "------------------------------------------\n"
+    printf "%s\n" "------------------------------------------"
     printf "是否安装指定版本(Y/N): "
     read -r input
     case $input in
@@ -2050,7 +2050,7 @@ uninstall_xray() {
 }
 
 uninstall() {
-    printf "------------------------------------------\n"
+    printf "%s\n" "------------------------------------------"
 
     # 2. 拆分 read -rp：先提示，后读取
     printf "是否确定要完全卸载(Y/N): "
