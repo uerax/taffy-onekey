@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.1"
+version="v4.1.2"
 
 #fonts color
 Green="\033[32m"
@@ -2025,8 +2025,8 @@ update_script() {
         if grep -q "#!/bin/" "$temp_file"; then
             mv "$temp_file" "$script_abs_path"
             chmod +x "$script_abs_path"
-            ok "更新成功！请重新运行脚本。"
-            exit 0
+            ok "更新成功！正在重新启动脚本..."
+            exec "$script_abs_path" "$@"
         else
             rm -f "$temp_file"
             error "更新失败：下载的文件无效（可能是网络拦截）。"
