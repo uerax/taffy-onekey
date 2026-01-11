@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.0"
+version="v4.1.1"
 
 #fonts color
 Green="\033[32m"
@@ -1843,7 +1843,7 @@ mihomo_hysteria2() {
     sed -i "s/\${port}/$port/" tmp.yaml
 
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
-    >> "${mihomo_cfg}/config.yaml" < tmp.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
     rm tmp.yaml
 
     restart_service mihomo 
