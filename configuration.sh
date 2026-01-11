@@ -632,29 +632,29 @@ show_info() {
 
     # 处理分享链接
     if [ -n "$link" ]; then
-        printf "%b分享链接:%b\n%s\n" "${Green}" "${Font}" "${link}"
+        printf "%b分享链接:%b\n%b\n" "${Green}" "${Font}" "${link}"
     fi
 
     # 处理复杂的多行配置信息
     # 使用 %s 打印变量，防止配置里的特殊字符（如 \n, \t）被 printf 再次解析
     if [ -n "$qx_cfg" ]; then
-        printf "------------------------------------------------------------\n"
-        printf "%bQuantumultX配置:%b\n%s\n" "${Green}" "${Font}" "${qx_cfg}"
+        printf "%s\n" "------------------------------------------------------------"
+        printf "%bQuantumultX配置:%b\n%b\n" "${Green}" "${Font}" "${qx_cfg}"
     fi
 
     if [ -n "$xray_outbound" ]; then
-        printf "------------------------------------------------------------\n"
-        printf "%bXray Outbounds配置:%b\n%s\n" "${Green}" "${Font}" "${xray_outbound}"
+        printf "%s\n" "------------------------------------------------------------"
+        printf "%bXray Outbounds配置:%b\n%b\n" "${Green}" "${Font}" "${xray_outbound}"
     fi
 
     if [ -n "$singbox_outbound" ]; then
-        printf "------------------------------------------------------------\n"
-        printf "%bSingbox Outbounds配置:%b\n%s\n" "${Green}" "${Font}" "${singbox_outbound}"
+        printf "%s\n" "------------------------------------------------------------"
+        printf "%bSingbox Outbounds配置:%b\n%b\n" "${Green}" "${Font}" "${singbox_outbound}"
     fi
 
     if [ -n "$clash_cfg" ]; then
-        printf "------------------------------------------------------------\n"
-        printf "%bClash配置:%b\n%s\n" "${Green}" "${Font}" "${clash_cfg}"
+        printf "%s\n" "------------------------------------------------------------"
+        printf "%bClash配置:%b\n%b\n" "${Green}" "${Font}" "${clash_cfg}"
     fi
 
     printf "%b------------------------------------------------------------%b\n" "${Cyan}" "${Font}"
