@@ -1826,6 +1826,8 @@ mihomo_hysteria2() {
     set_port
     ${PKG_MANAGER} openssl
 
+    protocol_type="hysteria2_nodomain"
+
     openssl ecparam -name prime256v1 -genkey -noout -out "${mihomo_cfg}/server.key"
 
     openssl req -x509 -nodes -key "${mihomo_cfg}/server.key" -out "${mihomo_cfg}/server.crt" -subj "/CN=www.python.org" -days 36500
@@ -1834,6 +1836,7 @@ mihomo_hysteria2() {
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     ip=$(curl -s https://ip.me)
+    domain=$ip
 
     wget -N ${mihomo_hysteria2_url} -O tmp.yaml
     judge "Mihomo Reality 配置文件下载"

@@ -470,6 +470,21 @@ singbox_hy2() {
     singbox_hy2_outbound_config
 }
 
+mihomo_hy2() {
+    local item="$1"
+    local type=$(yq -r ".listeners[$i].type" $mihomo_cfg)
+    local port=$(yq -r ".listeners[$i].port" $mihomo_cfg)
+    local up=$(yq -r ".listeners[$i].up" $mihomo_cfg)
+    local down=$(yq -r ".listeners[$i].down" $mihomo_cfg)
+    local password=$(yq -r ".listeners[$i].users.user1" $mihomo_cfg)
+
+    local link="hysteria2://${password}@${ip}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${ip}"
+
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
+
+    singbox_hy2_outbound_config
+}
+
 singbox_hy2_outbound_config() {
     local singbox_outbound="  {
     \"type\": \"hysteria2\",
@@ -490,6 +505,8 @@ singbox_hy2_outbound_config() {
     
     show_info
 }
+
+
 
 # hysteria2 end
 xray_range() {
@@ -588,6 +605,7 @@ mihomo_range() {
                 mihomo_vless "$i"
                 ;;
             "hysteria2")
+                mihomo_hy2 "$i"
                 ;;
             *)
                 ;;

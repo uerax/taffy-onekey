@@ -8,4 +8,4 @@
   up: 200
   down: 50
   certificate: /etc/mihomo/server.crt
-  private-key: etc/mihomo/server.key
+  private-key: /etc/mihomo/server.key
