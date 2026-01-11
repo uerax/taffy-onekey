@@ -38,7 +38,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 
 ## Script
 
-实现一键安装的功能,只兼容 ubuntu 和 debian
+实现一键安装的功能
 
 现在已支持以下协议
 
@@ -46,9 +46,6 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 - vless-tls-reality
 - vless-grpc-reality
 - vless-h2-reality
-- vmess-ws-tls
-- trojan-tls-tcp
-- trojan
 - shadowsocket-2022
 
 

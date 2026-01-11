@@ -973,8 +973,7 @@ singbox_hy2_outbound_config() {
         \"fingerprint\": \"chrome\"
       }
     },
-    \"password\": \"${password}\"
-}"   
+    \"password\": \"${password}\"\n}"   
 }
 
 vless_reality_grpc_outbound_config() {
@@ -1966,25 +1965,25 @@ info_return() {
     if [ -n "$qx_cfg" ]; then
         printf "%s\n" "------------------------------------------------"
         printf "${Green}QuantumultX配置: ${Font}\n"
-        printf "%s\n" "${qx_cfg}"
+        printf "%b\n" "${qx_cfg}"
     fi
 
     if [ -n "$xray_outbound" ]; then
         printf "%s\n" "------------------------------------------------"
         printf "${Green}Outbounds配置:${Font}\n"
-        printf "%s\n" "${xray_outbound}"
+        printf "%b\n" "${xray_outbound}"
     fi
 
     if [ -n "$singbox_outbound" ]; then
         printf "%s\n" "------------------------------------------------"
         printf "${Green}Singbox Outbounds配置:${Font}\n"
-        printf "%s\n" "${singbox_outbound}"
+        printf "%b\n" "${singbox_outbound}"
     fi
 
     if [ -n "$clash_cfg" ]; then
         printf "%s\n" "------------------------------------------------"
         printf "${Green}Clash配置: ${Font}\n"
-        printf "%s\n" "${clash_cfg}"
+        printf "%b\n" "${clash_cfg}"
     fi
 
     printf "%s\n" "------------------------------------------------"
