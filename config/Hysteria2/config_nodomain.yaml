@@ -11,5 +11,5 @@ auth:
 masquerade:
   type: proxy
   proxy:
-    url: https://live.qq.com/
+    url: https://www.python.org/
     rewriteHost: true

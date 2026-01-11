@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #fonts color
 Green="\033[32m"
@@ -23,26 +23,33 @@ singbox_outbound=""
 
 yq_install() {
     if ! command -v yq >/dev/null 2>&1; then
-        echo -e "正在安装 yq ..."
-        bash <(curl -fsSL $yq_install_url)
+        if command -v apk >/dev/null 2>&1; then
+            printf "Alpine 环境：直接通过 apk 安装 yq...\n"
+            apk add --no-cache yq
+        else
+            # 其他系统（Ubuntu/CentOS）再跑你的远程脚本
+            printf "正在通过远程脚本安装 yq ...\n"
+            curl -fsSL "$yq_install_url" | bash || curl -fsSL "$yq_install_url" | sh
+        fi
     else
-        echo -e "yq 已安装"
+        printf "yq 已安装\n"
     fi
 }
 
 # vmess start
 xray_vmess() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.protocol')
-    local password=$(echo "$item" | jq -r '.settings.clients[0].id')
-    local method=$(echo "$item" | jq -r '.streamSettings.network')
+    local type=$(printf "%s" "$item" | jq -r '.protocol')
+    local password=$(printf "%s" "$item" | jq -r '.settings.clients[0].id')
+    local method=$(printf "%s" "$item" | jq -r '.streamSettings.network')
     local port=443
-    local path=$(echo "$item" | jq -r '.streamSettings.wsSettings.path')
+    local path=$(printf "%s" "$item" | jq -r '.streamSettings.wsSettings.path')
     local domain=$ip
     local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    local encode_link=$(openssl base64 <<< $tmp)
+    #local encode_link=$(openssl base64 <<< $tmp)
+    local encode_link=$(printf "%s" "$tmp" | openssl base64 | tr -d '\n')
     local link="vmess://$encode_link"
 
     local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
@@ -56,16 +63,17 @@ xray_vmess() {
 
 singbox_vmess() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.type')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local password=$(echo "$item" | jq -r '.users[0].uuid')
-    local domain=$(echo "$item" | jq -r '.tls.server_name')
-    local method=$(echo "$item" | jq -r '.transport.type')
-    local path=$(echo "$item" | jq -r '.transport.path')
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local password=$(printf "%s" "$item" | jq -r '.users[0].uuid')
+    local domain=$(printf "%s" "$item" | jq -r '.tls.server_name')
+    local method=$(printf "%s" "$item" | jq -r '.transport.type')
+    local path=$(printf "%s" "$item" | jq -r '.transport.path')
     local hq_ip="cloudflare.182682.xyz"
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    local encode_link=$(openssl base64 <<< $tmp)
+    #local encode_link=$(openssl base64 <<< $tmp)
+    local encode_link=$(printf "%s" "$tmp" | openssl base64 | tr -d '\n')
     local link="vmess://$encode_link"
 
     local clash_cfg="  - name: $domain\n    type: vmess\n    server: '$domain'\n    port: 443\n    uuid: $password\n    alterId: 0\n    cipher: auto\n    udp: true\n    tls: true\n    network: ws\n    ws-opts:\n      path: \"${path}\"\n      headers:\n        Host: $domain"
@@ -150,10 +158,10 @@ vmess_info() {
 # trojan start
 singbox_trojan() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.type')
-    local password=$(echo "$item" | jq -r '.users[0].password')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local domain=$(echo "$item" | jq -r '.tls.server_name')
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local password=$(printf "%s" "$item" | jq -r '.users[0].password')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local domain=$(printf "%s" "$item" | jq -r '.tls.server_name')
 
     local link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
 
@@ -168,20 +176,20 @@ singbox_trojan() {
 # shadowsocket start
 xray_shadowsocket() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.protocol')
-    local port=$(echo "$item" | jq -r '.port')
-    local method=$(echo "$item" | jq -r '.settings.method')
-    local password=$(echo "$item" | jq -r '.settings.password')
+    local type=$(printf "%s" "$item" | jq -r '.protocol')
+    local port=$(printf "%s" "$item" | jq -r '.port')
+    local method=$(printf "%s" "$item" | jq -r '.settings.method')
+    local password=$(printf "%s" "$item" | jq -r '.settings.password')
     
     shadowsocket_info
 }
 
 singbox_shadowsocket() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.type')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local method=$(echo "$item" | jq -r '.method')
-    local password=$(echo "$item" | jq -r '.password')
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local method=$(printf "%s" "$item" | jq -r '.method')
+    local password=$(printf "%s" "$item" | jq -r '.password')
     
     shadowsocket_info
 }
@@ -218,7 +226,8 @@ shadowsocket_info() {
     local qx_cfg="shadowsocks=$ip:$port, method=$method, password=$password, tag=$ip"
     local clash_cfg="  - name: $ip\n    type: ss\n    server: '$ip'\n    port: $port\n    cipher: $method\n    password: $password\n    udp: true"
     local tmp="${method}:${password}"
-    tmp=$(openssl base64 <<< $tmp)
+    #tmp=$(openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64 | tr -d '\n')
     local link="ss://$tmp@${ip}:${port}"
     
     show_info
@@ -229,18 +238,18 @@ shadowsocket_info() {
 # vless start
 singbox_vless() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.type')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local password=$(echo "$item" | jq -r '.users[0].uuid')
-    local reality=$(echo "$item" | jq -r '.tls.reality')
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local password=$(printf "%s" "$item" | jq -r '.users[0].uuid')
+    local reality=$(printf "%s" "$item" | jq -r '.tls.reality')
     if [ -n "$reality" ]; then
-        local protocol=$(echo "$item" | jq -r '.transport.type')
-        local pubkey=$(echo "$item" | jq -r '.users[0].name')
-        local domain=$(echo "$item" | jq -r '.tls.server_name')
-        local shortId=$(echo "$reality" | jq -r '.short_id[0]')
+        local protocol=$(printf "%s" "$item" | jq -r '.transport.type')
+        local pubkey=$(printf "%s" "$item" | jq -r '.users[0].name')
+        local domain=$(printf "%s" "$item" | jq -r '.tls.server_name')
+        local shortId=$(printf "%s" "$reality" | jq -r '.short_id[0]')
         if [ "$protocol" = "grpc" ]; then
             # reality+grpc
-            local servName=$(echo "$item" | jq -r '.transport.service_name')
+            local servName=$(printf "%s" "$item" | jq -r '.transport.service_name')
             local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_grpc_outbound_config
@@ -256,23 +265,23 @@ singbox_vless() {
             vless_reality_tcp_outbound_config
         fi
     else
-        echo ""
+        printf "%s" ""
     fi
 }
 
 xray_vless() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.protocol')
-    local port=$(echo "$item" | jq -r '.port')
-    local password=$(echo "$item" | jq -r '.settings.clients[0].id')
-    local reality=$(echo "$item" | jq -r '.streamSettings.security')
+    local type=$(printf "%s" "$item" | jq -r '.protocol')
+    local port=$(printf "%s" "$item" | jq -r '.port')
+    local password=$(printf "%s" "$item" | jq -r '.settings.clients[0].id')
+    local reality=$(printf "%s" "$item" | jq -r '.streamSettings.security')
     if [ "$reality" = "reality" ]; then
-        local protocol=$(echo "$item" | jq -r '.streamSettings.network')
-        local pubkey=$(echo "$item" | jq -r '.key')
-        local domain=$(echo "$item" | jq -r '.streamSettings.realitySettings.serverNames[0]')
-        local shortId=$(echo "$item" | jq -r '.streamSettings.realitySettings.shortIds[0]')
+        local protocol=$(printf "%s" "$item" | jq -r '.streamSettings.network')
+        local pubkey=$(printf "%s" "$item" | jq -r '.key')
+        local domain=$(printf "%s" "$item" | jq -r '.streamSettings.realitySettings.serverNames[0]')
+        local shortId=$(printf "%s" "$item" | jq -r '.streamSettings.realitySettings.shortIds[0]')
         if [ "$protocol" = "grpc" ]; then
-            local servName=$(echo "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
+            local servName=$(printf "%s" "$item" | jq -r '.streamSettings.grpcSettings.serviceName')
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=$protocol&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: $protocol\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_grpc_outbound_config
@@ -287,7 +296,7 @@ xray_vless() {
             vless_reality_tcp_outbound_config
         fi
     else
-        echo ""
+        printf "%s" ""
     fi
 }
 
@@ -448,15 +457,15 @@ vless_reality_grpc_outbound_config() {
 # hysteria2 start
 singbox_hy2() {
     local item="$1"
-    local type=$(echo "$item" | jq -r '.type')
-    local port=$(echo "$item" | jq -r '.listen_port')
-    local up=$(echo "$item" | jq -r '.up_mbps')
-    local down=$(echo "$item" | jq -r '.down_mbps')
-    local password=$(echo "$item" | jq -r '.users[0].password')
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local up=$(printf "%s" "$item" | jq -r '.up_mbps')
+    local down=$(printf "%s" "$item" | jq -r '.down_mbps')
+    local password=$(printf "%s" "$item" | jq -r '.users[0].password')
     
-    local link="hysteria2://${password}@${ip}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://live.qq.com\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -470,7 +479,7 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://live.qq.com\",
+      \"server_name\": \"https://www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,
@@ -486,7 +495,7 @@ singbox_hy2_outbound_config() {
 xray_range() {
 
     if [ ! -e "$xray_cfg" ]; then
-        echo "Xray Config does not exist. Exiting."
+        printf "%s" "Xray Config does not exist. Exiting."
         exit 1  # 非零的退出状态表示异常退出
     fi
 
@@ -497,7 +506,7 @@ xray_range() {
     fi
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
-        type=$(echo "$inbound" | jq -r '.protocol')
+        type=$(printf "%s" "$inbound" | jq -r '.protocol')
         case "$type" in
             "shadowsocks")
                 xray_shadowsocket "$inbound"
@@ -518,7 +527,7 @@ xray_range() {
 singbox_range() {
 
     if [ ! -e "$singbox_cfg" ]; then
-        echo "Singbox Config does not exist. Exiting."
+        printf "%s" "Singbox Config does not exist. Exiting."
         exit 1  # 非零的退出状态表示异常退出
     fi
 
@@ -529,7 +538,7 @@ singbox_range() {
     fi
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $singbox_cfg | while read -r inbound; do
-        type=$(echo "$inbound" | jq -r '.type')
+        type=$(printf "%s" "$inbound" | jq -r '.type')
 
         case "$type" in
             "shadowsocks")
@@ -555,7 +564,7 @@ singbox_range() {
 
 mihomo_range() {
     if [ ! -e "$mihomo_cfg" ]; then
-        echo "Mihomo Config does not exist. Exiting."
+        printf "Mihomo Config does not exist. Exiting."
         exit 1  # 非零的退出状态表示异常退出
     fi
 
@@ -588,48 +597,51 @@ mihomo_range() {
 }
 
 show_info() {
-    echo -e "${Cyan}------------------------------------------------------------${Font}"
-    echo -e "${Cyan}--------------------------配置开始--------------------------${Font}"
-    echo -e "${Cyan}------------------------------------------------------------${Font}"
-    echo -e "${Green}协议:${Font} ${type}"
-    echo -e "${Green}地址:${Font} ${ip}"
-    if [ -n "$ipv6" ]; then
-        echo -e "${Green}地址IPv6:${Font} ${ipv6}"
-    fi
-    if [ -n "$hq_ip" ]; then
-        echo -e "${Green}cloudflare优选地址:${Font} ${hq_ip}"
-    fi
-    echo -e "${Green}密码:${Font} ${password}"
-    echo -e "${Green}端口:${Font} ${port}"
-    # echo -e "${Green}混淆:${Font} ${XRAY_OBFS}"
-    # echo -e "${Green}混淆路径:${Font} ${OBFS_PATH}"
-    # echo -e "${Green}PubKey(REALITY):${Font} ${XRAY_KEY}"
+    # 使用 %b 解析颜色变量，确保在所有 Shell 环境下颜色生效
+    # 分隔符统一，%s 引用变量确保安全
+    printf "%b------------------------------------------------------------%b\n" "${Cyan}" "${Font}"
+    printf "%b--------------------------配置开始--------------------------%b\n" "${Cyan}" "${Font}"
+    printf "%b------------------------------------------------------------%b\n" "${Cyan}" "${Font}"
+    
+    printf "%b协议:%b %s\n" "${Green}" "${Font}" "${type}"
+    printf "%b地址:%b %s\n" "${Green}" "${Font}" "${ip}"
+    
+    [ -n "$ipv6" ] && printf "%b地址IPv6:%b %s\n" "${Green}" "${Font}" "${ipv6}"
+    [ -n "$hq_ip" ] && printf "%b优选地址:%b %s\n" "${Green}" "${Font}" "${hq_ip}"
+    
+    printf "%b密码:%b %s\n" "${Green}" "${Font}" "${password}"
+    printf "%b端口:%b %s\n" "${Green}" "${Font}" "${port}"
+
+    # 处理分享链接
     if [ -n "$link" ]; then
-        echo -e "${Green}分享链接:${Font} ${link}"
+        printf "%b分享链接:%b\n%s\n" "${Green}" "${Font}" "${link}"
     fi
+
+    # 处理复杂的多行配置信息
+    # 使用 %s 打印变量，防止配置里的特殊字符（如 \n, \t）被 printf 再次解析
     if [ -n "$qx_cfg" ]; then
-        echo -e "------------------------------------------------------------"
-        echo -e "${Green}QuantumultX配置:${Font}"
-        echo -e "${qx_cfg}"
+        printf "------------------------------------------------------------\n"
+        printf "%bQuantumultX配置:%b\n%s\n" "${Green}" "${Font}" "${qx_cfg}"
     fi
+
     if [ -n "$xray_outbound" ]; then
-        echo -e "------------------------------------------------------------"
-        echo -e "${Green}Xray Outbounds配置:${Font}"
-        echo -e "${xray_outbound}"
+        printf "------------------------------------------------------------\n"
+        printf "%bXray Outbounds配置:%b\n%s\n" "${Green}" "${Font}" "${xray_outbound}"
     fi
+
     if [ -n "$singbox_outbound" ]; then
-        echo -e "------------------------------------------------------------"
-        echo -e "${Green}Singbox Outbounds配置:${Font}"
-        echo -e "${singbox_outbound}"
+        printf "------------------------------------------------------------\n"
+        printf "%bSingbox Outbounds配置:%b\n%s\n" "${Green}" "${Font}" "${singbox_outbound}"
     fi
+
     if [ -n "$clash_cfg" ]; then
-        echo -e "------------------------------------------------------------"
-        echo -e "${Green}Clash配置:${Font}"
-        echo -e "${clash_cfg}"
+        printf "------------------------------------------------------------\n"
+        printf "%bClash配置:%b\n%s\n" "${Green}" "${Font}" "${clash_cfg}"
     fi
-    echo -e "${Cyan}------------------------------------------------------------${Font}"
-    echo -e "${Cyan}--------------------------配置结束--------------------------${Font}"
-    echo -e "${Cyan}------------------------------------------------------------${Font}"
+
+    printf "%b------------------------------------------------------------%b\n" "${Cyan}" "${Font}"
+    printf "%b--------------------------配置结束--------------------------%b\n" "${Cyan}" "${Font}"
+    printf "%b------------------------------------------------------------%b\n" "${Cyan}" "${Font}"
 }
 
 xray_run() {

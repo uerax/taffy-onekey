@@ -1,0 +1,11 @@
+
+- name: 'hy2-${ip}'
+  type: hysteria2
+  port: ${port}
+  listen: "::"
+  users:
+    user1: "${password}"
+  up: 200
+  down: 50
+  certificate: /etc/mihomo/server.crt
+  private-key: etc/mihomo/server.key

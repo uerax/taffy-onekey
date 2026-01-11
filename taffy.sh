@@ -1,18 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty 
+
 stty erase ^?
 
-version="v3.3.1"
+version="v4.1.0"
 
 #fonts color
 Green="\033[32m"
 Red="\033[31m"
 Yellow="\033[33m"
-Blue='\033[0;34m'         # Blue
-Purple='\033[0;35m'       # Purple
-Cyan='\033[0;36m'         # Cyan
-White='\033[0;37m'
+Blue="\033[0;34m"         # Blue
+Purple="\033[0;35m"       # Purple
+Cyan="\033[0;36m"         # Cyan
+White="\033[0;37m"
 
 GreenBG="\033[42;37m"
 RedBG="\033[41;37m"
@@ -25,7 +26,6 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 bbr_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/BBR/sysctl.conf"
-website_git="https://github.com/bakasine/bakasine.github.io.git"
 ukonw_url="https://raw.githubusercontent.com/bakasine/rules/master/xray/uknow.txt"
 
 xray_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-xray.sh"
@@ -34,27 +34,6 @@ xray_socks5_append_config_url="https://raw.githubusercontent.com/uerax/taffy-one
 
 xray_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/config.json"
 xray_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/append.json"
-
-xray_trojan_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/config.json"
-xray_trojan_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan/append.json"
-
-xray_trojan_grpc_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/config.json"
-trojan_grpc_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-GRPC/nginx.conf"
-
-xray_trojan_tcp_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/config.json"
-trojan_tcp_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/nginx.conf"
-
-xray_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/config.json"
-vmess_ws_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/nginx.conf"
-
-vless_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/config.json"
-vless_ws_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-WS-TLS/nginx.conf"
-
-vless_grpc_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/config.json"
-vless_grpc_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-GRPC/nginx.conf"
-
-vless_vision_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/nginx.conf"
-vless_vision_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VLESS-TCP-XTLS-VISION/config.json"
 
 xray_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/config.json"
 xray_vless_reality_tcp_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/append.json"
@@ -82,9 +61,6 @@ singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/mast
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
-singbox_vmess_ws_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/VMESS-WS-TLS/singbox.json"
-singbox_trojan_tls_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/singbox.json"
-singbox_trojan_tls_nginx_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Trojan-TCP-TLS/taffy.conf"
 
 singbox_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox.json"
 singbox_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox_ap.json"
@@ -102,24 +78,21 @@ mihomo_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-one
 
 mihomo_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
 
+mihomo_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/mihomo.yaml"
+
+
 # MIHOMO URL END
 
 xray_cfg="/usr/local/etc/xray/config.json"
 xray_path="/opt/xray/"
 xray_log="${xray_path}xray_log"
-nginx_cfg="/etc/nginx/conf.d/taffy.conf"
-web_dir="blog"
 protocol_type=""
-web_path="/opt/web"
-ca_path="/opt/cert"
-ca_crt="${ca_path}/taffy.crt"
-ca_key="${ca_path}/taffy.key"
 ws_path="crayfish"
 ss_method=""
 
 xray_outbound=""
 
-INS="apt install -y"
+PKG_MANAGER="apt install -y"
 password=""
 domain=""
 link=""
@@ -134,7 +107,7 @@ xray_onekey_install() {
         xray_install
     fi
     if ! command -v xray >/dev/null 2>&1; then
-        echo -e "${Red}Xray 安装失败!!!${Font}"
+        printf "${Red}Xray 安装失败!!!${Font}\n"
         exit 1
     fi
     xray_configure
@@ -142,7 +115,7 @@ xray_onekey_install() {
 }
 
 is_root() {
-    if [ $(id -u) == 0 ]; then
+    if [ "$(id -u)" -eq 0 ]; then
         ok "进入安装流程"
         apt purge needrestart -y
         sleep 3
@@ -151,78 +124,198 @@ is_root() {
         info "切换root用户命令: sudo su"
         exit 1
     fi
-}
+} 
 
 get_system() {
-    source '/etc/os-release'
-    if [[ "${ID}" == "debian" ]]; then
-        info "检测系统为 debian"
-    elif [[ "${ID}"=="ubuntu" ]]; then
-        info "检测系统为 ubuntu"
-    elif [[ "${ID}"=="centos" ]]; then
-        error "centos fuck out!"
-        exit 1
+    . '/etc/os-release'
+    case "${ID}" in
+        "debian"|"ubuntu")
+            info "检测系统为 ${ID}，已设置包管理器为 apt"
+            ;;
+            
+        "alpine")
+            PKG_MANAGER="apk add --no-cache"
+            info "检测系统为 alpine，已设置包管理器为 apk"
+            ;;
+            
+        "centos")
+            # 满足你的特定需求
+            error "centos fuck out!"
+            exit 1
+            ;;
+            
+        *)
+            # 兜底逻辑，处理未知系统
+            error "当前系统为 ${ID:-Unknown} ${VERSION_ID:-Unknown} 不在支持的系统列表内"
+            exit 1
+            ;;
+    esac
+}
+
+_exec_service_action() {
+    local action="$1"
+    local name="$2"
+
+    # 优先尝试 Systemd (现代主流系统)
+    if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+        systemctl "${action}" "${name}"
+        return $?
+    # 其次尝试 OpenRC (针对 Alpine)
+    elif command -v rc-service >/dev/null 2>&1; then
+        rc-service "${name}" "${action}"
+        return $?
+    # 再次尝试通用 service 命令 (Debian/Ubuntu 回退方案)
+    elif command -v service >/dev/null 2>&1; then
+        service "${name}" "${action}"
+        return $?
+    # 最后尝试硬路径脚本 (SysVinit 兜底)
+    elif [ -x "/etc/init.d/${name}" ]; then
+        "/etc/init.d/${name}" "${action}"
+        return $?
     else
-        error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
-        exit 1
+        printf "${Red}错误: 无法找到适用的管理工具来执行 ${action} ${name}${Font}\n"
+        return 1
     fi
 }
 
-adjust_date() {
-  info "正在调整时区"
-  apt install -y locales
-  echo "Asia/Shanghai" > /etc/timezone && \
-  dpkg-reconfigure -f noninteractive tzdata && \
-  sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-  echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
-  dpkg-reconfigure --frontend=noninteractive locales && \
-  update-locale LANG=en_US.UTF-8
-  echo "Asia/Shanghai" > /etc/timezone
-  judge "时区调整"
+start_service()   { _exec_service_action "start"   "$1"; }
+stop_service()    { _exec_service_action "stop"    "$1"; }
+restart_service() { _exec_service_action "restart" "$1"; }
+service_status()  { _exec_service_action "status"  "$1"; }
+
+enable_service() {
+    local name="$1"
+    
+    if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+        systemctl enable "${name}"
+    elif command -v rc-update >/dev/null 2>&1; then
+        # Alpine: 只有 add 后才能用 rc-service 管理
+        rc-update add "${name}" default >/dev/null 2>&1 || true
+    else
+        # 传统 SysVinit 常用工具
+        if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig "${name}" on >/dev/null 2>&1 || true
+        elif command -v update-rc.d >/dev/null 2>&1; then
+            update-rc.d "${name}" defaults >/dev/null 2>&1 || true
+        fi
+    fi
 }
 
-env_install() {
+service_is_active() {
+    local name="$1"
 
-    ${INS} wget lsof curl jq openssl
+    if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+        systemctl is-active --quiet "${name}"
+        return $?
+    elif command -v rc-service >/dev/null 2>&1; then
+        # OpenRC status 成功代表服务正在运行
+        rc-service "${name}" status >/dev/null 2>&1
+        return $?
+    else
+        # 通用 service status 或直接检测进程
+        if service "${name}" status >/dev/null 2>&1; then
+            return 0
+        fi
+        # 最后的暴力检测：通过进程名简单判断
+        pgrep -x "${name}" >/dev/null 2>&1
+        return $?
+    fi
+}
+
+run_remote_script() {
+    url="$1"
+    shift || true
+    if command -v curl >/dev/null 2>&1; then
+        if command -v bash >/dev/null 2>&1; then
+            curl -fsSL "${url}" | bash -s -- "$@"
+        else
+            curl -fsSL "${url}" | sh -s -- "$@"
+        fi
+    elif command -v wget >/dev/null 2>&1; then
+        if command -v bash >/dev/null 2>&1; then
+            wget -qO- "${url}" | bash -s -- "$@"
+        else
+            wget -qO- "${url}" | sh -s -- "$@"
+        fi
+    else
+        error "缺少 curl/wget，无法获取远程脚本: ${url}"
+        return 1
+    fi
+}
+
+menu_item() {
+    # $1 是编号, $2 是描述, $3 是颜色变量
+    color="${3:-$Cyan}" # 默认青色
+    printf "${color}%s) %s ${Font}\n" "$1" "$2"
+} 
+
+env_install() {
+    ${PKG_MANAGER} wget lsof curl jq openssl
     judge "git wget lsof curl jq openssl 安装"
 }
 
 env_install_singbox() {
-
-    ${INS} wget lsof curl jq openssl
+    ${PKG_MANAGER} wget lsof curl jq openssl
     judge "wget lsof curl jq openssl 安装"
 }
 env_install_mihomo() {
-    ${INS} wget lsof curl openssl
+    ${PKG_MANAGER} wget lsof curl openssl
     judge "wget lsof curl openssl 安装"
-    #yq_install
-    #judge "yq 安装"
 }
 
 yq_install() {
-    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-    chmod +x /usr/local/bin/yq
-}
+    # 检查 yq 是否已安装
+    if command -v yq >/dev/null 2>&1; then
+        info "yq 已存在，跳过安装"
+        return 0
+    fi
 
-increase_max_handle() {
-    # 最大文件打开数
-    sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
-    sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
-    echo '* soft nofile 65536' >>/etc/security/limits.conf
-    echo '* hard nofile 65536' >>/etc/security/limits.conf
+    if [ "$ID" = "alpine" ]; then
+        info "正在通过 apk 安装 yq (Alpine 适配版)..."
+        # Alpine 官方仓库有 yq，这样安装的版本能完美兼容 musl 环境
+        $PKG_MANAGER yq
+    else
+        info "正在下载 yq 二进制文件 (Debian/Ubuntu)..."
+        # 确保 wget 存在
+        if ! command -v wget >/dev/null 2>&1; then
+            $PKG_MANAGER wget
+        fi
+        
+        # 下载二进制文件
+        wget -q "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" -O /usr/local/bin/yq
+        chmod +x /usr/local/bin/yq
+    fi
 }
 
 port_check() {
-    if [[ 0 -eq $(lsof -i:"$1" | grep -i -c "listen") ]]; then
-        ok "$1 端口未被占用"
+    local port="$1"
+    [ -z "${port}" ] && return 1
+
+    # 1. 使用 netstat 检测端口（兼容性最高）
+    # -a: 所有, -n: 数字格式, -l: 监听, -p: 显示进程(需要 root)
+    # 查找是否有 ":端口号 " 且状态为 LISTEN 的行
+    check_port=$(netstat -anl | grep "[:.]${port} " | grep "LISTEN")
+
+    if [ -z "${check_port}" ]; then
+        ok "${port} 端口未被占用"
         sleep 1
     else
-        error "检测到 $1 端口被占用，以下为 $1 端口占用信息"
-        lsof -i:"$1"
-        error "2s 后将尝试自动 kill 占用进程"
-        sleep 2
-        lsof -i:"$1" | awk '{print $2}' | grep -v "PID" | xargs kill -9
-        ok "kill 完成"
+        error "检测到 ${port} 端口被占用"
+        
+        # 2. 尝试获取占用该端口的 PID
+        # netstat -anp 在某些系统下能看到 PID，如果没有就尝试使用 fuser 或 ss
+        pid=$(netstat -anp 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | awk '{print $7}' | cut -d'/' -f1)
+        
+        # 3. 如果能拿到 PID 则尝试 kill
+        if [ -n "${pid}" ] && [ "${pid}" != "-" ]; then
+            warn "占用端口 ${port} 的进程 PID 为: ${pid}，准备清理..."
+            sleep 2
+            kill -9 "${pid}" 2>/dev/null || true
+            ok "进程已清理"
+        else
+            # 如果拿不到具体 PID（比如无权限或工具限制），提醒用户手动检查
+            warn "无法自动获取占用进程 PID，请手动检查或更换端口"
+        fi
         sleep 1
     fi
 }
@@ -239,115 +332,32 @@ close_firewall() {
     fi
 }
 
-nginx_install() {
-    # 判断是否有 nginx 命令
-    if ! command -v nginx >/dev/null 2>&1; then
-        ${INS} nginx cron
-        judge "Nginx 安装"
-    else
-        ok "Nginx 已存在"
-    fi
-
-    mkdir -p ${web_path} && cd ${web_path}
-
-    git clone ${website_git} ${web_dir}
-}
-
-update_web() {
-    git clone ${website_git} ${web_path}/${web_dir}
-}
-
-domain_handle() {
-    echo -e "------------------------------------------"
-    read -rp "输入你的域名(eg: example.com): " domain
-}
-
-apply_certificate() {
-    ipv6=''
-    echo -e "========================================"
-    read -rp "是否纯IPv6域名(Y/N): " is_v6
-    case $is_v6 in
-    [yY])
-    ipv6='--listen-v6'
-    ;;
-    *)
-    ;;
-    esac
-    sed -i '/\/etc\/nginx\/sites-enabled\//d' /etc/nginx/nginx.conf
-
-    cat>${nginx_cfg}<<EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root ${web_path}/${web_dir};
-    index index.html;
-}
-EOF
-
-    service nginx restart
-
-    if ! command -v /root/.acme.sh/acme.sh >/dev/null 2>&1; then
-        wget -O - https://get.acme.sh | sh
-        judge "安装 Acme"
-    else
-        ok "Acme 已安装"
-    fi
-    cd ~ && . .bashrc
-    /root/.acme.sh/acme.sh --upgrade --auto-upgrade
-    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-    echo ${domain}
-
-    if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force ${ipv6}; then
-        ok "SSL 证书生成成功"
-        sleep 2
-        mkdir -p ${ca_path}
-        if /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key}; then
-            chmod +r ${ca_key}
-            ok "SSL 证书配置成功"
-            sleep 2
-        fi
-    else
-        error "证书生成失败"
-        exit 1
-    fi
-}
-
-flush_certificate() {
-    cat > ${ca_path}/xray-cert-renew.sh <<EOF
-#!/bin/bash
-
-git clone ${website_git} ${web_path}/${web_dir}
-if /root/.acme.sh/acme.sh --issue -d ${domain} -w ${web_path}/${web_dir} --keylength ec-256 --force ${ipv6}; then
-  sleep 2
-  mkdir -p ${ca_path}
-  /root/.acme.sh/acme.sh --install-cert -d ${domain} --ecc --fullchain-file ${ca_crt} --key-file ${ca_key} --reloadcmd "nginx -s reload"
-else
-  exit 1
-fi
-
-echo "Xray Certificates Renewed"
-
-chmod +r ${ca_key}
-echo "Read Permission Granted for Private Key"
-
-systemctl restart xray
-systemctl restart sing-box
-echo "Xray Restarted"
-EOF
-
-    chmod +x ${ca_path}/xray-cert-renew.sh
-
-    (
-        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
-        echo "0 7 1 */2 *   bash ${ca_path}/xray-cert-renew.sh"
-    ) | crontab -
-
-}
-
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        bash <(curl -fsSL $xray_install_url)
+        if [ "${system}" = "alpine" ]; then
+            install_url="https://github.com/XTLS/Xray-install/raw/main/alpinelinux/install-release.sh"
+        else
+            install_url="${xray_install_url}"
+        fi
+
+        if command -v curl >/dev/null 2>&1; then
+            if command -v bash >/dev/null 2>&1; then
+                bash -c "$(curl -fsSL \"${install_url}\")"
+            else
+                sh -c "$(curl -fsSL \"${install_url}\")"
+            fi
+        elif command -v wget >/dev/null 2>&1; then
+            if command -v bash >/dev/null 2>&1; then
+                wget -qO- "${install_url}" | bash
+            else
+                wget -qO- "${install_url}" | sh
+            fi
+        else
+            error "缺少 curl 或 wget，无法下载 Xray 安装脚本"
+            exit 1
+        fi
+
         judge "Xray 安装"
     else
         ok "Xray 已安装"
@@ -369,7 +379,7 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: https://live.qq.com
+    sni: https://www.python.org
     skip-cert-verify: true
     alpn:
     - h3"
@@ -553,8 +563,8 @@ xray_vless_reality_h2() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -569,9 +579,9 @@ xray_vless_reality_h2() {
     
     routing_set
     vless_reality_h2_outbound_config
-    systemctl restart xray 
+    restart_service xray
 
-    systemctl enable xray
+    enable_service xray
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
@@ -585,8 +595,8 @@ xray_vless_reality_h2_append() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -600,14 +610,14 @@ xray_vless_reality_h2_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    xray run -confdir=./ -dump  > config.json
     rm append.json
     
 
     vless_reality_h2_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
-    systemctl restart xray 
+    restart_service xray
 }
 
 xray_vless_reality_tcp() {
@@ -618,8 +628,8 @@ xray_vless_reality_tcp() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -635,11 +645,9 @@ xray_vless_reality_tcp() {
     routing_set
     vless_reality_tcp_outbound_config
 
-    systemctl restart xray 
+    restart_service xray 
 
-    systemctl enable xray
-
-    service nginx stop
+    enable_service xray
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
@@ -653,8 +661,8 @@ xray_vless_reality_tcp_append() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -668,14 +676,14 @@ xray_vless_reality_tcp_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    xray run -confdir=./ -dump  > config.json
 
     rm append.json
 
     vless_reality_tcp_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
-    systemctl restart xray
+    restart_service xray
 }
 
 xray_vless_reality_grpc() {
@@ -685,8 +693,8 @@ xray_vless_reality_grpc() {
 
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -703,9 +711,9 @@ xray_vless_reality_grpc() {
     routing_set
     vless_reality_grpc_outbound_config
 
-    systemctl restart xray 
+    restart_service xray
 
-    systemctl enable xray
+    enable_service xray
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
@@ -719,8 +727,8 @@ xray_vless_reality_grpc_append() {
     domain="www.python.org"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(echo $keys | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(echo $keys | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
+    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -735,352 +743,35 @@ xray_vless_reality_grpc_append() {
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    xray run -confdir=./ -dump  > config.json
     rm append.json
 
     vless_reality_grpc_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
 
-    systemctl restart xray 
-}
-
-trojan_grpc() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-    
-    protocol_type="trojan_grpc"
-    password=$(xray uuid)
-    port=443
-    
-    wget -N ${xray_trojan_grpc_config_url} -O ${xray_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray 
-
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${trojan_grpc_nginx_url} -O ${nginx_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ca_key~" ${nginx_cfg}
-
-    service nginx restart
-
-    link="trojan://${password}@${domain}:${port}?security=tls&type=grpc&serviceName=${ws_path}&mode=gun#${domain}"
-
-    clash_config
-}
-
-xray_trojan_tcp_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-    
-    protocol_type="trojan_tcp"
-    password=$(xray uuid)
-    set_port
-    
-    wget -N ${xray_trojan_tcp_tls_config_url} -O ${xray_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~${port}~$port~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${xray_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${xray_cfg}
-
-    routing_set
-    trojan_tcp_tls_outbound_config
-
-    systemctl restart xray
-
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${trojan_tcp_tls_nginx_url} -O ${nginx_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-
-    service nginx restart
-
-    link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
-
-    clash_config
-    qx_config
-}
-
-xray_vmess_ws_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    protocol_type="vmess_ws"
-    password=$(xray uuid)
-
-    wget -N ${xray_vmess_ws_config_url} -O ${xray_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~19191~$port~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray
-    
-    systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vmess_ws_nginx_url} -O ${nginx_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-    sed -i "s~\${port}~$port~" ${nginx_cfg}
-
-    service nginx restart
-
-    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    encode_link=$(openssl base64 <<< $tmp)
-    link="vmess://$encode_link"
-
-    clash_config
-    qx_config
-    vmess_ws_tls_outbound_config
-}
-
-vless_ws_tls() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    protocol_type="vless_ws"
-    password=$(xray uuid)
-
-    wget -N ${vless_ws_config_url} -O ${xray_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray && systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vless_ws_nginx_url} -O ${nginx_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(openssl base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=ws&host=${domain}&path=%2F${ws_path}#${domain}"
-
-    clash_config
-}
-
-vless_grpc() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    protocol_type="vless_grpc"
-    password=$(xray uuid)
-
-    wget -N ${vless_grpc_config_url} -O ${xray_cfg}
-    judge "配置文件下载"
-    sed -i "s~\${password}~$password~" ${xray_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
-
-    routing_set
-
-    systemctl restart xray && systemctl enable xray
-
-    sleep 3
-
-    wget -N ${vless_grpc_nginx_url} -O ${nginx_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${domain}~$domain~" ${nginx_cfg}
-    sed -i "s~\${web_path}~$web_path~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${nginx_cfg}
-    sed -i "s~\${web_dir}~$web_dir~" ${nginx_cfg}
-    sed -i "s~\${ca_crt}~$ca_crt~" ${nginx_cfg}
-    sed -i "s~\${ca_key}~$ca_key~" ${nginx_cfg}
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(openssl base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&security=tls&sni=${domain}&type=grpc&host=${domain}&path=%2F${ws_path}#${domain}"
-}
-
-vless_tcp_xtls_vision() {
-    port_check 80
-    port_check 443
-    nginx_install
-    domain_handle
-    apply_certificate
-    flush_certificate
-
-    protocol_type="vless_vison"
-    password=$(xray uuid)
-    vless_tcp_xtls_vision_xray_cfg
-    systemctl restart xray && systemctl enable xray
-    sleep 3
-    vless_tcp_xtls_vision_nginx_cfg
-
-    service nginx restart
-
-    parts="auto:${password}@${domain}:443"
-    encode_parts=$(openssl base64 <<< $parts)
-    link="vless://${encode_parts}?encryption=none&flow=xtls-rprx-vision&security=tls&type=tcp&headerType=none#${domain}"
-
-    clash_config
-}
-
-vless_tcp_xtls_vision_nginx_cfg() {
-    cd /etc/nginx/ && wget -N ${vless_vision_nginx_url} -O /etc/nginx/nginx.conf
-    judge "配置文件下载"
-}
-
-vless_tcp_xtls_vision_xray_cfg() {
-    wget -N ${vless_vision_config_url} -O config.json
-    judge "配置文件下载"
-    sed -i "s/\${password}/$password/" config.json
-    sed -i "s~\${ca_crt}~$ca_crt~" config.json
-    sed -i "s~\${ca_key}~$ca_key~" config.json
-
-    routing_set
-
-    mv config.json ${xray_cfg}
-}
-
-xray_trojan() {
-    protocol_type="trojan"
-    ip=`curl -sS ipinfo.io/ip`
-    info "trojan基础不需要Nginx, 可以通过脚本一键卸载"
-    close_nginx()
-    if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
-          judge "openssl 安装"
-    fi
-    set_port
-    password=$(openssl rand -base64 16)
-
-    wget -N ${xray_trojan_config_url} -O config.json
-    judge "配置文件下载"
-    sed -i "s~\${port}~$port~" config.json
-    sed -i "s~\${password}~$password~" config.json
-    
-    mv config.json ${xray_cfg}
-    systemctl restart xray && systemctl enable xray
-
-    link="trojan://${password}@${ip}:${port}#${domain}"
-
-    trojan_outbound_config
-    clash_config
-    qx_config
-
-}
-
-trojan_append() {
-    protocol_type="trojan"
-    ip=`curl -sS ipinfo.io/ip`
-    if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
-          judge "openssl 安装"
-    fi
-    set_port
-    password=$(openssl rand -base64 16)
-
-    cd /usr/local/etc/xray
-
-    wget -Nq ${xray_trojan_append_config_url} -O append.json
-    judge "配置文件下载"
-
-    sed -i "s~\${password}~$password~" append.json
-    sed -i "s~\${port}~$port~" append.json
-
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
-    rm append.json
-
-    link="trojan://${password}@${ip}:${port}#${domain}"
-
-    trojan_outbound_config
-    clash_config
-    qx_config
-
-    systemctl restart xray
+    restart_service xray 
 }
 
 xray_shadowsocket() {
     
-    info "Shadowsocket不需要Nginx, 可以通过脚本一键卸载"
-    close_nginx()
     if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
+          ${PKG_MANAGER} openssl
           judge "openssl 安装"
     fi
     encrypt=1
     ss_method="2022-blake3-aes-128-gcm"
     set_port
-    echo -e "选择加密方法"
-    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-    echo -e "${Cyan}4) aes-128-gcm ${Font}"
-    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
-    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
-    echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+    printf "选择加密方法\n"
+    menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
+    menu_item "2" "2022-blake3-aes-256-gcm"
+    menu_item "3" "2022-blake3-chacha20-poly1305"
+    menu_item "4" "aes-128-gcm"
+    menu_item "5" "chacha20-ietf-poly1305"
+    menu_item "6" "xchacha20-ietf-poly1305"
+    printf "\n"
+    printf "选择加密方法(默认为1)："
+    read -r encrypt
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
@@ -1111,10 +802,11 @@ xray_shadowsocket() {
     esac
 
     shadowsocket_config
-    systemctl restart xray && systemctl enable xray
+    restart_service xray
+    enable_service xray
 
     tmp="${ss_method}:${password}"
-    tmp=$( openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
@@ -1139,8 +831,11 @@ xray_redirect() {
     protocol_type="redirect"
     ip=`curl -sS ipinfo.io/ip`
     set_port
-    read -rp "输入转发的目标地址: " re_ip
-    read -rp "输入转发的目标端口: " re_port
+    printf "输入转发的目标地址: "
+    read -r re_ip
+
+    printf "输入转发的目标端口: "
+    read -r re_port
 
     wget -N ${xray_redirect_config_url} -O config.json
     judge "配置文件下载"
@@ -1150,30 +845,34 @@ xray_redirect() {
     
     mv config.json ${xray_cfg}
 
-    systemctl restart xray && systemctl enable xray
+    restart_service xray
+    enable_service xray
 
-    echo -e "${Green}IP为:${Font} ${ip}"
-    echo -e "${Green}端口为:${Font} ${port}"
+    printf "${Green}IP为:${Font} ${ip}\n"
+    printf "${Green}端口为:${Font} ${port}\n"
 }
 
 xray_shadowsocket_append() {
     if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
+          ${PKG_MANAGER} openssl
           judge "openssl 安装"
     fi
     encrypt=1
     protocol_type="shadowsocket"
     ss_method="aes-128-gcm"
     set_port
-    echo -e "选择加密方法"
-    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-    echo -e "${Cyan}4) aes-128-gcm ${Font}"
-    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
-    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
-    echo -e ""
-    read -rp "选择加密方法(默认为4)：" encrypt
+    printf "选择加密方法\n"
+    menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
+    menu_item "2" "2022-blake3-aes-256-gcm"
+    menu_item "3" "2022-blake3-chacha20-poly1305"
+    menu_item "4" "aes-128-gcm"
+    menu_item "5" "chacha20-ietf-poly1305"
+    menu_item "6" "xchacha20-ietf-poly1305"
+    printf "\n"
+
+    # 3. 读取输入 (兼容 Alpine, 拆分提示语以替代 read -p)
+    printf "选择加密方法(默认为4)："
+    read -r encrypt
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
@@ -1212,11 +911,11 @@ xray_shadowsocket_append() {
     sed -i "s~\${method}~$ss_method~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    xray run -confdir=./ -dump  > config.json
     rm append.json
 
     tmp="${ss_method}:${password}"
-    tmp=$( openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
     link="ss://$tmp@${domain}:${port}"
@@ -1225,14 +924,17 @@ xray_shadowsocket_append() {
     clash_config
     qx_config
 
-    systemctl restart xray
+    restart_service xray
 }
 
 xray_redirect_append() {
     ip=`curl -sS ipinfo.io/ip`
     set_port
-    read -rp "输入转发的目标地址: " re_ip
-    read -rp "输入转发的目标端口: " re_port
+    printf "输入转发的目标地址: "
+    read -r re_ip
+
+    printf "输入转发的目标端口: "
+    read -r re_port
 
     cd /usr/local/etc/xray
 
@@ -1250,8 +952,8 @@ xray_redirect_append() {
 
     systemctl restart xray
 
-    echo -e "${Green}IP为:${Font} ${ip}"
-    echo -e "${Green}端口为:${Font} ${port}"
+    printf "${Green}IP为:${Font} ${ip}\n"
+    printf "${Green}端口为:${Font} ${port}\n"
 }
 
 # outbound start
@@ -1264,84 +966,15 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://live.qq.com\",
+      \"server_name\": \"https://www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,
         \"fingerprint\": \"chrome\"
       }
     },
-    \"password\": \"${password}\"\n}"   
-}
-
-
-vmess_ws_tls_outbound_config() {
-    xray_outbound="{
-    \"protocol\": \"vmess\",
-    \"settings\": {
-        \"vnext\": [
-            {
-                \"address\": \"${domain}\",
-                \"port\": 443,
-                \"users\": [
-                    {
-                        \"id\": \"${password}\",
-			            \"alterId\": 0,
-			            \"level\": 0,
-			            \"security\": \"auto\",
-			            \"email\": \"b@your.domain\"
-                    }
-                ]
-            }
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"ws\",
-	    \"security\": \"tls\",
-	    \"tlsSettings\": {
-            \"allowInsecure\": false,
-            \"serverName\": \"${domain}\"
-        },
-        \"wsSettings\": {
-            \"path\": \"/${ws_path}\",
-            \"headers\": {
-            \"Host\":\"${domain}\"
-            }
-        }
-    }\n}"
-
-    singbox_outbound="{
-	\"type\": \"vmess\",
-	\"server\": \"${domain}\",
-	\"server_port\": 443,
-	\"uuid\": \"${password}\",
-	\"security\": \"auto\",
-	\"alter_id\": 0,
-	\"global_padding\": false,
-	\"authenticated_length\": true,
-	\"tls\": {
-		\"enabled\": true,
-		\"disable_sni\": false,
-		\"server_name\": \"${domain}\",
-		\"insecure\": false,
-		\"alpn\": [
-			\"http/1.1\"
-		]
-	},
-	\"multiplex\": {
-		\"enabled\": true,
-		\"protocol\": \"smux\",
-		\"max_connections\": 5,
-		\"min_streams\": 4,
-		\"max_streams\": 0
-	},
-	\"transport\": {
-		\"type\": \"ws\",
-		\"path\": \"/${ws_path}\",
-		\"max_early_data\": 0,
-		\"early_data_header_name\": \"Sec-WebSocket-Protocol\"
-	},
-	\"connect_timeout\": \"5s\"\n}"
+    \"password\": \"${password}\"
+}"   
 }
 
 vless_reality_grpc_outbound_config() {
@@ -1410,28 +1043,6 @@ vless_reality_tcp_outbound_config() {
     }\n}"
 }
 
-trojan_tcp_tls_outbound_config() {
-    xray_outbound="{
-    \"sendThrough\": \"0.0.0.0\",
-    \"protocol\": \"trojan\",
-    \"settings\": {
-        \"servers\": [
-            {
-                \"address\": \"${domain}\",
-                \"password\": \"${password}\",
-                \"port\": ${port}
-            }
-        ]
-    },
-    \"streamSettings\": {
-        \"network\": \"tcp\",
-        \"security\": \"tls\",
-        \"tlsSettings\": {
-            \"serverName\": \"${domain}\"
-        }
-    }\n}"
-}
-
 vless_reality_h2_outbound_config() {
     xray_outbound="{
     \"protocol\": \"vless\",
@@ -1463,25 +1074,6 @@ vless_reality_h2_outbound_config() {
     }\n}"
 }
 
-trojan_outbound_config() {
-    xray_outbound="{
-    \"protocol\": \"trojan\",
-    \"settings\": {
-        \"servers\": [
-            {
-                \"address\": \"${ip}\",
-                \"port\": ${port},
-                \"password\": \"${password}\"
-            }
-        ]
-    }\n}"
-    singbox_outbound="{
-    \"type\": \"trojan\",
-    \"server\": \"${ip}\",
-    \"server_port\": ${port},
-    \"password\": \"${password}\"\n}"
-}
-
 shadowsocket_outbound_config() {
     xray_outbound="{
     \"protocol\": \"shadowsocks\",
@@ -1509,14 +1101,18 @@ socks5_append() {
     protocol_type="socks5"
     ip=`curl -sS ipinfo.io/ip`
     if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
+          ${PKG_MANAGER} openssl
           judge "openssl 安装"
     fi
     set_port
-    echo -e "------------------------------------------"
-    read -rp "设置你的用户名: " user
-    echo -e "------------------------------------------"
-    read -rp "设置你的密码: " password
+
+    printf "%s\n" "------------------------------------------"
+    # 拆分 read -rp：先用 printf 打印提示，再用 read 读取
+    printf "设置你的用户名: "
+    read -r user
+    printf "%s\n" "------------------------------------------"
+    printf "设置你的密码: "
+    read -r password
 
     cd /usr/local/etc/xray
 
@@ -1527,10 +1123,10 @@ socks5_append() {
     sed -i "s~\${user}~$user~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
+    xray run -confdir ./ -dump > config.json
     rm append.json
 
-    systemctl restart xray
+    restart_service xray
 
     #link="trojan://${password}@${ip}:${port}#${domain}"
 
@@ -1541,8 +1137,9 @@ socks5_append() {
 # outbound end
 
 routing_set() {
-    echo -e "是否配置Routing路由"
-    read -rp "请输入(y/n): " set_routing
+    printf "是否配置Routing路由\n"
+    printf "请输入(y/n): "
+    read -r set_routing
     case $set_routing in
     [yY])
       wget -Nq ${ukonw_url} -O uknow.tmp
@@ -1560,14 +1157,22 @@ routing_set() {
 }
 
 set_port() {
-    echo -e "------------------------------------------"
-    read -rp "设置你的端口(默认443): " input
-    if [[ $input =~ ^[0-9]+$ && $input -ge 0 && $input -le 65535 ]]; then
-        port=$(echo "$input")
-    else
-        port="443"
-    fi
-}
+    printf "%s\n" "------------------------------------------"
+    printf "%s" "设置你的端口(默认443): "
+    read -r input
+    case "$input" in
+        ''|*[!0-9]*)
+            port="443"
+            ;;
+        *)
+            if [ "$input" -ge 0 ] 2>/dev/null && [ "$input" -le 65535 ] 2>/dev/null; then
+                port="$input"
+            else
+                port="443"
+            fi
+            ;;
+    esac
+} 
 
 # XRAY END
 
@@ -1576,32 +1181,31 @@ singbox_onekey_install() {
     is_root
     get_system
     if ! command -v sing-box >/dev/null 2>&1; then
-        # adjust_date
         env_install_singbox
         close_firewall
         singbox_install
     fi
     if ! command -v sing-box >/dev/null 2>&1; then
-        echo -e "${Red}sing-box 安装失败!!!${Font}"
+        printf "${Red}sing-box 安装失败!!!${Font}\n"
         exit 1
     fi
     singbox_select
 }
 
-singbox_install() {
-    bash <(curl -fsSL $singbox_install_url)
+singbox_install() { 
+    curl -fsSL "$singbox_install_url" | bash 
 }
 
 uninstall_singbox() {
-    systemctl stop sing-box
+    stop_service sing-box
     apt remove sing-box -y
-    systemctl daemon-reload
 }
 
 singbox_routing_set() {
-    echo -e "是否配置sing-box Route路由"
-    read -rp "请输入(y/n): " set_routing
-    case $set_routing in
+    printf "是否配置sing-box Route路由\n"
+    printf "请输入(y/n，默认为 n): "
+    read -r set_routing
+    case "$set_routing" in
     [yY])
       wget -Nq ${singbox_route_url} -O uknow.tmp
 
@@ -1618,8 +1222,12 @@ singbox_routing_set() {
 
 singbox_hy2() {
     set_port
-    ${INS} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
+    ${PKG_MANAGER} openssl
+    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
+    
+    chmod +775 ${singbox_cfg_path}/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
@@ -1636,10 +1244,10 @@ singbox_hy2() {
 
     singbox_routing_set
 
-    systemctl restart sing-box
+    restart_service sing-box
     
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
@@ -1653,8 +1261,8 @@ singbox_vless_reality_h2() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    private_key=$(printf "%s" "$keys" | awk '{print $2}')
+    public_key=$(printf "%s" "$keys" | awk '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1667,9 +1275,9 @@ singbox_vless_reality_h2() {
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
-    systemctl restart sing-box
+    restart_service sing-box
 
-    systemctl enable sing-box
+    enable_service sing-box
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
 
@@ -1684,8 +1292,8 @@ singbox_vless_reality_grpc() {
     protocol_type="reality_grpc"
     domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    private_key=$(printf "%s" "$keys" | awk '{print $2}')
+    public_key=$(printf "%s" "$keys" | awk '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1699,9 +1307,9 @@ singbox_vless_reality_grpc() {
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
-    systemctl restart sing-box
+    restart_service sing-box
 
-    systemctl enable sing-box
+    enable_service sing-box
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
 
@@ -1716,8 +1324,8 @@ singbox_vless_reality_tcp() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    private_key=$(printf "%s" "$keys" | awk '{print $2}')
+    public_key=$(printf "%s" "$keys" | awk '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1730,9 +1338,9 @@ singbox_vless_reality_tcp() {
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
 
-    systemctl restart sing-box 
+    restart_service sing-box 
 
-    systemctl enable sing-box
+    enable_service sing-box
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
@@ -1740,75 +1348,27 @@ singbox_vless_reality_tcp() {
 
 }
 
-singbox_vmess_ws_tls() {
-    port_check 443
-    domain_handle
-
-    protocol_type="vmess_ws"
-    password=$(sing-box generate uuid)
-
-    wget -N ${singbox_vmess_ws_config_url} -O ${singbox_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~114514~443~" ${singbox_cfg}
-    sed -i "s~\${password}~$password~" ${singbox_cfg}
-    sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
-    sed -i "s~\${domain}~$domain~" ${singbox_cfg}
-
-    systemctl restart sing-box
-    
-    systemctl enable sing-box
-
-    tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"/${ws_path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
-    encode_link=$(openssl base64 <<< $tmp)
-    link="vmess://$encode_link"
-
-    clash_config
-    qx_config
-    vmess_ws_tls_outbound_config
-
-}
-
-singbox_trojan_tls_tcp() {
-    port_check 443
-    domain_handle
-
-    protocol_type="trojan_tcp"
-    password=$(sing-box generate uuid)
-
-    wget -N ${singbox_trojan_tls_config_url} -O ${singbox_cfg}
-    judge "配置文件下载"
-
-    sed -i "s~\${password}~$password~" ${singbox_cfg}
-    sed -i "s~\${domain}~$domain~" ${singbox_cfg}
-
-    systemctl restart sing-box
-    
-    systemctl enable sing-box
-
-    port=443
-
-    link="trojan://${password}@${domain}:${port}?security=tls&type=tcp&headerType=none#${domain}"
-
-    clash_config
-    qx_config
-}
-
-
 singbox_shadowsocket() {
     
-    encrypt=4
+    encrypt="4"
     ss_method="aes-128-gcm"
+    
+    # 2. 调用设置端口函数
     set_port
-    echo -e "选择加密方法"
-    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-    echo -e "${Cyan}4) aes-128-gcm ${Font}"
-    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
-    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
-    echo -e ""
-    read -rp "选择加密方法(默认为4)：" encrypt
+
+    # 3. 打印菜单 (使用自定义的 menu_item 函数)
+    printf "选择加密方法\n"
+    menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
+    menu_item "2" "2022-blake3-aes-256-gcm"
+    menu_item "3" "2022-blake3-chacha20-poly1305"
+    menu_item "4" "aes-128-gcm"
+    menu_item "5" "chacha20-ietf-poly1305"
+    menu_item "6" "xchacha20-ietf-poly1305"
+    printf "\n"
+
+    # 4. 读取输入 (兼容 Alpine：拆分提示语，替代 read -p)
+    printf "选择加密方法(默认为4)："
+    read -r encrypt
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
@@ -1844,10 +1404,10 @@ singbox_shadowsocket() {
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~114514~$port~" config.json
     mv config.json ${singbox_cfg}
-    systemctl restart sing-box && systemctl enable sing-box
+    restart_service sing-box && enable_service sing-box
 
     tmp="${ss_method}:${password}"
-    tmp=$( openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64)
     domain=`curl -sS ipinfo.io/ip`
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
     link="ss://$tmp@${domain}:${port}"
@@ -1861,8 +1421,13 @@ singbox_shadowsocket() {
 singbox_redirect() {
     ip=`curl -sS ipinfo.io/ip`
     set_port
-    read -rp "输入转发的目标地址: " re_ip
-    read -rp "输入转发的目标端口: " re_port
+    # 1. 获取转发目标地址
+    printf "输入转发的目标地址: "
+    read -r re_ip
+
+    # 2. 获取转发目标端口
+    printf "输入转发的目标端口: "
+    read -r re_port
 
     wget -N ${singbox_redirect_config_url} -O config.json
     judge "配置文件下载"
@@ -1872,16 +1437,21 @@ singbox_redirect() {
     sed -i "s~1919810~$re_port~" config.json
 
     mv config.json ${singbox_cfg}
-    systemctl restart sing-box
+    restart_service sing-box
     
-    echo -e "${Green}IP为:${Font} ${ip}"
-    echo -e "${Green}端口为:${Font} ${port}"
+    printf "${Green}IP为:${Font} ${ip}\n"
+    printf "${Green}端口为:${Font} ${port}"
 }
 
 singbox_hy2_append() {
     set_port
-    ${INS} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
+    ${PKG_MANAGER} openssl
+
+    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
+    
+    chmod +775 ${singbox_cfg_path}/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
@@ -1893,7 +1463,7 @@ singbox_hy2_append() {
     sed -i "s/\${domain}/$domain/" append.json
     sed -i "s~114514~$port~" append.json
 
-    systemctl stop sing-box
+    stop_service sing-box
 
     sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
 
@@ -1903,11 +1473,11 @@ singbox_hy2_append() {
 
     mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
-    systemctl restart sing-box
+    restart_service sing-box
     
     protocol_type="hysteria2_nodomain"
 
-    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
 
@@ -1922,8 +1492,8 @@ singbox_reality_grpc_append() {
     protocol_type="reality_grpc"
     domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    private_key=$(printf "%s" "$keys" | awk '{print $2}')
+    public_key=$(printf "%s" "$keys" | awk '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -1936,7 +1506,7 @@ singbox_reality_grpc_append() {
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~114514~$port~" append.json
 
-    systemctl stop sing-box
+    stop_service sing-box
 
     sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
 
@@ -1946,7 +1516,7 @@ singbox_reality_grpc_append() {
 
     mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
-    systemctl restart sing-box
+    restart_service sing-box
 
     vless_reality_grpc_outbound_config
     clash_config
@@ -1961,8 +1531,8 @@ singbox_reality_tcp_append() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(echo $keys | awk -F " " '{print $2}')
-    public_key=$(echo $keys | awk -F " " '{print $4}')
+    private_key=$(printf "%s" "$keys" | awk '{print $2}')
+    public_key=$(printf "%s" "$keys" | awk '{print $4}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -1974,7 +1544,7 @@ singbox_reality_tcp_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~114514~$port~" append.json
 
-    systemctl stop sing-box
+    stop_service sing-box
 
     sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
 
@@ -1984,7 +1554,7 @@ singbox_reality_tcp_append() {
 
     mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
-    systemctl restart sing-box 
+    restart_service sing-box 
 
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
@@ -1994,18 +1564,25 @@ singbox_reality_tcp_append() {
 }
 
 singbox_shadowsocket_append() {
-    encrypt=4
+    encrypt="4"
     ss_method="aes-128-gcm"
+    
+    # 2. 调用设置端口函数
     set_port
-    echo -e "选择加密方法"
-    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-    echo -e "${Cyan}4) aes-128-gcm ${Font}"
-    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
-    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
-    echo -e ""
-    read -rp "选择加密方法(默认为4)：" encrypt
+
+    # 3. 打印菜单 (使用自定义的 menu_item 函数，更整洁)
+    printf "选择加密方法\n"
+    menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
+    menu_item "2" "2022-blake3-aes-256-gcm"
+    menu_item "3" "2022-blake3-chacha20-poly1305"
+    menu_item "4" "aes-128-gcm"
+    menu_item "5" "chacha20-ietf-poly1305"
+    menu_item "6" "xchacha20-ietf-poly1305"
+    printf "\n"
+
+    # 4. 获取用户输入 (兼容 Alpine：拆分提示语，替代 read -p)
+    printf "选择加密方法(默认为4)："
+    read -r encrypt
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
@@ -2042,7 +1619,7 @@ singbox_shadowsocket_append() {
     sed -i "s~\${method}~$ss_method~" append.json
     sed -i "s~114514~$port~" append.json
     
-    systemctl stop sing-box
+    stop_service sing-box
 
     sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
 
@@ -2052,10 +1629,10 @@ singbox_shadowsocket_append() {
 
     mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
-    systemctl restart sing-box
+    restart_service sing-box
 
     tmp="${ss_method}:${password}"
-    tmp=$( openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64)
     domain=`curl -sS ipinfo.io/ip`
     link="ss://$tmp@${domain}:${port}"
 
@@ -2068,8 +1645,13 @@ singbox_shadowsocket_append() {
 singbox_redirect_append() {
     ip=`curl -sS ipinfo.io/ip`
     set_port
-    read -rp "输入转发的目标地址: " re_ip
-    read -rp "输入转发的目标端口: " re_port
+    # 1. 获取转发目标地址
+    printf "输入转发的目标地址: "
+    read -r re_ip
+
+    # 2. 获取转发目标端口
+    printf "输入转发的目标端口: "
+    read -r re_port
 
     wget -Nq ${singbox_redirect_append_config_url} -O append.json
     judge "配置文件下载"
@@ -2078,7 +1660,7 @@ singbox_redirect_append() {
     sed -i "s~114514~$port~" append.json
     sed -i "s~1919810~$re_port~" append.json
     
-    systemctl stop sing-box
+    restart_service sing-box
 
     sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
 
@@ -2088,34 +1670,33 @@ singbox_redirect_append() {
 
     mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
 
-    systemctl restart sing-box
+    restart_service sing-box
 
-    echo -e "${Green}IP为:${Font} ${ip}"
-    echo -e "${Green}端口为:${Font} ${port}"
+    printf "${Green}IP为:${Font} ${ip}\n"
+    printf "${Green}端口为:${Font} ${port}\n"
 }
 # SINGBOX END
 
 # MIHOMO START
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $mihomo_install_url)
+        curl -fsSL "$mihomo_install_url" | bash
         judge "Mihomo 安装"
     else
         ok "Mihomo 已安装"
     fi
 }
 
- mihomo_onekey_install() {
+mihomo_onekey_install() {
     is_root
     get_system
     if ! command -v mihomo >/dev/null 2>&1; then
-        # adjust_date
         env_install_mihomo
         close_firewall
         mihomo_install
     fi
     if ! command -v mihomo >/dev/null 2>&1; then
-        echo -e "${Red}mihomo 安装失败!!!${Font}"
+        printf "${Red}mihomo 安装失败!!!${Font}\n"
         exit 1
     fi
     mihomo_select
@@ -2124,21 +1705,26 @@ mihomo_install() {
 mihomo_shadowsocket() {
     
     if ! command -v openssl >/dev/null 2>&1; then
-          ${INS} openssl
+          ${PKG_MANAGER} openssl
           judge "openssl 安装"
     fi
     encrypt=4
     ss_method="aes-128-gcm"
     set_port
-    echo -e "选择加密方法"
-    echo -e "${Green}1) 2022-blake3-aes-128-gcm ${Font}"
-    echo -e "${Cyan}2) 2022-blake3-aes-256-gcm	${Font}"
-    echo -e "${Cyan}3) 2022-blake3-chacha20-poly1305 ${Font}"
-    echo -e "${Cyan}4) aes-128-gcm ${Font}"
-    echo -e "${Cyan}5) chacha20-ietf-poly1305 ${Font}"
-    echo -e "${Cyan}6) xchacha20-ietf-poly1305 ${Font}"
-    echo -e ""
-    read -rp "选择加密方法(默认为1)：" encrypt
+
+    # 2. 打印菜单（使用之前定义的 menu_item）
+    printf "选择加密方法\n"
+    menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
+    menu_item "2" "2022-blake3-aes-256-gcm"
+    menu_item "3" "2022-blake3-chacha20-poly1305"
+    menu_item "4" "aes-128-gcm"
+    menu_item "5" "chacha20-ietf-poly1305"
+    menu_item "6" "xchacha20-ietf-poly1305"
+    printf "\n"
+
+    # 3. 读取输入（兼容 Alpine 的 printf + read）
+    printf "选择加密方法(默认为4)："
+    read -r encrypt
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
@@ -2172,10 +1758,10 @@ mihomo_shadowsocket() {
     ipv6=`curl -sS6 --connect-timeout 4 ip.me`
 
     mihomo_shadowsocket_config
-    systemctl restart mihomo
+    restart_service mihomo
 
     tmp="${ss_method}:${password}"
-    tmp=$( openssl base64 <<< $tmp)
+    tmp=$(printf "%s" "$tmp" | openssl base64)
 
     link="ss://$tmp@${domain}:${port}"
 
@@ -2208,8 +1794,8 @@ mihomo_vless_reality_grpc() {
 
     protocol_type="reality_grpc"
     keys=$(mihomo generate reality-keypair)
-    private_key=$(echo $keys | awk '/PrivateKey:/ {print $2}')
-    public_key=$(echo $keys | awk '/PrivateKey:/ {print $4}')
+    private_key=$(printf "%s" "$keys" | awk '/PrivateKey:/ {print $2}')
+    public_key=$(printf "%s" "$keys" | awk '/PrivateKey:/ {print $4}')
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
@@ -2229,18 +1815,54 @@ mihomo_vless_reality_grpc() {
 
     vless_reality_grpc_outbound_config
 
-    systemctl restart mihomo 
+    restart_service mihomo 
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
 }
 
+mihomo_hysteria2() {
+    set_port
+    ${PKG_MANAGER} openssl
+
+    openssl ecparam -name prime256v1 -genkey -noout -out "${mihomo_cfg}/server.key"
+
+    openssl req -x509 -nodes -key "${mihomo_cfg}/server.key" -out "${mihomo_cfg}/server.crt" -subj "/CN=www.python.org" -days 36500
+    
+    chmod +775 ${mihomo_cfg}/server*
+
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    ip=$(curl -s https://ip.me)
+
+    wget -N ${mihomo_hysteria2_url} -O tmp.yaml
+    judge "Mihomo Reality 配置文件下载"
+
+    sed -i "s/\${password}/$password/" tmp.yaml
+    sed -i "s/\${ip}/$ip/" tmp.yaml
+    sed -i "s/\${port}/$port/" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    >> "${mihomo_cfg}/config.yaml" < tmp.yaml
+    rm tmp.yaml
+
+    restart_service mihomo 
+
+    singbox_hy2_outbound_config
+    clash_config
+    
+}
+
 mihomo_redirect() {
     ip=`curl -sS ipinfo.io/ip`
     set_port
-    read -rp "输入转发的目标地址: " re_ip
-    read -rp "输入转发的目标端口: " re_port
+    # 1. 获取转发目标地址
+    printf "输入转发的目标地址: "
+    read -r re_ip
+
+    # 2. 获取转发目标端口
+    printf "输入转发的目标端口: "
+    read -r re_port
 
     wget -N ${mihomo_redirect_config_url} -O tmp.yaml
     judge "配置文件下载"
@@ -2253,10 +1875,10 @@ mihomo_redirect() {
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
     rm tmp.yaml
-    systemctl restart mihomo
+    restart_service mihomo
     
-    echo -e "${Green}IP为:${Font} ${ip}"
-    echo -e "${Green}端口为:${Font} ${port}"
+    printf "${Green}IP为:${Font} ${ip}\n"
+    printf "${Green}端口为:${Font} ${port}\n"
 }
 
 mihomo_clear_listeners() {
@@ -2266,67 +1888,37 @@ mihomo_clear_listeners() {
 
 # MIHOMO END
 
-# OUTBOUNDS ADDPEND START
-singbox_outbound_append() {
-    echo -e "输入要插入的Outbound配置:"
-    read -r outbound
-
-    echo "{"outbounds":[$outbound]}" > ${singbox_cfg_path}/append.json
-
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    systemctl restart sing-box
-}
-
-xray_outbound_append() {
-    echo -e "输入要插入的Outbound配置:"
-    read -r outbound
-
-    echo "{"outbounds":[$outbound]}" > /usr/local/etc/xray/append.json
-
-    cp /usr/local/etc/xray/config.json /usr/local/etc/xray/config.json.bak
-
-    echo -e "$(xray run -confdir=./ -dump)"  > config.json
-
-    rm /usr/local/etc/xray/append.json
-
-    systemctl restart sing-box
-
-}
-# OUTBOUNDS ADDPEND END
-
 info() {
-    echo -e "${Info} ${Green} $1 ${Font}"
+    printf "${Info} ${Green}%s${Font}\n" "$1"
 }
+
 ok() {
-    echo -e "${OK} ${Green} $1 ${Font}"
+    printf "${OK} ${Green}%s${Font}\n" "$1"
 }
+
 error() {
-    echo -e "${Error} ${RedBG} $1 ${Font}"
+    printf "${Error} ${RedBG}%s${Font}\n" "$1"
 }
+
 warn() {
-    echo -e "${Warn} ${Yellow} $1 ${Font}"
+    printf "${Warn} ${Yellow}%s${Font}\n" "$1"
 }
 
 judge() {
-    # $? 上一次命令成功为0 失败为随机值
-    if [[ 0 -eq $? ]]; then
+    # $? 上一次命令成功为0 失败为非0
+    if [ "$?" -eq 0 ]; then
         ok "$1 完成"
     else
         error "$1 失败"
         exit 1
     fi
-}
+} 
 
 open_bbr() {
     is_root
-    source '/etc/os-release'
+    . '/etc/os-release'
     info "过于老的系统版本会导致开启失败"
-    if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
+    if [ "${ID}" = "debian" ] && [ "${VERSION_ID}" -ge 9 ]; then
         info "检测系统为 debian"
         #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
         #apt update && apt -t buster-backports install linux-image-amd64
@@ -2335,14 +1927,14 @@ open_bbr() {
         sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
-    elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
+    elif [ "${ID}" = "ubuntu" ] && [ "$(printf "%s" "${VERSION_ID}" | cut -d '.' -f1)" -ge 18 ]; then
         info "检测系统为 ubuntu"
         wget -N ${bbr_config_url} -O /etc/sysctl.conf
         judge "配置文件下载"
         sysctl -p
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
-    elif [[ "${ID}"=="centos" ]]; then
+    elif [ "${ID}" = "centos" ]; then
         error "centos fuck out!"
         exit 1
     #    INS = "yum install -y"
@@ -2359,290 +1951,224 @@ open_bbr() {
 }
 
 info_return() {
-    echo -e "------------------------------------------------"
-    echo -e "${Green}安装成功!!!!!!!!${Font}"
-    echo -e "------------------------------------------------"
-    echo -e "${Green}密码为:${Font} ${password}"
-    echo -e "${Green}端口为:${Font} ${port}"
-    echo -e "${Green}链接:${Font} ${link}"
+    # 统一使用 printf 格式化输出，保证跨系统兼容性
+    printf "%s\n" "------------------------------------------------"
+    printf "${Green}安装成功!!!!!!!!${Font}\n"
+    printf "%s\n" "------------------------------------------------"
+    printf "${Green}密码为:${Font} %s\n" "${password}"
+    printf "${Green}端口为:${Font} %s\n" "${port}"
+    printf "${Green}链接:${Font} %s\n" "${link}"
+
+    # 使用 [ -n "$var" ] 判断变量是否非空
     if [ -n "$qx_cfg" ]; then
-        echo -e "------------------------------------------------"
-        echo -e "${Green}QuantumultX配置: ${Font}"
-        echo -e "${qx_cfg}"
+        printf "%s\n" "------------------------------------------------"
+        printf "${Green}QuantumultX配置: ${Font}\n"
+        printf "%s\n" "${qx_cfg}"
     fi
+
     if [ -n "$xray_outbound" ]; then
-        echo -e "------------------------------------------------"
-        echo -e "${Green}Outbounds配置:${Font}"
-        echo -e "${xray_outbound}"
+        printf "%s\n" "------------------------------------------------"
+        printf "${Green}Outbounds配置:${Font}\n"
+        printf "%s\n" "${xray_outbound}"
     fi
+
     if [ -n "$singbox_outbound" ]; then
-        echo -e "------------------------------------------------"
-        echo -e "${Green}Singbox Outbounds配置:${Font}"
-        echo -e "${singbox_outbound}"
+        printf "%s\n" "------------------------------------------------"
+        printf "${Green}Singbox Outbounds配置:${Font}\n"
+        printf "%s\n" "${singbox_outbound}"
     fi
+
     if [ -n "$clash_cfg" ]; then
-        echo -e "------------------------------------------------"
-        echo -e "${Green}Clash配置: ${Font}"
-        echo -e "${clash_cfg}"
+        printf "%s\n" "------------------------------------------------"
+        printf "${Green}Clash配置: ${Font}\n"
+        printf "%s\n" "${clash_cfg}"
     fi
-    echo -e "------------------------------------------------"
+
+    printf "%s\n" "------------------------------------------------"
+
+    # 条件判断语句在 POSIX 中建议变量加双引号
     if [ "$protocol_type" = "vmess_ws" ]; then
-        echo -e "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}"
+        printf "${Yellow}注: 如果套CF需要在SSL/TLS encryption mode 改为 Full ${Font}\n"
     fi
-    
 }
 
 show_xray_info() {
-    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ xray
+    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" xray
 }
 
 show_singbox_info() {
-    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ singbox
+    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" singbox
 }
 
 show_mihomo_info() {
-    bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh)" @ mihomo
-}
-
-server_check() {
-
-    info "开始检测 Xray 服务"
-
-    xray_active=`systemctl is-active xray`
-
-    # result: active or inactive
-    if [[ $xray_active = "active" ]]; then
-        ok "Xray 服务正常"
-    else
-        error "Xray 服务异常"
-    fi
-
-    info "开始检测 Nginx 服务"
-
-    nginx_active=`systemctl is-active nginx`
-
-    # result: active or inactive
-    if [[ $nginx_active = "active" ]]; then
-        ok "Nginx 服务正常"
-    else
-        error "Nginx 服务异常"
-    fi
-
+    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" mihomo
 }
 
 update_script() {
-    script_path=$(cd `dirname $0`; pwd)
-    wget --no-check-certificate -q -O $( readlink -f -- "$0"; ) "https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh"
-    judge "更新"
-    exit
+    # 1. 获取当前脚本的绝对路径
+    # 使用 POSIX 兼容的方式获取路径，避免 readlink 缺失问题
+    case "$0" in
+        /*) script_abs_path="$0" ;;
+        *)  script_abs_path="$(pwd)/${0#./}" ;;
+    esac
+
+    info "正在从 GitHub 获取最新版本..."
+    
+    # 2. 下载到临时文件，防止直接覆盖导致脚本损坏
+    update_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/taffy.sh"
+    temp_file="taffy.sh.tmp"
+    
+    if wget --no-check-certificate -q -O "$temp_file" "$update_url"; then
+        # 3. 检查下载的文件是否有效（是否包含基本的 shell 声明）
+        if grep -q "#!/bin/" "$temp_file"; then
+            mv "$temp_file" "$script_abs_path"
+            chmod +x "$script_abs_path"
+            ok "更新成功！请重新运行脚本。"
+            exit 0
+        else
+            rm -f "$temp_file"
+            error "更新失败：下载的文件无效（可能是网络拦截）。"
+            exit 1
+        fi
+    else
+        rm -f "$temp_file"
+        error "更新失败：无法连接到 GitHub。"
+        exit 1
+    fi
 }
 
 xray_upgrade() {
-    echo -e "------------------------------------------"
-    read -rp "是否安装指定版本(Y/N): " input
+    printf "%s\n" "------------------------------------------"
+    printf "是否安装指定版本(Y/N): "
+    read -r input
     case $input in
     [yY])
-      read -rp "输入指定版本(eq: 1.7.5): " version
-      bash -c "$(curl -sSL ${xray_install_url})" @ install --version ${version}
+      printf "%s" "输入指定版本(eq: 1.7.5): "
+      read -r version
+      run_remote_script "${xray_install_url}" install --version "${version}"
       judge "Xray 更新"
       ;;
     [nN])
-      bash -c "$(curl -sSL ${xray_install_url})" @ install
+      run_remote_script "${xray_install_url}" install
       judge "Xray 更新"
       ;;
     *)
-      bash -c "$(curl -sSL ${xray_install_url})" @ install
+      run_remote_script "${xray_install_url}" install
       judge "Xray 更新"
       ;;
     esac
     
 }
 
-nginx_select() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  安装 Nginx${Font}"
-    echo -e "${Yellow}2)  卸载 Nginx${Font}"
-    echo -e "${Red}q)  退出${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-    case $opt_num in
-    1)
-    nginx_install
-    ;;
-    2)
-    uninstall_nginx
-    ;;
-    q)
-    ;;
-    *)
-    error "请输入正确的数字"
-    ;;
-    esac
-}
+manage_service() {
+    action="$1" # start, stop, restart, enable
+    service_name="$2"
 
-uninstall_nginx() {
-    info "Nginx 卸载"
-    apt purge -y nginx nginx-common nginx-core
-    apt autoremove -y
+    case "$action" in
+        start)
+            start_service "$service_name"
+            ;;
+        stop)
+            stop_service "$service_name"
+            ;;
+        restart)
+            restart_service "$service_name"
+            ;;
+        enable)
+            enable_service "$service_name"
+            ;;
+        status)
+            service_status "$service_name"
+            ;;
+        *)
+            error "Unknown action: $action"
+            ;;
+    esac
 }
 
 uninstall_xray() {
     info "Xray 卸载"
-    bash -c "$(curl -sSL ${xray_install_url})" @ remove --purge
+    run_remote_script "${xray_install_url}" remove --purge
     # rm -rf /home/xray
     rm -rf ${xray_path}
 }
 
-uninstall_acme() {
-    info "Acme 卸载"
-    /root/.acme.sh/acme.sh --uninstall
-    rm -r  ~/.acme.sh
-    (
-        crontab -l | grep -v "bash ${ca_path}/xray-cert-renew.sh"
-    ) | crontab -
-}
-
 uninstall() {
-    echo -e "------------------------------------------"
-    read -rp "是否确定要完全卸载(Y/N): " input
+    printf "%s\n" "------------------------------------------"
+
+    # 2. 拆分 read -rp：先提示，后读取
+    printf "是否确定要完全卸载(Y/N): "
+    read -r input
     case $input in
     [yY])
       uninstall_xray
-      uninstall_nginx
-      uninstall_acme
       uninstall_singbox
-      echo -e "全部卸载已完成"
+      printf "全部卸载已完成\n"
     ;;
     *)
     ;;
     esac
 }
 
-restart_nginx() {
-    info "开始启动 Nginx 服务"
-    service nginx restart
-    judge "Nginx 启动"
-}
-
-close_nginx() {
-    info "开始关闭 Nginx 服务"
-    service nginx stop
-    judge "Nginx 关闭"
-}
-
-restart_xray() {
-    info "开始启动 Xray 服务"
-    systemctl restart xray
-    judge "Xray 启动"
-}
-
-close_xray() {
-    info "开始关闭 Xray 服务"
-    systemctl stop xray
-    judge "Xray 关闭"
-}
-
-renew_ca() {
-    read -rp "输入新的域名: " domain
-    apply_certificate
-    flush_certificate
-}
-
-singbox_operation() {
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  启动 Singbox${Font}"
-    echo -e "${Yellow}2)  关闭 Singbox${Font}"
-    echo -e "${Green}3)  重启 Singbox${Font}"
-    echo -e "${Green}4)  查看 Singbox 状态${Font}"
-    echo -e "${Green}9)  查看 Singbox 日志${Font}"
-    echo -e "${Green}10) 升级 Singbox ${Font}"
-    echo -e "${Yellow}99) 卸载 Singbox ${Font}"
-    echo -e "${Red}q)  退出${Font}\n"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    read -rp "输入数字(回车确认): " opt_num
-    echo -e ""
-      case $opt_num in
-      1)
-          systemctl start sing-box
-          ;;
-      2)
-          systemctl stop sing-box
-          ;;
-      3)
-          systemctl restart sing-box
-          ;;
-      4)
-          systemctl status sing-box
-          ;;
-      9)
-          journalctl -u sing-box --output cat -f
-          ;;
-      10)
-          bash <(curl -fsSL $singbox_install_url)
-          ;;
-      99)
-          uninstall_singbox
-          ;;
-      q)
-          exit
-          ;;
-      *)
-          error "请输入正确的数字"
-          ;;
-      esac
-}
-
 question_answer() {
-    echo -e "${Red}1.我啥都不懂${Font}"
-    echo -e "${Green}https://github.com/uerax/taffy-onekey/issues 去 New Issue 问${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}2.Nginx 启动失败${Font}"
-    echo -e "${Green}执行\"service nginx status\"查看日志${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}3.Xray 启动失败${Font}"
-    echo -e "${Green}执行\"systemctl status xray\"查看日志${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}4.一键安装失败${Font}"
-    echo -e "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}"
-    echo -e "${Yellow} ------------------------------------------------ ${Font}"
-    echo -e "${Red}5.ChatGPT访问不了${Font}"
-    echo -e "${Green}可能性1): 你的VPS是大陆、香港或美国LA地区  ${Font}"
-    echo -e "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}"
+    # 统一使用 printf \n 换行，防止在 Debian 下打印出 "-e" 字符
+    printf "${Red}1.我啥都不懂${Font}\n"
+    printf "${Green}https://github.com/uerax/taffy-onekey/issues 去 New Issue 问${Font}\n"
+    printf "${Yellow} ------------------------------------------------ ${Font}\n"
+
+    printf "${Red}2.Nginx 启动失败${Font}\n"
+    printf "${Green}执行\"service nginx status\"查看日志${Font}\n"
+    printf "${Yellow} ------------------------------------------------ ${Font}\n"
+
+    printf "${Red}3.Xray 启动失败${Font}\n"
+    # %b 会处理字符串中的转义字符，是最稳妥的写法
+    printf "%b\n" "${Green}执行\"service status xray\" 或者 \"service_status xray\" 查看日志${Font}"
+    printf "${Yellow} ------------------------------------------------ ${Font}\n"
+
+    printf "${Red}4.一键安装失败${Font}\n"
+    printf "${Green}一般是证书获取失败,检查你的域名输入是否正确,还有域名是否绑定了当前机器的 IP ${Font}\n"
+    printf "${Yellow} ------------------------------------------------ ${Font}\n"
+
+    printf "${Red}5.ChatGPT访问不了${Font}\n"
+    printf "${Green}可能性1): 你的VPS是大陆、香港或美国LA地区  ${Font}\n"
+    printf "${Green}可能性2): key失效前往 https://fscarmen.cloudflare.now.cc/ 重新获取 ${Font}\n"
 }
 
 select_xray_append_type() {
-    echo -e "${Green}选择要插入的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket${Font}"
-    echo -e "${Green}2)  trojan${Font}"
-    echo -e "${Green}3)  socks5${Font}"
-    echo -e "${Green}4)  redirect${Font}"
-    echo -e "${Cyan}5)  vless-reality-tcp${Font}"
-    echo -e "${Cyan}6)  vless-reality-grpc${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择要插入的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 调用你之前的函数来生成菜单项
+    menu_item "1" "shadowsocket" "$Green"
+    menu_item "2" "socks5" "$Green"
+    menu_item "3" "redirect" "$Green"
+    menu_item "4" "vless-reality-tcp" "$Cyan"
+    menu_item "5" "vless-reality-grpc" "$Cyan"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容性读取 (printf + read -r)
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    # 4. 打印空行
+    printf "\n"
     mkdir -p ${xray_path}
     case $menu_num in
     1)
         xray_shadowsocket_append
         ;;
     2)
-        trojan_append
-        ;;
-    3)
         socks5_append
         ;;
-    4)
+    3)
         xray_redirect_append
         exit
         ;;
-    5)
+    4)
         xray_vless_reality_tcp_append
         ;;
-    6)
+    5)
         xray_vless_reality_grpc_append
         ;;
     q)
@@ -2657,17 +2183,25 @@ select_xray_append_type() {
 }
 
 select_singbox_append_type() {
-    echo -e "${Green}选择要插入的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket${Font}"
-    echo -e "${Green}2)  hysteria2${Font}"
-    echo -e "${Green}3)  vless-reality-tcp${Font}"
-    echo -e "${Green}4)  vless-reality-grpc${Font}"
-    echo -e "${Green}5)  redirect${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择要插入的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 复用你之前的 menu_item 函数
+    menu_item "1" "shadowsocket"
+    menu_item "2" "hysteria2"
+    menu_item "3" "vless-reality-tcp"
+    menu_item "4" "vless-reality-grpc"
+    menu_item "5" "redirect"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    
+    # 4. 打印一个空行保持美观
+    printf "\n"
     case $menu_num in
     1)
         singbox_shadowsocket_append
@@ -2697,20 +2231,26 @@ select_singbox_append_type() {
 }
 
 singbox_select() {
-    echo -e "${Green}选择安装的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  hysteria2${Font}"
-    echo -e "${Green}2)  vless-reality-tcp${Font}"
-    echo -e "${Green}3)  vless-reality-grpc${Font}"
-    echo -e "${Green}4)  vless-reality-h2${Font}"
-    echo -e "${Green}5)  shadowsocket${Font}"
-    echo -e "${Green}6)  vmess-tls-ws${Font}"
-    echo -e "${Green}7)  trojan-tls-tcp${Font}"
-    echo -e "${Green}10) redirect${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择安装的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 直接调用你的 menu_item 函数
+    menu_item "1" "hysteria2"
+    menu_item "2" "vless-reality-tcp"
+    menu_item "3" "vless-reality-grpc"
+    menu_item "4" "vless-reality-h2"
+    menu_item "5" "shadowsocket"
+    menu_item "10" "redirect"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    
+    # 4. 打印一个空行保持美观
+    printf "\n"
     case $menu_num in
     1)
         singbox_hy2
@@ -2726,12 +2266,6 @@ singbox_select() {
         ;;
     5)
         singbox_shadowsocket
-        ;;
-    6)
-        singbox_vmess_ws_tls
-        ;;
-    7)
-        singbox_trojan_tls_tcp
         ;;
     10)
         singbox_redirect
@@ -2749,20 +2283,23 @@ singbox_select() {
 }
 
 xray_select() {
-    echo -e "${Green}选择安装的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  vless-reality-tcp${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Green}3)  vless-reality-h2${Font}"
-    echo -e "${Green}4)  redirect${Font}"
-    echo -e "${Green}11)  trojan-tcp-tls${Font}"
-    echo -e "${Green}12)  trojan${Font}"
-    echo -e "${Cyan}21)  vmess-ws-tls${Font}"
-    echo -e "${Cyan}31)  shadowsocket${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择安装的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 复用你的 menu_item 函数 (数字, 内容, 颜色)
+    menu_item "1" "vless-reality-tcp" "$Green"
+    menu_item "2" "vless-reality-grpc" "$Cyan"
+    menu_item "3" "vless-reality-h2" "$Green"
+    menu_item "4" "redirect" "$Green"
+    menu_item "31" "shadowsocket" "$Cyan"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    printf "\n"
     mkdir -p ${xray_path}
     case $menu_num in
     1)
@@ -2777,15 +2314,6 @@ xray_select() {
     4)
         xray_redirect
         exit
-        ;;
-    11)
-        xray_trojan_tcp_tls
-        ;;
-    12)
-        xray_trojan
-        ;;
-    21)
-        xray_vmess_ws_tls
         ;;
     31)
         xray_shadowsocket
@@ -2802,21 +2330,32 @@ xray_select() {
 }
 
 mihomo_select() {
-    echo -e "${Green}选择安装的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Green}4)  redirect${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择安装的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 调用 menu_item 函数，保持数字与你给出的需求一致 (1, 2, 4, q)
+    menu_item "1" "shadowsocket" "$Green"
+    menu_item "2" "vless-reality-grpc" "$Cyan"
+    menu_item "3" "hysteria2" "$Cyan"
+    menu_item "4" "redirect" "$Green"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
+    # 这样在 Alpine 下不会报错，且光标位置与 read -p 一致
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    printf "\n"
     case $menu_num in
     1)
         mihomo_shadowsocket
         ;;
     2)
         mihomo_vless_reality_grpc
+        ;;
+    3)
+        mihomo_hysteria2
         ;;
     4)
         mihomo_redirect
@@ -2833,21 +2372,35 @@ mihomo_select() {
 }
 
 select_mihomo_append_type() {
-    echo -e "${Green}选择要插入的协议 ${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}"
-    echo -e "${Green}1)  shadowsocket${Font}"
-    echo -e "${Cyan}2)  vless-reality-grpc${Font}"
-    echo -e "${Green}4)  redirect${Font}"
-    echo -e "${Red}q)  不装了${Font}"
-    echo -e "${Purple}-------------------------------- ${Font}\n"
-    read -rp "输入数字(回车确认): " menu_num
-    echo -e ""
+    printf "${Green}选择要插入的协议 ${Font}\n"
+    printf "${Purple}-------------------------------- ${Font}\n"
+    
+    # 2. 复用 menu_item 函数 (数字, 内容, 颜色)
+    # 保持你需求的数字跳跃: 1, 2, 4
+    menu_item "1" "shadowsocket" "$Green"
+    menu_item "2" "vless-reality-grpc" "$Cyan"
+    menu_item "3" "hysteria2" "$Cyan"
+    menu_item "4" "redirect" "$Green"
+    menu_item "q" "不装了" "$Red"
+    
+    printf "${Purple}-------------------------------- ${Font}\n\n"
+    
+    # 3. 兼容性读取：先用 printf 提示，再用 read 读取
+    # 这样在 Alpine/BusyBox 环境下不会报错
+    printf "输入数字(回车确认): "
+    read -r menu_num
+    
+    # 4. 打印一个空行，保持间距美观
+    printf "\n"
     case $menu_num in
     1)
         mihomo_shadowsocket
         ;;
     2)
         mihomo_vless_reality_grpc
+        ;;
+    3)
+        mihomo_hysteria2
         ;;
     4)
         mihomo_redirect
@@ -2864,33 +2417,39 @@ select_mihomo_append_type() {
 }
 
 menu() {
-    echo -e "${Cyan}——————————————————————————————————— 脚本信息 ———————————————————————————————————${Font}
-\t\t\t\t${Yellow}Taffy 脚本${Font}
-\t\t\t${Yellow}--- Authored By uerax ---${Font}
-\t\t  ${Yellow}https://github.com/uerax/taffy-onekey${Font}
-\t\t\t      ${Yellow}版本号：${version}${Font}
-${Cyan}——————————————————————————————————— 安装向导 ———————————————————————————————————${Font}
-${Blue}0)   更新脚本${Font}
-${Green}1)   一键安装 Xray${Font}\t\t${Green}11)  一键安装 Singbox${Font}\t\t
-${Cyan}2)   插入 Xray 协议${Font}\t\t${Cyan}12)  插入 Singbox 协议${Font}
-${Cyan}3)   更换 Xray 协议${Font}\t\t${Cyan}13)  更换 Singbox 协议${Font}
-${Purple}4)   安装 / 更新 / 回退 Xray${Font}\t${Purple}14)  展示Singbox 操作面板${Font}
-${Yellow}5)   卸载 Xray${Font}\t\t\t${Purple}15)  查看 Singbox 配置链接${Font}
-${Purple}6)   查看 Xray 配置链接${Font}
-${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
-${Green}21)   一键安装 Mihomo${Font}
-${Cyan}22)   插入 Mihomo 协议${Font}
-${Purple}25)   查看 Mihomo 配置链接${Font}
-${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
-${Blue}70)  更新伪装站${Font}\t\t\t${Green}80)  安装 / 卸载 Nginx${Font}
-${Cyan}71)  更换域名证书${Font}
-${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}
-${Yellow}99)  常见问题${Font}\t\t\t${Green}100) 开启 BBR${Font}
-${Red}999) 完全卸载${Font}\t\t\t${Red}q)   退出${Font}
-${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
+    # 1. 使用 printf 重新构建布局，用固定空格代替 \t 以保证在不同终端下对齐
+    printf "${Cyan}——————————————————————————————————— 脚本信息 ———————————————————————————————————${Font}\n"
+    printf "                                ${Yellow}Taffy 脚本${Font}\n"
+    printf "                        ${Yellow}--- Authored By uerax ---${Font}\n"
+    printf "                  ${Yellow}https://github.com/uerax/taffy-onekey${Font}\n"
+    printf "                              ${Yellow}版本号：${version}${Font}\n"
+    printf "${Cyan}——————————————————————————————————— 安装向导 ———————————————————————————————————${Font}\n"
+    
+    # 使用 printf 的格式化能力来保证两列对齐
+    printf "${Blue}0)   更新脚本${Font}\n"
+    printf "${Green}1)   一键安装 Xray${Font}          ${Green}11)  一键安装 Singbox${Font}\n"
+    printf "${Cyan}2)   插入 Xray 协议${Font}         ${Cyan}12)  插入 Singbox 协议${Font}\n"
+    printf "${Cyan}3)   更换 Xray 协议${Font}         ${Cyan}13)  更换 Singbox 协议${Font}\n"
+    printf "${Purple}4)   安装/更新/回退 Xray${Font}    ${Purple}14)  展示 Singbox 面板${Font}\n"
+    printf "${Yellow}5)   卸载 Xray${Font}              ${Purple}15)  查看 Singbox 配置${Font}\n"
+    printf "${Purple}6)   查看 Xray 配置链接${Font}\n"
+    
+    printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
+    printf "${Green}21)  一键安装 Mihomo${Font}\n"
+    printf "${Cyan}22)  插入 Mihomo 协议${Font}\n"
+    printf "${Purple}25)  查看 Mihomo 配置链接${Font}\n"
+    
+    printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
+    printf "${Yellow}99)  常见问题${Font}               ${Green}100) 开启 BBR${Font}\n"
+    printf "${Red}999) 完全卸载${Font}               ${Red}q)   退出${Font}\n"
+    printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n\n"
 
-    read -rp "输入数字(回车确认)：" menu_num
-    echo -e ""
+    # 2. 兼容性读取 (解决 Alpine 不支持 read -p 的问题)
+    printf "输入数字(回车确认)："
+    read -r menu_num
+    
+    # 3. 打印空行
+    printf "\n"
     case $menu_num in
     0)
     update_script
@@ -2936,15 +2495,6 @@ ${Cyan}————————————————————————�
     ;;
     25)
     show_mihomo_info
-    ;;
-    70)
-    update_web
-    ;;
-    71)
-    renew_ca
-    ;;
-    80)
-    nginx_select
     ;;
     99)
     question_answer
