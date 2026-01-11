@@ -463,9 +463,9 @@ singbox_hy2() {
     local down=$(printf "%s" "$item" | jq -r '.down_mbps')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
     
-    local link="hysteria2://${password}@${ip}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://live.qq.com\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -479,7 +479,7 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://live.qq.com\",
+      \"server_name\": \"https://www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,

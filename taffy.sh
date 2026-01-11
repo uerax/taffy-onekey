@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.0.1"
+version="v4.1.0"
 
 #fonts color
 Green="\033[32m"
@@ -77,6 +77,9 @@ mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/maste
 mihomo_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/mihomo.yaml"
 
 mihomo_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
+
+mihomo_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/mihomo.yaml"
+
 
 # MIHOMO URL END
 
@@ -376,7 +379,7 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: https://live.qq.com
+    sni: https://www.python.org
     skip-cert-verify: true
     alpn:
     - h3"
@@ -963,14 +966,15 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://live.qq.com\",
+      \"server_name\": \"https://www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,
         \"fingerprint\": \"chrome\"
       }
     },
-    \"password\": \"${password}\"\n}"   
+    \"password\": \"${password}\"
+}"   
 }
 
 vless_reality_grpc_outbound_config() {
@@ -1221,7 +1225,7 @@ singbox_hy2() {
     ${PKG_MANAGER} openssl
     openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
 
-    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=live.qq.com" -days 36500
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
     
     chmod +775 ${singbox_cfg_path}/server*
 
@@ -1243,7 +1247,7 @@ singbox_hy2() {
     restart_service sing-box
     
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
@@ -1445,7 +1449,7 @@ singbox_hy2_append() {
 
     openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
 
-    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=live.qq.com" -days 36500
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
     
     chmod +775 ${singbox_cfg_path}/server*
 
@@ -1473,7 +1477,7 @@ singbox_hy2_append() {
     
     protocol_type="hysteria2_nodomain"
 
-    link="hysteria2://${password}@${domain}:${port}?peer=https://live.qq.com&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
 
@@ -1816,6 +1820,35 @@ mihomo_vless_reality_grpc() {
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
+}
+
+mihomo_hysteria() {
+    set_port
+    ${PKG_MANAGER} openssl
+
+    openssl ecparam -name prime256v1 -genkey -noout -out "${mihomo_cfg}/server.key"
+
+    openssl req -x509 -nodes -key "${mihomo_cfg}/server.key" -out "${mihomo_cfg}/server.crt" -subj "/CN=www.python.org" -days 36500
+    
+    chmod +775 ${mihomo_cfg}/server*
+
+    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
+    ip=$(curl -s https://ip.me)
+
+    wget -N ${mihomo_hysteria2_url} -O tmp.yaml
+    judge "Mihomo Reality 配置文件下载"
+
+    sed -i "s/\${password}/$password/" tmp.yaml
+    sed -i "s/\${ip}/$ip/" tmp.yaml
+    sed -i "s/\${port}/$port/" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    >> "${mihomo_cfg}/config.yaml" < tmp.yaml
+    rm tmp.yaml
+
+    singbox_hy2_outbound_config
+    clash_config
+    
 }
 
 mihomo_redirect() {
