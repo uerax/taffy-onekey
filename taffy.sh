@@ -1219,7 +1219,11 @@ singbox_routing_set() {
 singbox_hy2() {
     set_port
     ${PKG_MANAGER} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
+    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=live.qq.com" -days 36500
+    
+    chmod +775 ${singbox_cfg_path}/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
@@ -1438,7 +1442,12 @@ singbox_redirect() {
 singbox_hy2_append() {
     set_port
     ${PKG_MANAGER} openssl
-    openssl req -x509 -nodes -newkey ec:<(openssl ecparam -name prime256v1) -keyout ${singbox_cfg_path}/server.key -out ${singbox_cfg_path}/server.crt -subj "/CN=live.qq.com" -days 36500 && chmod +775 ${singbox_cfg_path}/server*
+
+    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+
+    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=live.qq.com" -days 36500
+    
+    chmod +775 ${singbox_cfg_path}/server*
 
     password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
     domain=$(curl -s https://ip.me)
