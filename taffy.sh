@@ -1687,7 +1687,7 @@ mihomo_install() {
     fi
 }
 
- mihomo_onekey_install() {
+mihomo_onekey_install() {
     is_root
     get_system
     if ! command -v mihomo >/dev/null 2>&1; then
@@ -1822,7 +1822,7 @@ mihomo_vless_reality_grpc() {
 
 }
 
-mihomo_hysteria() {
+mihomo_hysteria2() {
     set_port
     ${PKG_MANAGER} openssl
 
@@ -1845,6 +1845,8 @@ mihomo_hysteria() {
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     >> "${mihomo_cfg}/config.yaml" < tmp.yaml
     rm tmp.yaml
+
+    restart_service mihomo 
 
     singbox_hy2_outbound_config
     clash_config
@@ -2334,6 +2336,7 @@ mihomo_select() {
     # 2. 调用 menu_item 函数，保持数字与你给出的需求一致 (1, 2, 4, q)
     menu_item "1" "shadowsocket" "$Green"
     menu_item "2" "vless-reality-grpc" "$Cyan"
+    menu_item "3" "hysteria2" "$Cyan"
     menu_item "4" "redirect" "$Green"
     menu_item "q" "不装了" "$Red"
     
@@ -2350,6 +2353,9 @@ mihomo_select() {
         ;;
     2)
         mihomo_vless_reality_grpc
+        ;;
+    3)
+        mihomo_hysteria2
         ;;
     4)
         mihomo_redirect
@@ -2373,6 +2379,7 @@ select_mihomo_append_type() {
     # 保持你需求的数字跳跃: 1, 2, 4
     menu_item "1" "shadowsocket" "$Green"
     menu_item "2" "vless-reality-grpc" "$Cyan"
+    menu_item "3" "hysteria2" "$Cyan"
     menu_item "4" "redirect" "$Green"
     menu_item "q" "不装了" "$Red"
     
@@ -2391,6 +2398,9 @@ select_mihomo_append_type() {
         ;;
     2)
         mihomo_vless_reality_grpc
+        ;;
+    3)
+        mihomo_hysteria2
         ;;
     4)
         mihomo_redirect
