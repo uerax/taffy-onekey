@@ -45,7 +45,7 @@ install_mihomo() {
         rm mihomo.deb
 
         mkdir -p /etc/mihomo
-        wget -O /etc/mihomo/config.yaml https://gh-proxy.org/https://github.com/uerax/taffy-onekey/raw/master/Clash/mihomo-config.yaml
+        wget -O /etc/mihomo/config.yaml https://gh-proxy.org/https://raw.githubusercontent.com/uerax/taffy-onekey/refs/heads/master/config/Clash/config.yaml
 
         cat > /etc/systemd/system/mihomo.service <<EOF
 [Unit]
