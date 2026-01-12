@@ -2123,6 +2123,7 @@ uninstall() {
     [yY])
       uninstall_xray
       uninstall_singbox
+      mihomo_remove
       printf "全部卸载已完成\n"
     ;;
     *)
@@ -2457,6 +2458,7 @@ menu() {
     printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
     printf "${Green}21)  一键安装 Mihomo${Font}\n"
     printf "${Cyan}22)  插入 Mihomo 协议${Font}\n"
+    printf "${Cyan}23)  更新 Mihomo ${Font}\n"
     printf "${Purple}25)  查看 Mihomo 配置链接${Font}\n"
     
     printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
@@ -2512,6 +2514,9 @@ menu() {
     ;;
     22)
     select_mihomo_append_type
+    ;;
+    23)
+    mihomo_update
     ;;
     25)
     show_mihomo_info

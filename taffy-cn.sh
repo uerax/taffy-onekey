@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v3.0.1"
+version="v3.0.2"
 
 #fonts color
 Green="\033[32m"
@@ -80,10 +80,28 @@ mihomo_onekey() {
 
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $mihomo_install_url)
+        bash <(curl -fsSL $mihomo_install_url) | bash -s -- install
         judge "Mihomo 安装"
     else
         ok "Mihomo 已安装"
+    fi
+}
+
+mihomo_remove() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        bash <(curl -fsSL $mihomo_install_url) | bash -s -- remove
+        judge "Mihomo 卸载"
+    else
+        ok "Mihomo 卸载"
+    fi
+}
+
+mihomo_update() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        bash <(curl -fsSL $mihomo_install_url) | bash -s -- update
+        judge "Mihomo 更新"
+    else
+        ok "Mihomo 已更新"
     fi
 }
 
@@ -961,8 +979,9 @@ menu() {
     echo -e "${Purple}5)  查看配置链接${Font}"
     echo -e "${Green}11)  一键安装 Mihomo${Font}"
     echo -e "${Cyan}12)   插入 Mihomo 协议${Font}"
+    echo -e "${Cyan}13)   更新 Mihomo ${Font}"
     echo -e "${Green}100) 开启 BBR${Font}"
-    echo -e "${Red}999) 卸载 Xray${Font}"
+    echo -e "${Red}999) 卸载${Font}"
     echo -e "${Red}q)   退出${Font}"
     echo -e "${Cyan}————————————————————————————————————————${Font}\n"
 
@@ -992,6 +1011,9 @@ menu() {
     ;;
     12)
     mihomo_select
+    ;;
+    13)
+    mihomo_update
     ;;
     100)
     open_bbr
