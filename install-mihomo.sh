@@ -44,16 +44,24 @@ install_mihomo() {
         dpkg -i mihomo.deb
         rm mihomo.deb
 
-        # systemd service
+        mkdir -p /etc/mihomo
+        wget -O /etc/mihomo/config.yaml https://github.com/uerax/taffy-onekey/raw/master/Clash/mihomo-config.yaml
+
         cat > /etc/systemd/system/mihomo.service <<EOF
 [Unit]
-Description=mihomo Daemon
-After=network.target
+Description=mihomo Daemon, Another Clash Kernel.
+After=network.target NetworkManager.service systemd-networkd.service iwd.service
 
 [Service]
 Type=simple
+LimitNPROC=500
+LimitNOFILE=1000000
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
 Restart=always
+ExecStartPre=/usr/bin/sleep 1s
 ExecStart=/usr/bin/mihomo -d /etc/mihomo
+ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
@@ -64,7 +72,7 @@ EOF
 
     elif [ "$OS" = "alpine" ]; then
         curl -Lo mihomo.tar.gz "https://github.com/MetaCubeX/mihomo/releases/download/v${VERSION}/mihomo-linux-${ARCH}-v${VERSION}.tar.gz"
-        tar -xzf mihomo.tar.gz -C /usr/local/bin
+        tar -xzf mihomo.tar.gz -C /usr/bin/
         rm mihomo.tar.gz
 
         mkdir -p /etc/mihomo
@@ -73,9 +81,12 @@ EOF
         # openrc init script
         cat > /etc/init.d/mihomo <<'EOF'
 #!/sbin/openrc-run
-command="/usr/local/bin/mihomo"
+description="mihomo Daemon, Another Clash Kernel"
+command="/usr/bin/mihomo"
 command_args="-d /etc/mihomo"
-pidfile="/run/mihomo.pid"
+command_background=yes
+rc_ulimit="-n 1000000"
+pidfile="/run/${RC_SVCNAME}.pid"
 EOF
         chmod +x /etc/init.d/mihomo
         rc-update add mihomo default
@@ -113,7 +124,7 @@ update_mihomo() {
         systemctl restart mihomo
     elif [ "$OS" = "alpine" ]; then
         curl -Lo mihomo.tar.gz "https://github.com/MetaCubeX/mihomo/releases/download/v${VERSION}/mihomo-linux-${ARCH}-v${VERSION}.tar.gz"
-        tar -xzf mihomo.tar.gz -C /usr/local/bin
+        tar -xzf mihomo.tar.gz -C /usr/bin
         rm mihomo.tar.gz
         rc-service mihomo restart
     fi
@@ -131,7 +142,7 @@ uninstall_mihomo() {
         rc-service mihomo stop
         rc-update del mihomo
         rm -f /etc/init.d/mihomo
-        rm -f /usr/local/bin/mihomo
+        rm -f /usr/bin/mihomo
         rm -rf /etc/mihomo
     fi
     echo "mihomo uninstalled."
