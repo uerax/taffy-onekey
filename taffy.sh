@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.2"
+version="v4.1.3"
 
 #fonts color
 Green="\033[32m"
@@ -1679,11 +1679,29 @@ singbox_redirect_append() {
 # MIHOMO START
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
-        curl -fsSL "$mihomo_install_url" | bash
+        curl -fsSL "$mihomo_install_url" | bash -s -- install
         judge "Mihomo 安装"
     else
         ok "Mihomo 已安装"
     fi
+}
+
+mihomo_update() {
+    if ! command -v mihomo >/dev/null 2>&1; then
+        curl -fsSL "$mihomo_install_url" | bash -s -- update
+        judge "Mihomo 已更新"
+    else
+        ok "Mihomo 已更新"
+    fi
+}
+
+mihomo_remove() {
+     if ! command -v mihomo >/dev/null 2>&1; then
+        curl -fsSL "$mihomo_install_url" | bash -s -- remove
+        judge "Mihomo 已卸载"
+    else
+        ok "Mihomo 已卸载"
+    fi   
 }
 
 mihomo_onekey_install() {
