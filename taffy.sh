@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.3"
+version="v4.1.4"
 
 #fonts color
 Green="\033[32m"
@@ -1687,18 +1687,18 @@ mihomo_install() {
 }
 
 mihomo_update() {
-    if ! command -v mihomo >/dev/null 2>&1; then
+    if command -v mihomo >/dev/null 2>&1; then
         curl -fsSL "$mihomo_install_url" | bash -s -- update
-        judge "Mihomo 已更新"
+        judge "Mihomo 更新"
     else
         ok "Mihomo 已更新"
     fi
 }
 
 mihomo_remove() {
-     if ! command -v mihomo >/dev/null 2>&1; then
+     if command -v mihomo >/dev/null 2>&1; then
         curl -fsSL "$mihomo_install_url" | bash -s -- remove
-        judge "Mihomo 已卸载"
+        judge "Mihomo 卸载"
     else
         ok "Mihomo 已卸载"
     fi   

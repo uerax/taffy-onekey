@@ -3,7 +3,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 stty erase ^?/
 
-version="v3.0.2"
+version="v3.0.3"
 
 #fonts color
 Green="\033[32m"
@@ -88,20 +88,20 @@ mihomo_install() {
 }
 
 mihomo_remove() {
-    if ! command -v mihomo >/dev/null 2>&1; then
+    if command -v mihomo >/dev/null 2>&1; then
         bash <(curl -fsSL $mihomo_install_url) | bash -s -- remove
         judge "Mihomo 卸载"
     else
-        ok "Mihomo 卸载"
+        ok "Mihomo 已卸载"
     fi
 }
 
 mihomo_update() {
     if ! command -v mihomo >/dev/null 2>&1; then
+        ok "Mihomo 已更新"
+    else
         bash <(curl -fsSL $mihomo_install_url) | bash -s -- update
         judge "Mihomo 更新"
-    else
-        ok "Mihomo 已更新"
     fi
 }
 
