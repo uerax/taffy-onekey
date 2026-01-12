@@ -80,7 +80,7 @@ mihomo_onekey() {
 
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $mihomo_install_url) | bash -s -- install
+        curl -fsSL "$mihomo_install_url" | bash -s -- install
         judge "Mihomo 安装"
     else
         ok "Mihomo 已安装"
@@ -89,7 +89,7 @@ mihomo_install() {
 
 mihomo_remove() {
     if command -v mihomo >/dev/null 2>&1; then
-        bash <(curl -fsSL $mihomo_install_url) | bash -s -- remove
+        curl -fsSL "$mihomo_install_url" | bash -s -- remove
         judge "Mihomo 卸载"
     else
         ok "Mihomo 已卸载"
@@ -100,7 +100,7 @@ mihomo_update() {
     if ! command -v mihomo >/dev/null 2>&1; then
         ok "Mihomo 已更新"
     else
-        bash <(curl -fsSL $mihomo_install_url) | bash -s -- update
+        curl -fsSL "$mihomo_install_url" | bash -s -- update
         judge "Mihomo 更新"
     fi
 }
