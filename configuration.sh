@@ -263,6 +263,7 @@ singbox_vless() {
             # reality+tcp
             local link="vless://$password@$ip:$port?encryption=none&security=reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    flow: $flow\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, tag=$ip"
             vless_reality_tcp_outbound_config
         fi
     else
@@ -294,6 +295,7 @@ xray_vless() {
             # reality+tcp
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    flow: $flow\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, tag=$ip"
             vless_reality_tcp_outbound_config
         fi
     else
@@ -320,9 +322,6 @@ mihomo_vless() {
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: grpc\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_grpc_outbound_config
         else 
-            if [ "$flow" == "null" ] || [ -z "$flow" ]; then
-                flow=""
-            fi
             # reality+tcp
             local link="vless://$password@$ip:$port?encryption=none&security=reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, tag=$ip"

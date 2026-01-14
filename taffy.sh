@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.6"
+version="v4.1.7"
 
 #fonts color
 Green="\033[32m"
