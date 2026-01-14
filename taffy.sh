@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.5"
+version="v4.1.6"
 
 #fonts color
 Green="\033[32m"
@@ -75,6 +75,7 @@ mihomo_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-mih
 mihomo_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/mihomo.yaml"
 
 mihomo_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/mihomo.yaml"
+mihomo_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/mihomo.yaml"
 
 mihomo_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
 
@@ -402,6 +403,7 @@ clash_config() {
     port: $port
     uuid: $password
     network: tcp
+    flow: xtls-rprx-vision
     tls: true
     udp: true
     packet-encoding: xudp
@@ -552,6 +554,9 @@ qx_config() {
     "shadowsocket")
     qx_cfg="shadowsocks=$domain:$port, method=$ss_method, password=$password, tag=$domain"
     ;;
+    "reality_tcp")
+    qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$public_key, reality-hex-shortid=8eb7bab5a41eb27d, tag=$ip"
+    ;;
     esac
 }
 
@@ -625,8 +630,9 @@ xray_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.python.org"
     protocol_type="reality_tcp"
+    domain="www.python.org"
+    flow="xtls-rprx-vision"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
     public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
@@ -649,7 +655,8 @@ xray_vless_reality_tcp() {
 
     enable_service xray
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    qx_config
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 }
 
@@ -659,6 +666,7 @@ xray_vless_reality_tcp_append() {
     port_check $port
 
     domain="www.python.org"
+    flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
@@ -681,7 +689,8 @@ xray_vless_reality_tcp_append() {
     rm append.json
 
     vless_reality_tcp_outbound_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    qx_config
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
     restart_service xray
 }
@@ -1022,7 +1031,8 @@ vless_reality_tcp_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"encryption\": \"none\"
+                        \"encryption\": \"none\",
+                        \"flow\": \"xtls-rprx-vision\"
                     }
                 ]
             }\
@@ -1321,6 +1331,7 @@ singbox_vless_reality_tcp() {
     port_check $port
 
     domain="www.python.org"
+    flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
@@ -1341,7 +1352,8 @@ singbox_vless_reality_tcp() {
 
     enable_service sing-box
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    qx_config
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
 
@@ -1528,6 +1540,7 @@ singbox_reality_tcp_append() {
     port_check $port
 
     domain="www.python.org"
+    flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
     private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
@@ -1555,11 +1568,11 @@ singbox_reality_tcp_append() {
 
     restart_service sing-box 
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
-
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     vless_reality_tcp_outbound_config
     clash_config
     qx_config
+    
 }
 
 singbox_shadowsocket_append() {
@@ -1836,6 +1849,43 @@ mihomo_vless_reality_grpc() {
 
     clash_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+
+}
+
+mihomo_vless_reality_tcp() {
+    password=$(mihomo generate uuid)
+    set_port
+    port_check $port
+
+    domain="www.python.org"
+    flow="xtls-rprx-vision"
+    protocol_type="reality_tcp"
+    keys=$(mihomo generate reality-keypair)
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
+    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+
+    wget -N ${mihomo_vless_reality_tcp_url} -O tmp.yaml
+    judge "Mihomo Reality 配置文件下载"
+
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${name}~$ip~" tmp.yaml
+    sed -i "s~\${privateKey}~$private_key~" tmp.yaml
+    sed -i "s~\${publicKey}~$public_key~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    rm tmp.yaml
+
+    vless_reality_tcp_outbound_config
+
+    restart_service mihomo 
+
+    clash_config
+    qx_config
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
 }
 

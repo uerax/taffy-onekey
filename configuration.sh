@@ -241,6 +241,7 @@ singbox_vless() {
     local type=$(printf "%s" "$item" | jq -r '.type')
     local port=$(printf "%s" "$item" | jq -r '.listen_port')
     local password=$(printf "%s" "$item" | jq -r '.users[0].uuid')
+    local flow=$(printf "%s" "$item" | jq -r '.users[0].flow')
     local reality=$(printf "%s" "$item" | jq -r '.tls.reality')
     if [ -n "$reality" ]; then
         local protocol=$(printf "%s" "$item" | jq -r '.transport.type')
@@ -260,8 +261,8 @@ singbox_vless() {
             vless_reality_h2_outbound_config
         else
             # reality+tcp
-            local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
-            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&security=reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    flow: $flow\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_tcp_outbound_config
         fi
     else
@@ -291,8 +292,8 @@ xray_vless() {
             vless_reality_h2_outbound_config
         else
             # reality+tcp
-            local link="vless://$password@$ip:$port?encryption=none&security=$reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
-            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&security=$reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    flow: $flow\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_tcp_outbound_config
         fi
     else
@@ -323,14 +324,14 @@ mihomo_vless() {
                 flow=""
             fi
             # reality+tcp
-            local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none${flow:+"flow=$flow"}#$ip"
-            local qx_cfg="vless=$ip:$port, method=none, password=$password, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, ${flow:+"vless-flow=$flow, "}tag=$ip"
+            local link="vless://$password@$ip:$port?encryption=none&security=reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
+            local qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, tag=$ip"
             local clash_cfg="  - name: $ip
     type: vless
     server: '$ip'
     port: $port
     uuid: $password
-$( [[ -n "$flow" ]] && echo "    flow: $flow" )
+    flow: $flow
     network: tcp
     tls: true
     udp: true
@@ -391,7 +392,8 @@ vless_reality_tcp_outbound_config() {
                 \"users\": [
                     {
                         \"id\": \"${password}\",
-                        \"encryption\": \"none\"
+                        \"encryption\": \"none\",
+                        \"flow\": \"xtls-rprx-vision\"
                     }
                 ]
             }\

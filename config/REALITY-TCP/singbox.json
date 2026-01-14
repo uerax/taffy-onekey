@@ -10,7 +10,7 @@
                 {
                     "name": "${pubicKey}",
                     "uuid": "${password}",
-                    "flow": ""
+                    "flow": "xtls-rprx-vision"
                 }
             ],
             "tls": {

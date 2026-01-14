@@ -1,0 +1,17 @@
+
+- name: 'vless-${name}'
+  type: vless
+  port: ${port} 
+  listen: "::"
+  users:
+    - username: ${publicKey}
+      uuid: ${password}
+      flow: xtls-rprx-vision
+  reality-config:
+    dest: www.python.org:443
+    private-key: ${privateKey}
+    short-id:
+      - "8eb7bab5a41eb27d"
+      - ""
+    server-names:
+      - www.python.org
