@@ -243,7 +243,7 @@ singbox_vless() {
     local password=$(printf "%s" "$item" | jq -r '.users[0].uuid')
     local flow=$(printf "%s" "$item" | jq -r '.users[0].flow')
     local reality=$(printf "%s" "$item" | jq -r '.tls.reality')
-    if [ -n "$reality" ] || [ "$reality" = "null" ]; then
+    if [ -n "$reality" ] && [ "$reality" != "null" ]; then
         local protocol=$(printf "%s" "$item" | jq -r '.transport.type')
         local pubkey=$(printf "%s" "$item" | jq -r '.users[0].name')
         local domain=$(printf "%s" "$item" | jq -r '.tls.server_name')
@@ -310,7 +310,7 @@ mihomo_vless() {
     local password=$(yq -r ".listeners[$i].users[0].uuid" $mihomo_cfg)
     local reality=$(yq -r ".listeners[$i].reality-config" $mihomo_cfg)
     local flow=$(yq -r ".listeners[$i].users[0].flow" $mihomo_cfg)
-    if [ -n "$reality" ] || [ "$reality" = "null" ]; then
+    if [ -n "$reality" ] && [ "$reality" != "null" ]; then
         local grpc=$(yq -r ".listeners[$i].grpc-service-name" $mihomo_cfg)
         local pubkey=$(yq -r ".listeners[$i].users[0].username" $mihomo_cfg)
         local domain=$(yq -r ".listeners[$i].reality-config.server-names[0]" $mihomo_cfg)
