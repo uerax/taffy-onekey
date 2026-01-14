@@ -2407,8 +2407,9 @@ mihomo_select() {
     # 2. 调用 menu_item 函数，保持数字与你给出的需求一致 (1, 2, 4, q)
     menu_item "1" "shadowsocket" "$Green"
     menu_item "2" "vless-reality-grpc" "$Cyan"
-    menu_item "3" "hysteria2" "$Cyan"
-    menu_item "4" "redirect" "$Green"
+    menu_item "3" "vless-reality-tcp" "$Cyan"
+    menu_item "4" "hysteria2" "$Cyan"
+    menu_item "5" "redirect" "$Green"
     menu_item "q" "不装了" "$Red"
     
     printf "${Purple}-------------------------------- ${Font}\n\n"
@@ -2426,9 +2427,12 @@ mihomo_select() {
         mihomo_vless_reality_grpc
         ;;
     3)
-        mihomo_hysteria2
+        mihomo_vless_reality_tcp
         ;;
     4)
+        mihomo_hysteria2
+        ;;
+    5)
         mihomo_redirect
         ;;
     q)
@@ -2450,8 +2454,9 @@ select_mihomo_append_type() {
     # 保持你需求的数字跳跃: 1, 2, 4
     menu_item "1" "shadowsocket" "$Green"
     menu_item "2" "vless-reality-grpc" "$Cyan"
-    menu_item "3" "hysteria2" "$Cyan"
-    menu_item "4" "redirect" "$Green"
+    menu_item "3" "vless-reality-tcp" "$Cyan"
+    menu_item "4" "hysteria2" "$Cyan"
+    menu_item "5" "redirect" "$Green"
     menu_item "q" "不装了" "$Red"
     
     printf "${Purple}-------------------------------- ${Font}\n\n"
@@ -2471,9 +2476,12 @@ select_mihomo_append_type() {
         mihomo_vless_reality_grpc
         ;;
     3)
-        mihomo_hysteria2
+        mihomo_vless_reality_tcp
         ;;
     4)
+        mihomo_hysteria2
+        ;;
+    5)
         mihomo_redirect
         ;;
     q)
