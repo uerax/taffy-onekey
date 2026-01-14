@@ -306,6 +306,7 @@ mihomo_vless() {
     local port=$(yq -r ".listeners[$i].port" $mihomo_cfg)
     local password=$(yq -r ".listeners[$i].users[0].uuid" $mihomo_cfg)
     local reality=$(yq -r ".listeners[$i].reality-config" $mihomo_cfg)
+    local flow=$(yq -r ".listeners[$i].users[0].flow" $mihomo_cfg)
     if [ -n "$reality" ]; then
         local grpc=$(yq -r ".listeners[$i].grpc-service-name" $mihomo_cfg)
         local pubkey=$(yq -r ".listeners[$i].users[0].username" $mihomo_cfg)
@@ -318,9 +319,29 @@ mihomo_vless() {
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: grpc\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    # skip-cert-verify: true\n    servername: $domain\n    grpc-opts:\n      grpc-service-name: \"${servName}\"\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_grpc_outbound_config
         else 
+            if [ "$flow" == "null" ] || [ -z "$flow" ]; then
+                flow=""
+            fi
             # reality+tcp
-            local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
-            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none${flow:+"flow=$flow"}#$ip"
+            local qx_cfg="vless=$ip:$port, method=none, password=$password, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, ${flow:+"vless-flow=$flow, "}tag=$ip"
+            local clash_cfg="  - name: $ip
+    type: vless
+    server: '$ip'
+    port: $port
+    uuid: $password
+$( [[ -n "$flow" ]] && echo "    flow: $flow" )
+    network: tcp
+    tls: true
+    udp: true
+    packet-encoding: xudp
+    servername: $domain
+    reality-opts:
+      public-key: $pubkey
+      short-id: $shortId
+    client-fingerprint: safari"
+            #local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n  ${flow:+"  flow: $flow\n  "}  network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
+            
             vless_reality_tcp_outbound_config
         fi
     fi
