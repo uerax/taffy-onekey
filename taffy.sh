@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty
 
 stty erase ^?
 
-version="v4.1.4"
+version="v4.1.5"
 
 #fonts color
 Green="\033[32m"
@@ -250,17 +250,17 @@ menu_item() {
 } 
 
 env_install() {
-    ${PKG_MANAGER} wget lsof curl jq openssl
-    judge "git wget lsof curl jq openssl 安装"
+    ${PKG_MANAGER} wget net-tools curl jq openssl
+    judge "git wget net-tools curl jq openssl 安装"
 }
 
 env_install_singbox() {
-    ${PKG_MANAGER} wget lsof curl jq openssl
-    judge "wget lsof curl jq openssl 安装"
+    ${PKG_MANAGER} wget net-tools curl jq openssl
+    judge "wget net-tools curl jq openssl 安装"
 }
 env_install_mihomo() {
-    ${PKG_MANAGER} wget lsof curl openssl
-    judge "wget lsof curl openssl 安装"
+    ${PKG_MANAGER} wget net-tools curl openssl
+    judge "wget net-tools curl openssl 安装"
 }
 
 yq_install() {
@@ -563,8 +563,8 @@ xray_vless_reality_h2() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -595,8 +595,8 @@ xray_vless_reality_h2_append() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -628,8 +628,8 @@ xray_vless_reality_tcp() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -661,8 +661,8 @@ xray_vless_reality_tcp_append() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
 
@@ -693,8 +693,8 @@ xray_vless_reality_grpc() {
 
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -727,8 +727,8 @@ xray_vless_reality_grpc_append() {
     domain="www.python.org"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F'PrivateKey: ' '{print $2}' | awk '{print $1}')
-    public_key=$(printf "%s" "$keys" | awk -F'Password: ' '{print $2}' | awk '{print $1}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -1260,8 +1260,8 @@ singbox_vless_reality_h2() {
     domain="www.python.org"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '{print $2}')
-    public_key=$(printf "%s" "$keys" | awk '{print $4}')
+    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
+    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1291,8 +1291,8 @@ singbox_vless_reality_grpc() {
     protocol_type="reality_grpc"
     domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '{print $2}')
-    public_key=$(printf "%s" "$keys" | awk '{print $4}')
+    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
+    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1323,8 +1323,8 @@ singbox_vless_reality_tcp() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '{print $2}')
-    public_key=$(printf "%s" "$keys" | awk '{print $4}')
+    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
+    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
@@ -1491,8 +1491,8 @@ singbox_reality_grpc_append() {
     protocol_type="reality_grpc"
     domain="www.python.org"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '{print $2}')
-    public_key=$(printf "%s" "$keys" | awk '{print $4}')
+    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
+    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -1530,8 +1530,8 @@ singbox_reality_tcp_append() {
     domain="www.python.org"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '{print $2}')
-    public_key=$(printf "%s" "$keys" | awk '{print $4}')
+    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
+    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
     # short_id=$(openssl rand -hex 8)
     ip=$(curl -sS ipinfo.io/ip)
 
@@ -1811,8 +1811,8 @@ mihomo_vless_reality_grpc() {
 
     protocol_type="reality_grpc"
     keys=$(mihomo generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk '/PrivateKey:/ {print $2}')
-    public_key=$(printf "%s" "$keys" | awk '/PrivateKey:/ {print $4}')
+    private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
+    public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
     ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
     ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
