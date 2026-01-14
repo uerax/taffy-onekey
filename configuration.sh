@@ -315,7 +315,7 @@ mihomo_vless() {
         local pubkey=$(yq -r ".listeners[$i].users[0].username" $mihomo_cfg)
         local domain=$(yq -r ".listeners[$i].reality-config.server-names[0]" $mihomo_cfg)
         local shortId=$(yq -r ".listeners[$i].reality-config.short-id[0]" $mihomo_cfg)
-        if [ -z "$grpc" ] || [ "$grpc" = "null" ]; then
+        if [ -n "$grpc" ] && [ "$grpc" != "null" ]; then
             # reality+grpc
             local servName=$(yq -r ".listeners[$i].grpc-service-name" $mihomo_cfg)
             local link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=$shortId&fp=safari&pbk=$pubkey&type=grpc&peer=$domain&allowInsecure=1&serviceName=$servName&mode=multi#$ip"
