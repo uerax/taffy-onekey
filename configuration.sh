@@ -544,8 +544,8 @@ singbox_anytls() {
     local port=$(printf "%s" "$item" | jq -r '.listen_port')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
 
-    local link="anytls://${password}@${ip}:${port}?sni=www.python.org&insecure=1#${ip}"
-    local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: www.python.org\n    skip-cert-verify: true"
+    local link="anytls://${password}@${ip}:${port}?sni=${anytls_sni}&insecure=1#${ip}"
+    local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: ${anytls_sni}\n    skip-cert-verify: true"
 
     anytls_outbound_config
 }
