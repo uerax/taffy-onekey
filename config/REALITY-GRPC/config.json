@@ -27,9 +27,9 @@
                 "security": "reality",
                 "realitySettings": {
                     "show": false,
-                    "dest": "www.python.org:443",
+                    "dest": "${reality_sni}:443",
                     "serverNames": [
-                        "www.python.org"
+                        "${reality_sni}"
                     ],
                     "privateKey": "${privateKey}",
                     "shortIds": [

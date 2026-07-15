@@ -8,10 +8,10 @@
       uuid: ${password}
   grpc-service-name: "${ws_path}"
   reality-config:
-    dest: www.python.org:443
+    dest: ${reality_sni}:443
     private-key: ${privateKey}
     short-id:
       - "8eb7bab5a41eb27d"
       - ""
     server-names:
-      - www.python.org
+      - ${reality_sni}

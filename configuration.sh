@@ -15,6 +15,8 @@ Font="\033[0m"
 singbox_cfg="/etc/sing-box/config.json"
 xray_cfg="/usr/local/etc/xray/config.json"
 mihomo_cfg="/etc/mihomo/config.yaml"
+anytls_sni="www.rust-lang.org"
+reality_sni="www.python.org"
 
 yq_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-yq.sh"
 
@@ -533,9 +535,56 @@ singbox_hy2_outbound_config() {
     show_info
 }
 
-
-
 # hysteria2 end
+
+# anytls start
+singbox_anytls() {
+    local item="$1"
+    local type=$(printf "%s" "$item" | jq -r '.type')
+    local port=$(printf "%s" "$item" | jq -r '.listen_port')
+    local password=$(printf "%s" "$item" | jq -r '.users[0].password')
+
+    local link="anytls://${password}@${ip}:${port}?sni=www.python.org&insecure=1#${ip}"
+    local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: www.python.org\n    skip-cert-verify: true"
+
+    anytls_outbound_config
+}
+
+mihomo_anytls() {
+    local item="$1"
+    local i="$item"
+    local type=$(yq -r ".listeners[$i].type" $mihomo_cfg)
+    local port=$(yq -r ".listeners[$i].port" $mihomo_cfg)
+    # users 为 map: username: password，取第一个值
+    local password=$(yq -r ".listeners[$i].users | to_entries | .[0].value" $mihomo_cfg)
+
+    local link="anytls://${password}@${ip}:${port}?sni=${anytls_sni}&insecure=1#${ip}"
+    local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: ${anytls_sni}\n    skip-cert-verify: true"
+
+    anytls_outbound_config
+}
+
+anytls_outbound_config() {
+    local singbox_outbound="{
+    \"type\": \"anytls\",
+    \"server\": \"${ip}\",
+    \"server_port\": ${port},
+    \"password\": \"${password}\",
+    \"tls\": {
+      \"enabled\": true,
+      \"server_name\": \"${anytls_sni}\",
+      \"insecure\": true,
+      \"utls\": {
+        \"enabled\": true,
+        \"fingerprint\": \"chrome\"
+      }
+    }
+}"
+
+    show_info
+}
+# anytls end
+
 xray_range() {
 
     if [ ! -e "$xray_cfg" ]; then
@@ -594,6 +643,9 @@ singbox_range() {
             "hysteria2")
                 singbox_hy2 "$inbound"
                 ;;
+            "anytls")
+                singbox_anytls "$inbound"
+                ;;
             "vmess")
                 singbox_vmess "$inbound"
                 ;;
@@ -633,6 +685,9 @@ mihomo_range() {
                 ;;
             "hysteria2")
                 mihomo_hy2 "$i"
+                ;;
+            "anytls")
+                mihomo_anytls "$i"
                 ;;
             *)
                 ;;

@@ -43,6 +43,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 现在已支持以下协议
 
 - hysteria2
+- anytls（Sing-box / Mihomo）
 - vless-tls-reality
 - vless-grpc-reality
 - vless-h2-reality

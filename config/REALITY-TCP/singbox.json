@@ -15,11 +15,11 @@
             ],
             "tls": {
                 "enabled": true,
-                "server_name": "www.python.org",
+                "server_name": "${reality_sni}",
                 "reality": {
                     "enabled": true,
                     "handshake": {
-                        "server": "www.python.org",
+                        "server": "${reality_sni}",
                         "server_port": 443
                     },
                     "private_key": "${privateKey}",

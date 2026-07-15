@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 stty erase ^?
 
-version="v4.1.7"
+version="v5.0.0"
 
 #fonts color
 Green="\033[32m"
@@ -58,6 +58,7 @@ singbox_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/mast
 singbox_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/singbox_ap.json"
 
 singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
+singbox_anytls_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/AnyTLS/singbox.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
@@ -80,6 +81,7 @@ mihomo_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onek
 mihomo_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/mihomo.yaml"
 
 mihomo_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/mihomo.yaml"
+mihomo_anytls_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/AnyTLS/mihomo.yaml"
 
 
 # MIHOMO URL END
@@ -90,6 +92,8 @@ xray_log="${xray_path}xray_log"
 protocol_type=""
 ws_path="crayfish"
 ss_method=""
+anytls_sni="www.rust-lang.org"
+reality_sni="www.python.org"
 
 xray_outbound=""
 
@@ -401,7 +405,18 @@ clash_config() {
     skip-cert-verify: true
     alpn:
     - h3"
-    ;;    
+    ;;
+    "anytls")
+    clash_cfg="  - name: $domain
+    type: anytls
+    server: '$domain'
+    port: $port
+    password: $password
+    client-fingerprint: chrome
+    udp: true
+    sni: '$anytls_sni'
+    skip-cert-verify: true"
+    ;;
     "hysteria2")
     clash_cfg="  - name: $domain
     type: hysteria2
@@ -424,7 +439,7 @@ clash_config() {
     tls: true
     udp: true
     packet-encoding: xudp
-    servername: www.python.org
+    servername: $reality_sni
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -441,7 +456,7 @@ clash_config() {
     udp: true
     packet-encoding: xudp
     # skip-cert-verify: true
-    servername: www.python.org
+    servername: $reality_sni
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -538,7 +553,7 @@ clash_config() {
     network: h2
     packet-encoding: xudp
     flow: ''
-    servername: www.python.org
+    servername: $reality_sni
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -582,7 +597,7 @@ xray_vless_reality_h2() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
@@ -598,6 +613,7 @@ xray_vless_reality_h2() {
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
     
     routing_set
     vless_reality_h2_outbound_config
@@ -614,7 +630,7 @@ xray_vless_reality_h2_append() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
@@ -631,6 +647,7 @@ xray_vless_reality_h2_append() {
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
+    sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
     xray run -confdir=./ -dump > config.json.new
     mv config.json.new config.json
@@ -648,7 +665,7 @@ xray_vless_reality_tcp() {
     port_check $port
 
     protocol_type="reality_tcp"
-    domain="www.python.org"
+    domain="$reality_sni"
     flow="xtls-rprx-vision"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
@@ -664,6 +681,7 @@ xray_vless_reality_tcp() {
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
 
     routing_set
     vless_reality_tcp_outbound_config
@@ -682,7 +700,7 @@ xray_vless_reality_tcp_append() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
@@ -700,6 +718,7 @@ xray_vless_reality_tcp_append() {
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
+    sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
     xray run -confdir=./ -dump > config.json.new
     mv config.json.new config.json
@@ -718,7 +737,7 @@ xray_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.python.org"
+    domain="$reality_sni"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
     public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
@@ -734,6 +753,7 @@ xray_vless_reality_grpc() {
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
 
     routing_set
     vless_reality_grpc_outbound_config
@@ -751,7 +771,7 @@ xray_vless_reality_grpc_append() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
@@ -769,6 +789,7 @@ xray_vless_reality_grpc_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~\${port}~$port~" append.json
+    sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
     xray run -confdir=./ -dump > config.json.new
     mv config.json.new config.json
@@ -1004,7 +1025,29 @@ singbox_hy2_outbound_config() {
         \"fingerprint\": \"chrome\"
       }
     },
-    \"password\": \"${password}\"\n}"   
+    \"password\": \"${password}\"\n}"
+}
+
+anytls_outbound_config() {
+    # 服务端地址优先用 domain（安装时多为公网 IP），否则用 ip
+    _any_host="${domain}"
+    [ -z "${_any_host}" ] && _any_host="${ip}"
+    singbox_outbound="{
+    \"type\": \"anytls\",
+    \"server\": \"${_any_host}\",
+    \"server_port\": ${port},
+    \"password\": \"${password}\",
+    \"tls\": {
+      \"enabled\": true,
+      \"server_name\": \"${anytls_sni}\",
+      \"insecure\": true,
+      \"utls\": {
+        \"enabled\": true,
+        \"fingerprint\": \"chrome\"
+      }
+    }
+}"
+    xray_outbound=""
 }
 
 vless_reality_grpc_outbound_config() {
@@ -1285,12 +1328,59 @@ singbox_hy2() {
     clash_config
 }
 
+# 自签证书：已有则复用（避免 append 冲掉 hy2/anytls 共用证书）
+_ensure_self_signed_tls() {
+    cert_dir="$1"
+    mkdir -p "${cert_dir}"
+    if [ ! -f "${cert_dir}/server.crt" ] || [ ! -f "${cert_dir}/server.key" ]; then
+        if ! command -v openssl >/dev/null 2>&1; then
+            ${PKG_MANAGER} openssl
+            judge "openssl 安装"
+        fi
+        openssl ecparam -name prime256v1 -genkey -noout -out "${cert_dir}/server.key"
+        openssl req -x509 -nodes -key "${cert_dir}/server.key" -out "${cert_dir}/server.crt" \
+            -subj "/CN=${anytls_sni}" -days 36500
+        chmod 644 "${cert_dir}/server.crt"
+        chmod 600 "${cert_dir}/server.key"
+    fi
+}
+
+singbox_anytls() {
+    set_port
+    port_check $port
+    _ensure_self_signed_tls "${singbox_cfg_path}"
+
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
+    domain=$(curl -sS --connect-timeout 4 https://ip.me)
+    ip="${domain}"
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+
+    wget -N ${singbox_anytls_url} -O config.json
+    judge "AnyTLS 配置文件下载"
+
+    sed -i "s~\${password}~$password~" config.json
+    sed -i "s~114514~$port~" config.json
+
+    mv config.json ${singbox_cfg}
+
+    singbox_routing_set
+
+    restart_service sing-box
+    enable_service sing-box
+
+    protocol_type="anytls"
+    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+
+    anytls_outbound_config
+    clash_config
+}
+
 singbox_vless_reality_h2() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
     private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
@@ -1306,6 +1396,7 @@ singbox_vless_reality_h2() {
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
     restart_service sing-box
 
@@ -1322,7 +1413,7 @@ singbox_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.python.org"
+    domain="$reality_sni"
     keys=$(sing-box generate reality-keypair)
     private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
     public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
@@ -1338,6 +1429,7 @@ singbox_vless_reality_grpc() {
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
     restart_service sing-box
 
@@ -1353,7 +1445,7 @@ singbox_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
@@ -1370,6 +1462,7 @@ singbox_vless_reality_tcp() {
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
+    sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
     restart_service sing-box 
 
@@ -1519,13 +1612,46 @@ singbox_hy2_append() {
     clash_config
 }
 
+singbox_anytls_append() {
+    set_port
+    port_check $port
+    _ensure_self_signed_tls "${singbox_cfg_path}"
+
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
+    domain=$(curl -sS --connect-timeout 4 https://ip.me)
+    ip="${domain}"
+
+    wget -N ${singbox_anytls_url} -O append.json
+    judge "AnyTLS 配置文件下载"
+
+    sed -i "s~\${password}~$password~" append.json
+    sed -i "s~114514~$port~" append.json
+
+    stop_service sing-box
+
+    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
+
+    rm append.json
+
+    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
+    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
+
+    restart_service sing-box
+
+    protocol_type="anytls"
+    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+
+    anytls_outbound_config
+    clash_config
+}
+
 singbox_reality_grpc_append() {
     password=$(sing-box generate uuid)
     set_port
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.python.org"
+    domain="$reality_sni"
     keys=$(sing-box generate reality-keypair)
     private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
     public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
@@ -1540,6 +1666,7 @@ singbox_reality_grpc_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~114514~$port~" append.json
+    sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
     stop_service sing-box
 
@@ -1563,7 +1690,7 @@ singbox_reality_tcp_append() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
@@ -1579,6 +1706,7 @@ singbox_reality_tcp_append() {
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~114514~$port~" append.json
+    sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
     stop_service sing-box
 
@@ -1853,7 +1981,7 @@ mihomo_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
-    domain="www.python.org"
+    domain="$reality_sni"
     keys=$(mihomo generate reality-keypair)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
     public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
@@ -1869,6 +1997,7 @@ mihomo_vless_reality_grpc() {
     sed -i "s~\${publicKey}~$public_key~" tmp.yaml
     sed -i "s~\${ws_path}~$ws_path~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
+    sed -i "s~\${reality_sni}~$reality_sni~" tmp.yaml
 
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
@@ -1888,7 +2017,7 @@ mihomo_vless_reality_tcp() {
     set_port
     port_check $port
 
-    domain="www.python.org"
+    domain="$reality_sni"
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(mihomo generate reality-keypair)
@@ -1905,6 +2034,7 @@ mihomo_vless_reality_tcp() {
     sed -i "s~\${privateKey}~$private_key~" tmp.yaml
     sed -i "s~\${publicKey}~$public_key~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
+    sed -i "s~\${reality_sni}~$reality_sni~" tmp.yaml
 
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
@@ -1952,6 +2082,40 @@ mihomo_hysteria2() {
     link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
     singbox_hy2_outbound_config
     clash_config
+}
+
+mihomo_anytls() {
+    set_port
+    port_check $port
+    _ensure_self_signed_tls "${mihomo_cfg}"
+
+    protocol_type="anytls"
+
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
+    ip=$(curl -sS --connect-timeout 4 https://ip.me)
+    domain=$ip
+    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+
+    wget -N ${mihomo_anytls_url} -O tmp.yaml
+    judge "AnyTLS 配置文件下载"
+
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${ip}~$ip~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
+
+    cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml
+    rm tmp.yaml
+
+    restart_service mihomo
+
+    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+    anytls_outbound_config
+    clash_config
+}
+
+mihomo_anytls_append() {
+    mihomo_anytls
 }
 
 mihomo_redirect() {
@@ -2289,14 +2453,15 @@ select_singbox_append_type() {
     menu_item "3" "vless-reality-tcp"
     menu_item "4" "vless-reality-grpc"
     menu_item "5" "redirect"
+    menu_item "6" "anytls" "$Cyan"
     menu_item "q" "不装了" "$Red"
-    
+
     printf "${Purple}-------------------------------- ${Font}\n\n"
-    
+
     # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
     printf "输入数字(回车确认): "
     read -r menu_num
-    
+
     # 4. 打印一个空行保持美观
     printf "\n"
     case $menu_num in
@@ -2316,6 +2481,9 @@ select_singbox_append_type() {
         singbox_redirect_append
         exit
         ;;
+    6)
+        singbox_anytls_append
+        ;;
     q)
         exit
         ;;
@@ -2330,22 +2498,23 @@ select_singbox_append_type() {
 singbox_select() {
     printf "${Green}选择安装的协议 ${Font}\n"
     printf "${Purple}-------------------------------- ${Font}\n"
-    
+
     # 2. 直接调用你的 menu_item 函数
     menu_item "1" "hysteria2"
     menu_item "2" "vless-reality-tcp"
     menu_item "3" "vless-reality-grpc"
     menu_item "4" "vless-reality-h2"
     menu_item "5" "shadowsocket"
+    menu_item "6" "anytls" "$Cyan"
     menu_item "10" "redirect"
     menu_item "q" "不装了" "$Red"
-    
+
     printf "${Purple}-------------------------------- ${Font}\n\n"
-    
+
     # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
     printf "输入数字(回车确认): "
     read -r menu_num
-    
+
     # 4. 打印一个空行保持美观
     printf "\n"
     case $menu_num in
@@ -2363,6 +2532,9 @@ singbox_select() {
         ;;
     5)
         singbox_shadowsocket
+        ;;
+    6)
+        singbox_anytls
         ;;
     10)
         singbox_redirect
@@ -2436,10 +2608,11 @@ mihomo_select() {
     menu_item "3" "vless-reality-tcp" "$Cyan"
     menu_item "4" "hysteria2" "$Cyan"
     menu_item "5" "redirect" "$Green"
+    menu_item "6" "anytls" "$Cyan"
     menu_item "q" "不装了" "$Red"
-    
+
     printf "${Purple}-------------------------------- ${Font}\n\n"
-    
+
     # 3. 兼容所有系统的读取方式：先 printf 提示，再 read 读取
     # 这样在 Alpine 下不会报错，且光标位置与 read -p 一致
     printf "输入数字(回车确认): "
@@ -2461,6 +2634,9 @@ mihomo_select() {
     5)
         mihomo_redirect
         ;;
+    6)
+        mihomo_anytls
+        ;;
     q)
         exit
         ;;
@@ -2475,7 +2651,7 @@ mihomo_select() {
 select_mihomo_append_type() {
     printf "${Green}选择要插入的协议 ${Font}\n"
     printf "${Purple}-------------------------------- ${Font}\n"
-    
+
     # 2. 复用 menu_item 函数 (数字, 内容, 颜色)
     # 保持你需求的数字跳跃: 1, 2, 4
     menu_item "1" "shadowsocket" "$Green"
@@ -2483,15 +2659,16 @@ select_mihomo_append_type() {
     menu_item "3" "vless-reality-tcp" "$Cyan"
     menu_item "4" "hysteria2" "$Cyan"
     menu_item "5" "redirect" "$Green"
+    menu_item "6" "anytls" "$Cyan"
     menu_item "q" "不装了" "$Red"
-    
+
     printf "${Purple}-------------------------------- ${Font}\n\n"
-    
+
     # 3. 兼容性读取：先用 printf 提示，再用 read 读取
     # 这样在 Alpine/BusyBox 环境下不会报错
     printf "输入数字(回车确认): "
     read -r menu_num
-    
+
     # 4. 打印一个空行，保持间距美观
     printf "\n"
     case $menu_num in
@@ -2509,6 +2686,9 @@ select_mihomo_append_type() {
         ;;
     5)
         mihomo_redirect
+        ;;
+    6)
+        mihomo_anytls_append
         ;;
     q)
         exit

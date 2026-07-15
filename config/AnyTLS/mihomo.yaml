@@ -1,0 +1,9 @@
+
+- name: 'anytls-${ip}'
+  type: anytls
+  port: ${port}
+  listen: "::"
+  users:
+    taffy: "${password}"
+  certificate: /etc/mihomo/server.crt
+  private-key: /etc/mihomo/server.key

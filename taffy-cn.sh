@@ -43,6 +43,7 @@ xray_log="/var/log/xray"
 protocol_type=""
 
 ss_method=""
+reality_sni="www.python.org"
 
 xray_outbound=''
 
@@ -350,7 +351,7 @@ clash_config() {
     network: tcp
     tls: true
     udp: true
-    servername: www.python.org
+    servername: $reality_sni
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
@@ -366,7 +367,7 @@ clash_config() {
     tls: true
     udp: true
     # skip-cert-verify: true
-    servername: www.python.org
+    servername: $reality_sni
     grpc-opts:
       grpc-service-name: \"${ws_path}\"
     reality-opts:
@@ -460,7 +461,7 @@ clash_config() {
     udp: true
     network: h2
     flow: ''
-    servername: www.python.org
+    servername: $reality_sni
     reality-opts:
       public-key: $public_key
       short-id: 8eb7bab5a41eb27d
