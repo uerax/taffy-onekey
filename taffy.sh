@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binstty 
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 stty erase ^?
 
@@ -118,7 +118,10 @@ xray_onekey_install() {
 is_root() {
     if [ "$(id -u)" -eq 0 ]; then
         ok "进入安装流程"
-        apt purge needrestart -y
+        # needrestart 仅 Debian/Ubuntu 常见，Alpine 无 apt
+        if command -v apt >/dev/null 2>&1; then
+            apt purge needrestart -y >/dev/null 2>&1 || true
+        fi
         sleep 3
     else
         error "请切使用root用户执行脚本"
@@ -281,9 +284,21 @@ yq_install() {
         if ! command -v wget >/dev/null 2>&1; then
             $PKG_MANAGER wget
         fi
-        
-        # 下载二进制文件
-        wget -q "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" -O /usr/local/bin/yq
+
+        # 按架构选择二进制，避免 arm64 误下 amd64
+        arch_raw=$(uname -m)
+        case "${arch_raw}" in
+            x86_64) yq_arch="amd64" ;;
+            aarch64|arm64) yq_arch="arm64" ;;
+            armv7l) yq_arch="arm" ;;
+            i386|i686) yq_arch="386" ;;
+            *)
+                error "不支持的架构: ${arch_raw}"
+                return 1
+                ;;
+        esac
+
+        wget -q "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${yq_arch}" -O /usr/local/bin/yq
         chmod +x /usr/local/bin/yq
     fi
 }
@@ -323,8 +338,10 @@ port_check() {
 
 close_firewall() {
     if command -v iptables >/dev/null 2>&1; then
-        # 主要针对oracle vps
-        apt purge netfilter-persistent -y
+        # 主要针对 oracle vps；仅 Debian/Ubuntu 有 netfilter-persistent
+        if command -v apt >/dev/null 2>&1; then
+            apt purge netfilter-persistent -y >/dev/null 2>&1 || true
+        fi
         iptables -P INPUT ACCEPT
         iptables -P FORWARD ACCEPT
         iptables -P OUTPUT ACCEPT
@@ -336,7 +353,7 @@ close_firewall() {
 xray_install() {
 
     if ! command -v xray >/dev/null 2>&1; then
-        if [ "${system}" = "alpine" ]; then
+        if [ "${ID}" = "alpine" ]; then
             install_url="https://github.com/XTLS/Xray-install/raw/main/alpinelinux/install-release.sh"
         else
             install_url="${xray_install_url}"
@@ -380,7 +397,7 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: https://www.python.org
+    sni: www.python.org
     skip-cert-verify: true
     alpn:
     - h3"
@@ -615,9 +632,9 @@ xray_vless_reality_h2_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    xray run -confdir=./ -dump  > config.json
+    xray run -confdir=./ -dump > config.json.new
+    mv config.json.new config.json
     rm append.json
-    
 
     vless_reality_h2_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
@@ -684,8 +701,8 @@ xray_vless_reality_tcp_append() {
     sed -i "s~\${pubicKey}~$public_key~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    xray run -confdir=./ -dump  > config.json
-
+    xray run -confdir=./ -dump > config.json.new
+    mv config.json.new config.json
     rm append.json
 
     vless_reality_tcp_outbound_config
@@ -701,6 +718,7 @@ xray_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
+    domain="www.python.org"
     keys=$(xray x25519)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
     public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
@@ -752,14 +770,15 @@ xray_vless_reality_grpc_append() {
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    xray run -confdir=./ -dump  > config.json
+    xray run -confdir=./ -dump > config.json.new
+    mv config.json.new config.json
     rm append.json
 
     vless_reality_grpc_outbound_config
     link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
 
-    restart_service xray 
+    restart_service xray
 }
 
 xray_shadowsocket() {
@@ -784,6 +803,7 @@ xray_shadowsocket() {
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
+      ss_method="2022-blake3-aes-128-gcm"
       ;;
     2)
       password=$(openssl rand -base64 32)
@@ -801,7 +821,7 @@ xray_shadowsocket() {
       password=$(openssl rand -base64 16)
       ss_method="chacha20-ietf-poly1305"
       ;;
-    5)
+    6)
       password=$(openssl rand -base64 16)
       ss_method="xchacha20-ietf-poly1305"
       ;;
@@ -885,6 +905,7 @@ xray_shadowsocket_append() {
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
+      ss_method="2022-blake3-aes-128-gcm"
       ;;
     2)
       password=$(openssl rand -base64 32)
@@ -902,7 +923,7 @@ xray_shadowsocket_append() {
       password=$(openssl rand -base64 16)
       ss_method="chacha20-ietf-poly1305"
       ;;
-    5)
+    6)
       password=$(openssl rand -base64 16)
       ss_method="xchacha20-ietf-poly1305"
       ;;
@@ -920,7 +941,8 @@ xray_shadowsocket_append() {
     sed -i "s~\${method}~$ss_method~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    xray run -confdir=./ -dump  > config.json
+    xray run -confdir=./ -dump > config.json.new
+    mv config.json.new config.json
     rm append.json
 
     tmp="${ss_method}:${password}"
@@ -959,7 +981,7 @@ xray_redirect_append() {
     mv tmp.json config.json
     rm append.json
 
-    systemctl restart xray
+    restart_service xray
 
     printf "${Green}IP为:${Font} ${ip}\n"
     printf "${Green}端口为:${Font} ${port}\n"
@@ -975,7 +997,7 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://www.python.org\",
+      \"server_name\": \"www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,
@@ -1132,7 +1154,8 @@ socks5_append() {
     sed -i "s~\${user}~$user~" append.json
     sed -i "s~\${port}~$port~" append.json
 
-    xray run -confdir ./ -dump > config.json
+    xray run -confdir=./ -dump > config.json.new
+    mv config.json.new config.json
     rm append.json
 
     restart_service xray
@@ -1256,7 +1279,7 @@ singbox_hy2() {
     restart_service sing-box
     
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
@@ -1383,6 +1406,7 @@ singbox_shadowsocket() {
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
+      ss_method="2022-blake3-aes-128-gcm"
       ;;
     2)
       password=$(sing-box generate rand 32 --base64)
@@ -1400,7 +1424,7 @@ singbox_shadowsocket() {
       password=$(sing-box generate rand 16 --base64)
       ss_method="chacha20-ietf-poly1305"
       ;;
-    5)
+    6)
       password=$(sing-box generate rand 16 --base64)
       ss_method="xchacha20-ietf-poly1305"
       ;;
@@ -1488,7 +1512,7 @@ singbox_hy2_append() {
     
     protocol_type="hysteria2_nodomain"
 
-    link="hysteria2://${password}@${domain}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
 
@@ -1598,6 +1622,7 @@ singbox_shadowsocket_append() {
     case $encrypt in
     1)
       password=$(sing-box generate rand 16 --base64)
+      ss_method="2022-blake3-aes-128-gcm"
       ;;
     2)
       password=$(sing-box generate rand 32 --base64)
@@ -1615,7 +1640,7 @@ singbox_shadowsocket_append() {
       password=$(sing-box generate rand 16 --base64)
       ss_method="chacha20-ietf-poly1305"
       ;;
-    5)
+    6)
       password=$(sing-box generate rand 16 --base64)
       ss_method="xchacha20-ietf-poly1305"
       ;;
@@ -1729,6 +1754,10 @@ mihomo_onekey_install() {
         printf "${Red}mihomo 安装失败!!!${Font}\n"
         exit 1
     fi
+    # 一键安装视为更换：清空旧 listeners，避免重复堆叠
+    if [ -f "${mihomo_cfg}/config.yaml" ]; then
+        mihomo_clear_listeners
+    fi
     mihomo_select
 }
 
@@ -1758,6 +1787,7 @@ mihomo_shadowsocket() {
     case $encrypt in
     1)
       password=$(openssl rand -base64 16)
+      ss_method="2022-blake3-aes-128-gcm"
       ;;
     2)
       password=$(openssl rand -base64 32)
@@ -1775,7 +1805,7 @@ mihomo_shadowsocket() {
       password=$(openssl rand -base64 16)
       ss_method="chacha20-ietf-poly1305"
       ;;
-    5)
+    6)
       password=$(openssl rand -base64 16)
       ss_method="xchacha20-ietf-poly1305"
       ;;
@@ -1823,6 +1853,7 @@ mihomo_vless_reality_grpc() {
     port_check $port
 
     protocol_type="reality_grpc"
+    domain="www.python.org"
     keys=$(mihomo generate reality-keypair)
     private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
     public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
@@ -1916,11 +1947,11 @@ mihomo_hysteria2() {
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
     rm tmp.yaml
 
-    restart_service mihomo 
+    restart_service mihomo
 
+    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
     singbox_hy2_outbound_config
     clash_config
-    
 }
 
 mihomo_redirect() {
@@ -1988,32 +2019,27 @@ open_bbr() {
     is_root
     . '/etc/os-release'
     info "过于老的系统版本会导致开启失败"
+    # 使用 drop-in，避免整文件覆盖 /etc/sysctl.conf
+    bbr_dropin="/etc/sysctl.d/99-taffy-bbr.conf"
     if [ "${ID}" = "debian" ] && [ "${VERSION_ID}" -ge 9 ]; then
         info "检测系统为 debian"
-        #echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
-        #apt update && apt -t buster-backports install linux-image-amd64
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf
+        mkdir -p /etc/sysctl.d
+        wget -N ${bbr_config_url} -O "${bbr_dropin}"
         judge "配置文件下载"
-        sysctl -p
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}"
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [ "${ID}" = "ubuntu" ] && [ "$(printf "%s" "${VERSION_ID}" | cut -d '.' -f1)" -ge 18 ]; then
         info "检测系统为 ubuntu"
-        wget -N ${bbr_config_url} -O /etc/sysctl.conf
+        mkdir -p /etc/sysctl.d
+        wget -N ${bbr_config_url} -O "${bbr_dropin}"
         judge "配置文件下载"
-        sysctl -p
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}"
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [ "${ID}" = "centos" ]; then
         error "centos fuck out!"
         exit 1
-    #    INS = "yum install -y"
-    # RedHat 系发行版关闭 SELinux
-    #if [[ "${ID}" == "centos" || "${ID}" == "ol" ]]; then
-    #  sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    #  setenforce 0
-    #fi
-    #    env_install
     else
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1

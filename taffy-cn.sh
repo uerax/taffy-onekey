@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-stty erase ^?/
+stty erase ^?
 
 version="v3.0.3"
 

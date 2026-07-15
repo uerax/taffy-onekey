@@ -6,7 +6,6 @@
   users:
     - username: ${publicKey}
       uuid: ${password}
-      flow: xtls-rprx-vision
   grpc-service-name: "${ws_path}"
   reality-config:
     dest: www.python.org:443

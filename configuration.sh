@@ -276,6 +276,7 @@ xray_vless() {
     local type=$(printf "%s" "$item" | jq -r '.protocol')
     local port=$(printf "%s" "$item" | jq -r '.port')
     local password=$(printf "%s" "$item" | jq -r '.settings.clients[0].id')
+    local flow=$(printf "%s" "$item" | jq -r '.settings.clients[0].flow // empty')
     local reality=$(printf "%s" "$item" | jq -r '.streamSettings.security')
     if [ "$reality" = "reality" ]; then
         local protocol=$(printf "%s" "$item" | jq -r '.streamSettings.network')
@@ -289,10 +290,13 @@ xray_vless() {
             vless_reality_grpc_outbound_config
         elif [ "$protocol" = "h2" ]; then
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&sid=$shortId&sni=$domain&fp=safari&pbk=$pubkey&type=http#$ip"
-            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"        
+            local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    network: h2\n    flow: ''\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             vless_reality_h2_outbound_config
         else
             # reality+tcp
+            if [ -z "$flow" ] || [ "$flow" = "null" ]; then
+                flow="xtls-rprx-vision"
+            fi
             local link="vless://$password@$ip:$port?encryption=none&security=$reality&flow=$flow&sni=$domain&fp=safari&sid=$shortId&pbk=$pubkey&type=tcp&headerType=none#$ip"
             local clash_cfg="  - name: $ip\n    type: vless\n    server: '$ip'\n    port: $port\n    uuid: $password\n    flow: $flow\n    network: tcp\n    tls: true\n    udp: true\n    packet-encoding: xudp\n    servername: $domain\n    reality-opts:\n      public-key: $pubkey\n      short-id: $shortId\n    client-fingerprint: safari"
             local qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$pubkey, reality-hex-shortid=$shortId, tag=$ip"
@@ -485,24 +489,25 @@ singbox_hy2() {
     local down=$(printf "%s" "$item" | jq -r '.down_mbps')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
     
-    local link="hysteria2://${password}@${ip}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?sni=www.python.org&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
 
 mihomo_hy2() {
     local item="$1"
+    local i="$item"
     local type=$(yq -r ".listeners[$i].type" $mihomo_cfg)
     local port=$(yq -r ".listeners[$i].port" $mihomo_cfg)
     local up=$(yq -r ".listeners[$i].up" $mihomo_cfg)
     local down=$(yq -r ".listeners[$i].down" $mihomo_cfg)
     local password=$(yq -r ".listeners[$i].users.user1" $mihomo_cfg)
 
-    local link="hysteria2://${password}@${ip}:${port}?peer=https://www.python.org&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?sni=www.python.org&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: https://www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: www.python.org\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -516,7 +521,7 @@ singbox_hy2_outbound_config() {
     \"tls\": {
       \"enabled\": true,
       \"disable_sni\": false,
-      \"server_name\": \"https://www.python.org\",
+      \"server_name\": \"www.python.org\",
       \"insecure\": true,
       \"utls\": {
         \"enabled\": false,
@@ -524,7 +529,7 @@ singbox_hy2_outbound_config() {
       }
     },
     \"password\": \"${password}\"\n  }"
-    
+
     show_info
 }
 
