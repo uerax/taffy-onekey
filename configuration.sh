@@ -29,12 +29,29 @@ yq_install() {
             printf "Alpine 环境：直接通过 apk 安装 yq...\n"
             apk add --no-cache yq
         else
-            # 其他系统（Ubuntu/CentOS）再跑你的远程脚本
+            # 其他系统（Ubuntu/Debian）再跑你的远程脚本
             printf "正在通过远程脚本安装 yq ...\n"
             curl -fsSL "$yq_install_url" | bash || curl -fsSL "$yq_install_url" | sh
+            if ! command -v yq >/dev/null 2>&1; then
+                printf "yq 安装失败\n"
+                exit 1
+            fi
         fi
     else
         printf "yq 已安装\n"
+    fi
+}
+
+get_public_ip() {
+    ip=""
+    ipv6=""
+    for _url in "https://ip.me" "https://ifconfig.me/ip" "https://ipinfo.io/ip"; do
+        ip=$(curl -4 -fsS --connect-timeout 4 "${_url}" 2>/dev/null | tr -d ' \n\r')
+        [ -n "${ip}" ] && break
+    done
+    ipv6=$(curl -6 -fsS --connect-timeout 4 https://ip.me 2>/dev/null | tr -d ' \n\r')
+    if [ -z "${ip}" ] && [ -n "${ipv6}" ]; then
+        ip="${ipv6}"
     fi
 }
 
@@ -47,7 +64,7 @@ xray_vmess() {
     local port=443
     local path=$(printf "%s" "$item" | jq -r '.streamSettings.wsSettings.path')
     local domain=$ip
-    local hq_ip="cloudflare.182682.xyz"
+    local hq_ip=""
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     #local encode_link=$(openssl base64 <<< $tmp)
@@ -71,7 +88,7 @@ singbox_vmess() {
     local domain=$(printf "%s" "$item" | jq -r '.tls.server_name')
     local method=$(printf "%s" "$item" | jq -r '.transport.type')
     local path=$(printf "%s" "$item" | jq -r '.transport.path')
-    local hq_ip="cloudflare.182682.xyz"
+    local hq_ip=""
 
     local tmp="{\"v\":\"2\",\"ps\":\"${domain}\",\"add\":\"${domain}\",\"port\":\"443\",\"id\":\"${password}\",\"aid\":\"0\",\"scy\":\"auto\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"${domain}\",\"path\":\"${path}\",\"tls\":\"tls\",\"sni\":\"${domain}\",\"alpn\":\"\",\"fp\":\"safari\"}"
     #local encode_link=$(openssl base64 <<< $tmp)
@@ -589,14 +606,10 @@ xray_range() {
 
     if [ ! -e "$xray_cfg" ]; then
         printf "%s" "Xray Config does not exist. Exiting."
-        exit 1  # 非零的退出状态表示异常退出
+        exit 1
     fi
 
-    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
-    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
-    if [ ! -n "$ip" ]; then
-        ip=$ipv6
-    fi
+    get_public_ip
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $xray_cfg | while read -r inbound; do
         type=$(printf "%s" "$inbound" | jq -r '.protocol')
@@ -621,14 +634,10 @@ singbox_range() {
 
     if [ ! -e "$singbox_cfg" ]; then
         printf "%s" "Singbox Config does not exist. Exiting."
-        exit 1  # 非零的退出状态表示异常退出
+        exit 1
     fi
 
-    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
-    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
-    if [ ! -n "$ip" ]; then
-        ip=$ipv6
-    fi
+    get_public_ip
     # 遍历 JSON 数组并调用相应函数
     jq -c '.inbounds[]' $singbox_cfg | while read -r inbound; do
         type=$(printf "%s" "$inbound" | jq -r '.type')
@@ -661,18 +670,14 @@ singbox_range() {
 mihomo_range() {
     if [ ! -e "$mihomo_cfg" ]; then
         printf "Mihomo Config does not exist. Exiting."
-        exit 1  # 非零的退出状态表示异常退出
+        exit 1
     fi
 
     if ! command -v yq >/dev/null 2>&1; then
         yq_install
     fi
 
-    ip=$(curl -s4 --connect-timeout 4 https://ip.me)
-    ipv6=$(curl -s6 --connect-timeout 4 https://ip.me)
-    if [ ! -n "$ip" ]; then
-        ip=$ipv6
-    fi
+    get_public_ip
 
     for i in $(yq '.listeners | keys | .[]' $mihomo_cfg); do
         type=$(yq -r ".listeners[$i].type" $mihomo_cfg)

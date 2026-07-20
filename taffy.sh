@@ -379,17 +379,17 @@ menu_item() {
 } 
 
 env_install() {
-    ${PKG_MANAGER} wget net-tools curl jq openssl
-    judge "git wget net-tools curl jq openssl 安装"
+    ${PKG_MANAGER} wget lsof curl jq openssl
+    judge "git wget lsof curl jq openssl 安装"
 }
 
 env_install_singbox() {
-    ${PKG_MANAGER} wget net-tools curl jq openssl
-    judge "wget net-tools curl jq openssl 安装"
+    ${PKG_MANAGER} wget lsof curl jq openssl
+    judge "wget lsof curl jq openssl 安装"
 }
 env_install_mihomo() {
-    ${PKG_MANAGER} wget net-tools curl openssl
-    judge "wget net-tools curl openssl 安装"
+    ${PKG_MANAGER} wget lsof curl openssl
+    judge "wget lsof curl openssl 安装"
 }
 
 yq_install() {
@@ -433,20 +433,21 @@ port_check() {
     local check_port=""
     local pid=""
 
-    if command -v ss >/dev/null 2>&1; then
-        check_port=$(ss -lnt 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1)
+    if command -v lsof >/dev/null 2>&1; then
+        # lsof -i :port returns listening process info
+        check_port=$(lsof -i TCP:"${port}" -P -n -s TCP:LISTEN 2>/dev/null | head -n2)
     fi
-    if [ -z "${check_port}" ] && command -v netstat >/dev/null 2>&1; then
-        check_port=$(netstat -anl 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | head -n1)
+    if [ -z "${check_port}" ] && command -v ss >/dev/null 2>&1; then
+        check_port=$(ss -lnt 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1)
     fi
 
     if [ -n "${check_port}" ]; then
         warn "端口 ${port} 已被占用"
-        if command -v ss >/dev/null 2>&1; then
-            pid=$(ss -lntp 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1 | sed -n 's/.*pid=\([0-9]*\).*/\1/p')
+        if command -v lsof >/dev/null 2>&1; then
+            pid=$(lsof -i TCP:"${port}" -P -n -s TCP:LISTEN 2>/dev/null | awk 'NR>1{print $2; exit}')
         fi
-        if [ -z "${pid}" ] && command -v netstat >/dev/null 2>&1; then
-            pid=$(netstat -anp 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | awk '{print $7}' | cut -d'/' -f1 | head -n1)
+        if [ -z "${pid}" ] && command -v ss >/dev/null 2>&1; then
+            pid=$(ss -lntp 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1 | sed -n 's/.*pid=\([0-9]*\).*/\1/p')
         fi
         if [ -n "${pid}" ] && [ "${pid}" != "-" ]; then
             warn "占用进程 PID: ${pid}"
