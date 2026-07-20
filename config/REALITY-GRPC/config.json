@@ -33,7 +33,7 @@
                     ],
                     "privateKey": "${privateKey}",
                     "shortIds": [
-                        "8eb7bab5a41eb27d",
+                        "${shortId}",
                         ""
                     ]
                 },

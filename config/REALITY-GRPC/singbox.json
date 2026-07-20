@@ -24,7 +24,7 @@
                     },
                     "private_key": "${privateKey}",
                     "short_id": [
-                        "8eb7bab5a41eb27d",
+                        "${shortId}",
                         ""
                     ]
                 }

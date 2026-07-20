@@ -1,6 +1,4 @@
 {
-    "route": {
-    },
     "inbounds": [
         {
             "type": "vless",
@@ -29,11 +27,6 @@
                     ]
                 }
             }
-        }
-    ],
-    "outbounds": [
-        {
-            "type": "direct"
         }
     ]
 }

@@ -1,0 +1,24 @@
+{
+    "inbounds": [
+        {
+            "type": "hysteria2",
+            "listen": "::",
+            "listen_port": 114514,
+            "up_mbps": 200,
+            "down_mbps": 50,
+            "users": [
+                {
+                    "password": "${password}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "alpn": [
+                    "h3"
+                ],
+                "certificate_path": "/etc/sing-box/server.crt",
+                "key_path": "/etc/sing-box/server.key"
+            }
+        }
+    ]
+}

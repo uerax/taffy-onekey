@@ -47,7 +47,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 | Core | Config path | Notes |
 |------|-------------|--------|
 | Xray | `/usr/local/etc/xray/config.json` | Extra dir `/opt/xray/` |
-| Sing-box | `/etc/sing-box/config.json` | Service name `sing-box` |
+| Sing-box | `/etc/sing-box/config.json` | Service name `sing-box`; `install-singbox.sh` uses `.deb` on Debian/Ubuntu, binary+OpenRC on Alpine |
 | Mihomo | `/etc/mihomo/config.yaml` | Base template from `config/Clash/config.yaml` |
 
 ## Architecture
@@ -55,10 +55,10 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 ### Layers
 
 ```
-taffy.sh (v4.1.7, #!/bin/sh)     # full product: menu + protocol orchestration
+taffy.sh (v5.1.0, #!/bin/sh)     # full product: menu + protocol orchestration
 taffy-cn.sh (v3.0.3, bash)       # thinner China fork (duplicated logic, not a wrapper)
   → install-xray.sh / -cn        # binary + unit only (xray from XTLS install lineage)
-  → install-singbox.sh           # latest sing-box .deb
+  → install-singbox.sh           # sing-box: .deb (Debian/Ubuntu) or binary+OpenRC (Alpine)
   → install-mihomo.sh / -cn      # mihomo package + systemd/OpenRC + base YAML
   → install-yq.sh                # mikefarah/yq (or apk yq on Alpine)
   → config/<Protocol>/…          # templates with ${placeholders}, fetched by URL
@@ -66,8 +66,8 @@ taffy-cn.sh (v3.0.3, bash)       # thinner China fork (duplicated logic, not a w
 ```
 
 - **`taffy.sh`**: Xray + Sing-box + Mihomo, BBR, routing helpers, replace + append flows. Template URLs are `raw.githubusercontent.com/uerax/taffy-onekey/master/config/...`.
-- **`taffy-cn.sh`**: Fewer menus/cores (no Sing-box path like main); every GitHub URL prefixed with `gh-proxy.com`. Treat as a **separate** codebase that must be patched independently if behavior should match.
-- **`configuration.sh`**: Standalone. Often pulled **remotely** by `show_*_info` via `run_remote_script` (not sourced locally). Walks inbounds with `jq` (Xray/Sing-box) or `yq` (Mihomo `listeners`).
+- **`taffy-cn.sh`**: Fewer menus/cores (Xray + Mihomo only; **no Sing-box**, no anytls). Every GitHub URL prefixed with `gh-proxy.com`. Treat as a **separate** codebase that must be patched independently if behavior should match.
+- **`configuration.sh`**: Standalone. Often pulled **remotely** by `show_*_info` via `run_remote_script` (not sourced locally). Walks inbounds with `jq` (Xray/Sing-box) or `yq` (Mihomo `listeners`). CLI: `$1` = `xray` | `singbox` | `mihomo` (default singbox).
 - **`install-*.sh`**: Install binaries/services only; protocol config is owned by `taffy*.sh` + `config/`.
 
 ### Critical runtime behavior: templates come from GitHub `master`
@@ -86,15 +86,24 @@ Shared shape for nearly every protocol function:
 4. `sed -i` substitute placeholders (`~` delimiter). Keep names lockstep with templates—including the typo **`${pubicKey}`**.
 5. Merge if append; build share URL + Clash/QX/outbound strings; `restart_service` + `enable_service`.
 
+**Port substitution is mixed:** many templates use literal `114514` (listen) / `1919810` (redirect target) instead of `${port}`—`sed` must match that form. Also `${password}`, `${privateKey}`, `${pubicKey}`, `${reality_sni}`, `${ip}`, `${name}`, etc.
+
 **Merge differs by core** (do not copy the wrong one):
 
 | Core | Replace | Append merge |
 |------|---------|--------------|
 | Xray | overwrite `config.json` | fragment + `xray run -confdir=./ -dump > config.json` (some paths use `jq '.inbounds += [input]'`) |
 | Sing-box | overwrite `config.json` | `sing-box merge tmp.json -c config.json -c append.json` then rename |
-| Mihomo | often rewrite listeners | several `*_append` functions simply call the full install helper; `mihomo_clear_listeners` truncates after `listeners:` via `sed` |
+| Mihomo | often rewrite listeners | most “append” menu entries call the same helper as install; helpers `cat` a fragment onto `config.yaml`. `mihomo_clear_listeners` truncates after `listeners:` via `sed`. `mihomo_anytls_append` → `mihomo_anytls`. |
 
-Default REALITY / self-signed SNI target is hard-coded **`www.python.org`** in many functions and templates.
+Default SNIs (globals in `taffy.sh` / `configuration.sh`):
+
+| Use | Default |
+|-----|---------|
+| REALITY / hy2 self-sign / hy2 share link | `reality_sni=www.python.org` |
+| anytls cert CN + share link | `anytls_sni=www.rust-lang.org` |
+
+Self-signed TLS for Sing-box/Mihomo hy2 & anytls lives as `server.crt` / `server.key` under the core config dir. **`_ensure_self_signed_tls`** reuses existing certs so append does not clobber a shared pair (anytls uses this; hy2 still regenerates on full replace).
 
 `open_bbr` downloads `config/BBR/sysctl.conf` and **writes it over `/etc/sysctl.conf` entirely** (not a drop-in snippet)—then `sysctl -p`.
 
@@ -110,18 +119,19 @@ Default REALITY / self-signed SNI target is hard-coded **`www.python.org`** in m
 | Core | Replace (onekey / 更换) | Append (插入) |
 |------|-------------------------|---------------|
 | Xray | reality-tcp/grpc/h2, redirect, shadowsocket | ss, socks5, redirect, reality-tcp/grpc |
-| Sing-box | hy2, reality-tcp/grpc/h2, ss, redirect | ss, hy2, reality-tcp/grpc, redirect |
-| Mihomo | ss, reality-grpc/tcp, hy2, redirect | same set |
+| Sing-box | hy2, reality-tcp/grpc/h2, ss, **anytls**, redirect | ss, hy2, reality-tcp/grpc, **anytls**, redirect |
+| Mihomo | ss, reality-grpc/tcp, hy2, **anytls**, redirect | same set |
 
-README-advertised set: hysteria2, vless reality (tcp/grpc/h2), shadowsocket-2022. Older dirs (`Trojan*`, `VLESS-WS-TLS`, `VMESS-WS-TLS`, `Naive`, …) are template leftovers, not the main menu path.
+README-advertised set: hysteria2, **anytls (Sing-box / Mihomo)**, vless reality (tcp/grpc/h2), shadowsocket-2022. Older dirs (`Trojan*`, `VLESS-WS-TLS`, `VMESS-WS-TLS`, `Naive`, …) are template leftovers, not the main menu path.
 
-Template naming under `config/<Family>/`: `config.json`/`append.json` (Xray), `singbox.json`/`singbox_ap.json` (Sing-box), `mihomo.yaml` (listener fragment), occasional `nginx.conf` for legacy TLS fronts. `config/Clash/config.yaml` is Mihomo **server** base (listeners), not a client profile.
+Template naming under `config/<Family>/`: `config.json`/`append.json` (Xray), `singbox.json`/`singbox_ap.json` (Sing-box), `mihomo.yaml` (listener fragment), occasional `nginx.conf` for legacy TLS fronts. `config/Clash/config.yaml` is Mihomo **server** base (listeners), not a client profile. **`config/AnyTLS/`** has `singbox.json` + `mihomo.yaml` only (no Xray).
 
 ## Conventions when editing
 
-- **Placeholder lockstep**: every `${…}` in templates must match `sed` in `taffy.sh` / `taffy-cn.sh` (and vice versa). Do not “fix” `${pubicKey}` without updating both.
-- **Four-way protocol changes**: replace function, `_append` sibling (if any), outbound builder, and `configuration.sh` parser branch for that inbound type.
+- **Placeholder lockstep**: every `${…}` (and every hard-coded `114514` / `1919810`) in templates must match `sed` in `taffy.sh` / `taffy-cn.sh` (and vice versa). Do not “fix” `${pubicKey}` without updating both.
+- **Four-way protocol changes**: replace function, `_append` sibling (if any), outbound builder, and `configuration.sh` parser branch for that inbound type. anytls also needs `clash_config` case + share-link format in both `taffy.sh` and `configuration.sh`.
 - **URL constants** at the top of `taffy.sh` / `taffy-cn.sh` must match `config/` paths; CN must keep `gh-proxy.com` prefixes.
-- **Shebang discipline**: no bashisms in `#!/bin/sh` files (`taffy.sh`, `configuration.sh`, mihomo installers). `taffy-cn.sh` and `install-xray.sh` are bash.
+- **Shebang discipline**: no bashisms in `#!/bin/sh` files (`taffy.sh`, `configuration.sh`, mihomo installers). `taffy-cn.sh` and `install-xray.sh` / `install-singbox.sh` are bash.
 - **README caveat**: share links may fail client import—fix generation in `configuration.sh` / outbound builders first.
 - **Do not assume local `config/` is used at runtime** until URLs are pointed at it or changes are published to the URL’s branch.
+- **SNI globals**: changing `anytls_sni` / `reality_sni` must stay consistent across templates (where hard-coded), share links, cert `-subj`, and `configuration.sh`.

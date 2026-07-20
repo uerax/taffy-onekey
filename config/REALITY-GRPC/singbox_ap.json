@@ -1,6 +1,4 @@
 {
-    "route": {
-    },
     "inbounds": [
         {
             "type": "vless",
@@ -10,7 +8,7 @@
                 {
                     "name": "${pubicKey}",
                     "uuid": "${password}",
-                    "flow": "xtls-rprx-vision"
+                    "flow": ""
                 }
             ],
             "tls": {
@@ -28,12 +26,11 @@
                         ""
                     ]
                 }
+            },
+            "transport": {
+                "type": "grpc",
+                "service_name": "${ws_path}"
             }
-        }
-    ],
-    "outbounds": [
-        {
-            "type": "direct"
         }
     ]
 }

@@ -829,18 +829,30 @@ open_bbr() {
     is_root
     source '/etc/os-release'
     info "过于老的系统版本会导致开启失败"
+    # 使用 drop-in，避免整文件覆盖 /etc/sysctl.conf
+    bbr_dropin="/etc/sysctl.d/99-taffy-bbr.conf"
     if [[ "${ID}" == "debian" && ${VERSION_ID} -ge 9 ]]; then
         info "检测系统为 debian"
-        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf
+        mkdir -p /etc/sysctl.d
+        wget -Nq ${bbr_config_url} -O "${bbr_dropin}"
         judge 配置文件下载
-        sysctl -p
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}"
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 18 ]]; then
         info "检测系统为 ubuntu"
-        wget -Nq ${bbr_config_url} -O /etc/sysctl.conf
+        mkdir -p /etc/sysctl.d
+        wget -Nq ${bbr_config_url} -O "${bbr_dropin}"
         judge 配置文件下载
-        sysctl -p
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}"
+        info "输入一下命令检测是否成功安装"
+        info "lsmod | grep bbr"
+    elif [[ "${ID}" == "alpine" ]]; then
+        info "检测系统为 alpine"
+        mkdir -p /etc/sysctl.d
+        wget -Nq ${bbr_config_url} -O "${bbr_dropin}"
+        judge 配置文件下载
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}" || true
         info "输入一下命令检测是否成功安装"
         info "lsmod | grep bbr"
     elif [[ "${ID}"=="centos" ]]; then

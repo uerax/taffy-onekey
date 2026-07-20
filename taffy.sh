@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 stty erase ^?
 
-version="v5.0.0"
+version="v5.1.0"
 
 #fonts color
 Green="\033[32m"
@@ -58,10 +58,15 @@ singbox_ss_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/mast
 singbox_ss_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Shadowsocket/singbox_ap.json"
 
 singbox_hysteria2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox.json"
+singbox_hysteria2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Hysteria2/singbox_ap.json"
 singbox_anytls_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/AnyTLS/singbox.json"
+singbox_anytls_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/AnyTLS/singbox_ap.json"
 singbox_vless_reality_h2_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox.json"
+singbox_vless_reality_h2_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-H2/singbox_ap.json"
 singbox_vless_reality_grpc_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox.json"
+singbox_vless_reality_grpc_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-GRPC/singbox_ap.json"
 singbox_vless_reality_tcp_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox.json"
+singbox_vless_reality_tcp_append_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/REALITY-TCP/singbox_ap.json"
 
 singbox_redirect_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox.json"
 singbox_redirect_append_config_url="https://raw.githubusercontent.com/uerax/taffy-onekey/master/config/Redirect/singbox_ap.json"
@@ -94,6 +99,7 @@ ws_path="crayfish"
 ss_method=""
 anytls_sni="www.rust-lang.org"
 reality_sni="www.python.org"
+short_id=""
 
 xray_outbound=""
 
@@ -230,6 +236,121 @@ service_is_active() {
     fi
 }
 
+
+# --- shared helpers ---
+get_public_ip() {
+    # 优先 IPv4；多源 fallback，避免单一探测失败导致空链接
+    ip=""
+    ipv6=""
+    for _url in "https://ip.me" "https://ifconfig.me/ip" "https://ipinfo.io/ip"; do
+        ip=$(curl -4 -fsS --connect-timeout 4 "${_url}" 2>/dev/null | tr -d ' \n\r')
+        [ -n "${ip}" ] && break
+    done
+    ipv6=$(curl -6 -fsS --connect-timeout 4 https://ip.me 2>/dev/null | tr -d ' \n\r')
+    if [ -z "${ip}" ] && [ -n "${ipv6}" ]; then
+        ip="${ipv6}"
+    fi
+    if [ -z "${ip}" ]; then
+        warn "无法获取公网 IP，分享链接地址可能为空"
+    fi
+}
+
+gen_short_id() {
+    if command -v openssl >/dev/null 2>&1; then
+        short_id=$(openssl rand -hex 8)
+    else
+        short_id=$(tr -cd 'a-f0-9' < /dev/urandom | fold -w16 | head -n1)
+    fi
+    [ -n "${short_id}" ] || short_id="0000000000000000"
+}
+
+parse_x25519_keys() {
+    # $1 = raw keypair text from xray/sing-box/mihomo
+    # 兼容 "Private key:" / "PrivateKey:" / "Public key:" / "PublicKey:" / Password:
+    _raw="$1"
+    private_key=$(printf "%s\n" "${_raw}" | awk -F': *' '
+        /[Pp]rivate[Kk]ey|[Pp]rivate key/ {print $2; exit}
+    ' | tr -d ' \r')
+    public_key=$(printf "%s\n" "${_raw}" | awk -F': *' '
+        /[Pp]ublic[Kk]ey|[Pp]ublic key/ {print $2; exit}
+    ' | tr -d ' \r')
+    # 新版 xray 可能把公钥标成 Password:
+    if [ -z "${public_key}" ]; then
+        public_key=$(printf "%s\n" "${_raw}" | awk -F': *' '/^Password/ {print $2; exit}' | tr -d ' \r')
+    fi
+    if [ -z "${private_key}" ] || [ -z "${public_key}" ]; then
+        error "密钥解析失败，请检查 xray/sing-box/mihomo 版本输出格式"
+        printf "%s\n" "${_raw}"
+        exit 1
+    fi
+}
+
+service_apply() {
+    # enable + restart + 粗检
+    _svc="$1"
+    enable_service "${_svc}"
+    restart_service "${_svc}"
+}
+
+run_config_script() {
+    # 优先本地 configuration.sh，否则远程 master
+    _mode="$1"
+    _local=""
+    case "$0" in
+        /*) _base=$(dirname "$0") ;;
+        *)  _base=$(dirname "$(pwd)/${0#./}") ;;
+    esac
+    if [ -f "${_base}/configuration.sh" ]; then
+        _local="${_base}/configuration.sh"
+    elif [ -f "./configuration.sh" ]; then
+        _local="./configuration.sh"
+    fi
+    if [ -n "${_local}" ]; then
+        info "使用本地 configuration.sh"
+        if command -v bash >/dev/null 2>&1; then
+            bash "${_local}" "${_mode}"
+        else
+            sh "${_local}" "${_mode}"
+        fi
+    else
+        run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" "${_mode}"
+    fi
+}
+
+singbox_operation() {
+    # 菜单 14：Sing-box 服务管理
+    printf "${Green}Sing-box 服务管理${Font}\n"
+    printf "${Purple}--------------------------------${Font}\n"
+    menu_item "1" "启动"
+    menu_item "2" "停止"
+    menu_item "3" "重启"
+    menu_item "4" "状态"
+    menu_item "5" "开机自启"
+    menu_item "q" "返回" "$Red"
+    printf "${Purple}--------------------------------${Font}\n"
+    printf "输入数字(回车确认): "
+    read -r _op
+    case "${_op}" in
+        1) start_service sing-box ;;
+        2) stop_service sing-box ;;
+        3) restart_service sing-box ;;
+        4) service_status sing-box ;;
+        5) enable_service sing-box; ok "已设置开机自启" ;;
+        q) return 0 ;;
+        *) error "请输入正确的数字" ;;
+    esac
+}
+
+singbox_merge_append() {
+    # 将当前目录 append.json 合并进 sing-box 配置
+    stop_service sing-box
+    sing-box merge "${singbox_cfg_path}/tmp.json" -c "${singbox_cfg_path}/config.json" -c append.json
+    rm -f append.json
+    mv "${singbox_cfg_path}/config.json" "${singbox_cfg_path}/config.json.bak"
+    mv "${singbox_cfg_path}/tmp.json" "${singbox_cfg_path}/config.json"
+    service_apply sing-box
+}
+
 run_remote_script() {
     url="$1"
     shift || true
@@ -309,36 +430,46 @@ yq_install() {
 
 port_check() {
     local port="$1"
-    [ -z "${port}" ] && return 1
+    local check_port=""
+    local pid=""
 
-    # 1. 使用 netstat 检测端口（兼容性最高）
-    # -a: 所有, -n: 数字格式, -l: 监听, -p: 显示进程(需要 root)
-    # 查找是否有 ":端口号 " 且状态为 LISTEN 的行
-    check_port=$(netstat -anl | grep "[:.]${port} " | grep "LISTEN")
+    if command -v ss >/dev/null 2>&1; then
+        check_port=$(ss -lnt 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1)
+    fi
+    if [ -z "${check_port}" ] && command -v netstat >/dev/null 2>&1; then
+        check_port=$(netstat -anl 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | head -n1)
+    fi
 
-    if [ -z "${check_port}" ]; then
-        ok "${port} 端口未被占用"
-        sleep 1
-    else
-        error "检测到 ${port} 端口被占用"
-        
-        # 2. 尝试获取占用该端口的 PID
-        # netstat -anp 在某些系统下能看到 PID，如果没有就尝试使用 fuser 或 ss
-        pid=$(netstat -anp 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | awk '{print $7}' | cut -d'/' -f1)
-        
-        # 3. 如果能拿到 PID 则尝试 kill
-        if [ -n "${pid}" ] && [ "${pid}" != "-" ]; then
-            warn "占用端口 ${port} 的进程 PID 为: ${pid}，准备清理..."
-            sleep 2
-            kill -9 "${pid}" 2>/dev/null || true
-            ok "进程已清理"
-        else
-            # 如果拿不到具体 PID（比如无权限或工具限制），提醒用户手动检查
-            warn "无法自动获取占用进程 PID，请手动检查或更换端口"
+    if [ -n "${check_port}" ]; then
+        warn "端口 ${port} 已被占用"
+        if command -v ss >/dev/null 2>&1; then
+            pid=$(ss -lntp 2>/dev/null | grep -E "[:.]${port}[[:space:]]" | head -n1 | sed -n 's/.*pid=\([0-9]*\).*/\1/p')
         fi
-        sleep 1
+        if [ -z "${pid}" ] && command -v netstat >/dev/null 2>&1; then
+            pid=$(netstat -anp 2>/dev/null | grep "[:.]${port} " | grep "LISTEN" | awk '{print $7}' | cut -d'/' -f1 | head -n1)
+        fi
+        if [ -n "${pid}" ] && [ "${pid}" != "-" ]; then
+            warn "占用进程 PID: ${pid}"
+        fi
+        printf "是否结束占用进程并继续(Y/N): "
+        read -r _kill
+        case "${_kill}" in
+            [yY])
+                if [ -n "${pid}" ] && [ "${pid}" != "-" ]; then
+                    kill -9 "${pid}" 2>/dev/null || true
+                fi
+                ;;
+            *)
+                error "端口占用，已退出"
+                exit 1
+                ;;
+        esac
+    else
+        ok "端口 ${port} 可用"
     fi
 }
+
+
 
 close_firewall() {
     if command -v iptables >/dev/null 2>&1; then
@@ -442,7 +573,7 @@ clash_config() {
     servername: $reality_sni
     reality-opts:
       public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
+      short-id: ${short_id}
     client-fingerprint: safari"
     ;;
     "reality_grpc")
@@ -461,7 +592,7 @@ clash_config() {
       grpc-service-name: \"${ws_path}\"
     reality-opts:
       public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
+      short-id: ${short_id}
     client-fingerprint: safari"
     ;;
     "trojan_grpc")
@@ -556,7 +687,7 @@ clash_config() {
     servername: $reality_sni
     reality-opts:
       public-key: $public_key
-      short-id: 8eb7bab5a41eb27d
+      short-id: ${short_id}
     client-fingerprint: safari"
     ;;
     "shadowsocket")
@@ -587,7 +718,7 @@ qx_config() {
     qx_cfg="shadowsocks=$domain:$port, method=$ss_method, password=$password, tag=$domain"
     ;;
     "reality_tcp")
-    qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$public_key, reality-hex-shortid=8eb7bab5a41eb27d, tag=$ip"
+    qx_cfg="vless=$ip:$port, method=none, password=$password, vless-flow=$flow, obfs=over-tls, obfs-host=$domain, reality-base64-pubkey=$public_key, reality-hex-shortid=${short_id}, tag=$ip"
     ;;
     esac
 }
@@ -600,11 +731,9 @@ xray_vless_reality_h2() {
     domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${xray_vless_reality_h2_url} -O ${xray_cfg}
     judge "Xray Reality H2配置文件下载"
@@ -612,6 +741,7 @@ xray_vless_reality_h2() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
     
@@ -621,7 +751,7 @@ xray_vless_reality_h2() {
 
     enable_service xray
 
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
 }
 
@@ -633,10 +763,9 @@ xray_vless_reality_h2_append() {
     domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     cd /usr/local/etc/xray
 
@@ -646,6 +775,7 @@ xray_vless_reality_h2_append() {
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~\${shortId}~$short_id~" append.json
     sed -i "s~\${port}~$port~" append.json
     sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
@@ -654,9 +784,9 @@ xray_vless_reality_h2_append() {
     rm append.json
 
     vless_reality_h2_outbound_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=http#$ip"
     clash_config
-    restart_service xray
+    service_apply xray
 }
 
 xray_vless_reality_tcp() {
@@ -668,11 +798,9 @@ xray_vless_reality_tcp() {
     domain="$reality_sni"
     flow="xtls-rprx-vision"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${xray_vless_reality_tcp_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -680,6 +808,7 @@ xray_vless_reality_tcp() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
 
@@ -691,7 +820,7 @@ xray_vless_reality_tcp() {
     enable_service xray
 
     qx_config
-    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
 }
 
@@ -704,10 +833,9 @@ xray_vless_reality_tcp_append() {
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     cd /usr/local/etc/xray
 
@@ -717,6 +845,7 @@ xray_vless_reality_tcp_append() {
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~\${shortId}~$short_id~" append.json
     sed -i "s~\${port}~$port~" append.json
     sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
@@ -726,9 +855,9 @@ xray_vless_reality_tcp_append() {
 
     vless_reality_tcp_outbound_config
     qx_config
-    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     clash_config
-    restart_service xray
+    service_apply xray
 }
 
 xray_vless_reality_grpc() {
@@ -739,11 +868,9 @@ xray_vless_reality_grpc() {
     protocol_type="reality_grpc"
     domain="$reality_sni"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${xray_vless_reality_grpc_url} -O ${xray_cfg}
     judge "Xray Reality 配置文件下载"
@@ -751,6 +878,7 @@ xray_vless_reality_grpc() {
     sed -i "s~\${password}~$password~" ${xray_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${xray_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${xray_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${xray_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${xray_cfg}
     sed -i "s~\${port}~$port~" ${xray_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${xray_cfg}
@@ -763,7 +891,7 @@ xray_vless_reality_grpc() {
     enable_service xray
 
     clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 }
 
 xray_vless_reality_grpc_append() {
@@ -774,10 +902,9 @@ xray_vless_reality_grpc_append() {
     domain="$reality_sni"
     protocol_type="reality_grpc"
     keys=$(xray x25519)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/Private key/{print $2}')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/Public key/{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     cd /usr/local/etc/xray
 
@@ -787,6 +914,7 @@ xray_vless_reality_grpc_append() {
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~\${shortId}~$short_id~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~\${port}~$port~" append.json
     sed -i "s~\${reality_sni}~$reality_sni~" append.json
@@ -796,10 +924,10 @@ xray_vless_reality_grpc_append() {
     rm append.json
 
     vless_reality_grpc_outbound_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
     clash_config
 
-    restart_service xray
+    service_apply xray
 }
 
 xray_shadowsocket() {
@@ -811,6 +939,7 @@ xray_shadowsocket() {
     encrypt=1
     ss_method="2022-blake3-aes-128-gcm"
     set_port
+    port_check $port
     printf "选择加密方法\n"
     menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
     menu_item "2" "2022-blake3-aes-256-gcm"
@@ -852,13 +981,12 @@ xray_shadowsocket() {
     esac
 
     shadowsocket_config
-    restart_service xray
-    enable_service xray
+    service_apply xray
 
     tmp="${ss_method}:${password}"
     tmp=$(printf "%s" "$tmp" | openssl base64)
-    domain=`curl -sS ipinfo.io/ip`
-    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
+    get_public_ip
+    domain="${ip}"
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -879,8 +1007,9 @@ shadowsocket_config() {
 
 xray_redirect() {
     protocol_type="redirect"
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     set_port
+    port_check $port
     printf "输入转发的目标地址: "
     read -r re_ip
 
@@ -895,8 +1024,7 @@ xray_redirect() {
     
     mv config.json ${xray_cfg}
 
-    restart_service xray
-    enable_service xray
+    service_apply xray
 
     printf "${Green}IP为:${Font} ${ip}\n"
     printf "${Green}端口为:${Font} ${port}\n"
@@ -911,6 +1039,7 @@ xray_shadowsocket_append() {
     protocol_type="shadowsocket"
     ss_method="aes-128-gcm"
     set_port
+    port_check $port
     printf "选择加密方法\n"
     menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
     menu_item "2" "2022-blake3-aes-256-gcm"
@@ -968,20 +1097,21 @@ xray_shadowsocket_append() {
 
     tmp="${ss_method}:${password}"
     tmp=$(printf "%s" "$tmp" | openssl base64)
-    domain=`curl -sS ipinfo.io/ip`
-    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
+    get_public_ip
+    domain="${ip}"
     link="ss://$tmp@${domain}:${port}"
 
     shadowsocket_outbound_config
     clash_config
     qx_config
 
-    restart_service xray
+    service_apply xray
 }
 
 xray_redirect_append() {
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     set_port
+    port_check $port
     printf "输入转发的目标地址: "
     read -r re_ip
 
@@ -1002,7 +1132,7 @@ xray_redirect_append() {
     mv tmp.json config.json
     rm append.json
 
-    restart_service xray
+    service_apply xray
 
     printf "${Green}IP为:${Font} ${ip}\n"
     printf "${Green}端口为:${Font} ${port}\n"
@@ -1074,7 +1204,7 @@ vless_reality_grpc_outbound_config() {
             \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\"
+            \"shortId\": \"${short_id}\"
         },
         \"grpcSettings\": {
             \"serviceName\": \"${ws_path}\",
@@ -1111,7 +1241,7 @@ vless_reality_tcp_outbound_config() {
             \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\",
+            \"shortId\": \"${short_id}\",
             \"spiderX\": \"/\"
         }
     }\n}"
@@ -1142,7 +1272,7 @@ vless_reality_h2_outbound_config() {
             \"fingerprint\": \"safari\",
             \"serverName\": \"${domain}\",
             \"publicKey\": \"${public_key}\",
-            \"shortId\": \"8eb7bab5a41eb27d\",
+            \"shortId\": \"${short_id}\",
             \"spiderX\": \"/\"
         }
     }\n}"
@@ -1173,15 +1303,15 @@ shadowsocket_outbound_config() {
 
 socks5_append() {
     protocol_type="socks5"
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     if ! command -v openssl >/dev/null 2>&1; then
           ${PKG_MANAGER} openssl
           judge "openssl 安装"
     fi
     set_port
+    port_check $port
 
     printf "%s\n" "------------------------------------------"
-    # 拆分 read -rp：先用 printf 打印提示，再用 read 读取
     printf "设置你的用户名: "
     read -r user
     printf "%s\n" "------------------------------------------"
@@ -1201,15 +1331,8 @@ socks5_append() {
     mv config.json.new config.json
     rm append.json
 
-    restart_service xray
-
-    #link="trojan://${password}@${ip}:${port}#${domain}"
-
-    #clash_config
-    #qx_config
+    service_apply xray
 }
-
-# outbound end
 
 routing_set() {
     printf "是否配置Routing路由\n"
@@ -1297,40 +1420,36 @@ singbox_routing_set() {
 
 singbox_hy2() {
     set_port
-    ${PKG_MANAGER} openssl
-    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+    port_check $port
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}"
 
-    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
-    
-    chmod +775 ${singbox_cfg_path}/server*
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
+    get_public_ip
+    domain="${ip}"
 
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    domain=$(curl -s https://ip.me)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
-
-    wget -N ${singbox_hysteria2_url} -O config.yaml
+    wget -N ${singbox_hysteria2_url} -O config.json
     judge "配置文件下载"
 
-    sed -i "s/\${password}/$password/" config.yaml
-    sed -i "s/\${domain}/$domain/" config.yaml
-    sed -i "s~114514~$port~" config.yaml
+    sed -i "s~\${password}~$password~" config.json
+    sed -i "s~114514~$port~" config.json
 
-    mv config.yaml ${singbox_cfg}
+    mv config.json ${singbox_cfg}
 
     singbox_routing_set
 
-    restart_service sing-box
-    
+    service_apply sing-box
+
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
 }
 
-# 自签证书：已有则复用（避免 append 冲掉 hy2/anytls 共用证书）
 _ensure_self_signed_tls() {
+    # $1=dir  $2=optional CN (默认 anytls_sni；hy2 传 reality_sni)
     cert_dir="$1"
+    cert_cn="${2:-$anytls_sni}"
     mkdir -p "${cert_dir}"
     if [ ! -f "${cert_dir}/server.crt" ] || [ ! -f "${cert_dir}/server.key" ]; then
         if ! command -v openssl >/dev/null 2>&1; then
@@ -1339,7 +1458,7 @@ _ensure_self_signed_tls() {
         fi
         openssl ecparam -name prime256v1 -genkey -noout -out "${cert_dir}/server.key"
         openssl req -x509 -nodes -key "${cert_dir}/server.key" -out "${cert_dir}/server.crt" \
-            -subj "/CN=${anytls_sni}" -days 36500
+            -subj "/CN=${cert_cn}" -days 36500
         chmod 644 "${cert_dir}/server.crt"
         chmod 600 "${cert_dir}/server.key"
     fi
@@ -1351,9 +1470,8 @@ singbox_anytls() {
     _ensure_self_signed_tls "${singbox_cfg_path}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    domain=$(curl -sS --connect-timeout 4 https://ip.me)
-    ip="${domain}"
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    get_public_ip
+    domain="${ip}"
 
     wget -N ${singbox_anytls_url} -O config.json
     judge "AnyTLS 配置文件下载"
@@ -1365,8 +1483,7 @@ singbox_anytls() {
 
     singbox_routing_set
 
-    restart_service sing-box
-    enable_service sing-box
+    service_apply sing-box
 
     protocol_type="anytls"
     link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
@@ -1383,11 +1500,9 @@ singbox_vless_reality_h2() {
     domain="$reality_sni"
     protocol_type="reality_h2"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
-    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${singbox_vless_reality_h2_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1395,14 +1510,13 @@ singbox_vless_reality_h2() {
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
-    restart_service sing-box
+    service_apply sing-box
 
-    enable_service sing-box
-
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=http#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=http#$ip"
 
     clash_config
 }
@@ -1415,11 +1529,9 @@ singbox_vless_reality_grpc() {
     protocol_type="reality_grpc"
     domain="$reality_sni"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
-    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${singbox_vless_reality_grpc_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1427,15 +1539,14 @@ singbox_vless_reality_grpc() {
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${singbox_cfg}
     sed -i "s~\${ws_path}~$ws_path~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
-    restart_service sing-box
+    service_apply sing-box
 
-    enable_service sing-box
-
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
 
     clash_config
 }
@@ -1449,11 +1560,9 @@ singbox_vless_reality_tcp() {
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
-    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${singbox_vless_reality_tcp_url} -O ${singbox_cfg}
     judge "配置文件下载"
@@ -1461,29 +1570,25 @@ singbox_vless_reality_tcp() {
     sed -i "s~\${password}~$password~" ${singbox_cfg}
     sed -i "s~\${privateKey}~$private_key~" ${singbox_cfg}
     sed -i "s~\${pubicKey}~$public_key~" ${singbox_cfg}
+    sed -i "s~\${shortId}~$short_id~" ${singbox_cfg}
     sed -i "s~114514~$port~" ${singbox_cfg}
     sed -i "s~\${reality_sni}~$reality_sni~" ${singbox_cfg}
 
-    restart_service sing-box 
-
-    enable_service sing-box
+    service_apply sing-box
 
     qx_config
-    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
     clash_config
 
 }
 
 singbox_shadowsocket() {
-    
     encrypt="4"
     ss_method="aes-128-gcm"
-    
-    # 2. 调用设置端口函数
     set_port
+    port_check $port
 
-    # 3. 打印菜单 (使用自定义的 menu_item 函数)
     printf "选择加密方法\n"
     menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
     menu_item "2" "2022-blake3-aes-256-gcm"
@@ -1492,8 +1597,6 @@ singbox_shadowsocket() {
     menu_item "5" "chacha20-ietf-poly1305"
     menu_item "6" "xchacha20-ietf-poly1305"
     printf "\n"
-
-    # 4. 读取输入 (兼容 Alpine：拆分提示语，替代 read -p)
     printf "选择加密方法(默认为4)："
     read -r encrypt
     case $encrypt in
@@ -1523,6 +1626,7 @@ singbox_shadowsocket() {
       ;;
     *)
       password=$(sing-box generate rand 16 --base64)
+      ss_method="aes-128-gcm"
       ;;
     esac
 
@@ -1532,12 +1636,12 @@ singbox_shadowsocket() {
     sed -i "s~\${password}~$password~" config.json
     sed -i "s~114514~$port~" config.json
     mv config.json ${singbox_cfg}
-    restart_service sing-box && enable_service sing-box
+    service_apply sing-box
 
     tmp="${ss_method}:${password}"
     tmp=$(printf "%s" "$tmp" | openssl base64)
-    domain=`curl -sS ipinfo.io/ip`
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    get_public_ip
+    domain="${ip}"
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1547,13 +1651,11 @@ singbox_shadowsocket() {
 }
 
 singbox_redirect() {
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     set_port
-    # 1. 获取转发目标地址
+    port_check $port
     printf "输入转发的目标地址: "
     read -r re_ip
-
-    # 2. 获取转发目标端口
     printf "输入转发的目标端口: "
     read -r re_port
 
@@ -1565,50 +1667,34 @@ singbox_redirect() {
     sed -i "s~1919810~$re_port~" config.json
 
     mv config.json ${singbox_cfg}
-    restart_service sing-box
-    
+    service_apply sing-box
+
     printf "${Green}IP为:${Font} ${ip}\n"
-    printf "${Green}端口为:${Font} ${port}"
+    printf "${Green}端口为:${Font} ${port}\n"
 }
 
 singbox_hy2_append() {
     set_port
-    ${PKG_MANAGER} openssl
+    port_check $port
+    # 复用已有证书，避免冲掉 anytls/hy2 共用私钥
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}" "${reality_sni}"
 
-    openssl ecparam -name prime256v1 -genkey -noout -out "${singbox_cfg_path}/server.key"
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
+    get_public_ip
+    domain="${ip}"
 
-    openssl req -x509 -nodes -key "${singbox_cfg_path}/server.key" -out "${singbox_cfg_path}/server.crt" -subj "/CN=www.python.org" -days 36500
-    
-    chmod +775 ${singbox_cfg_path}/server*
-
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    domain=$(curl -s https://ip.me)
-
-    wget -N ${singbox_hysteria2_url} -O append.json
+    wget -N ${singbox_hysteria2_append_url} -O append.json
     judge "配置文件下载"
 
-    sed -i "s/\${password}/$password/" append.json
-    sed -i "s/\${domain}/$domain/" append.json
+    sed -i "s~\${password}~$password~" append.json
     sed -i "s~114514~$port~" append.json
 
-    stop_service sing-box
+    singbox_merge_append
 
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box
-    
     protocol_type="hysteria2_nodomain"
-
-    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
-
     clash_config
 }
 
@@ -1618,25 +1704,16 @@ singbox_anytls_append() {
     _ensure_self_signed_tls "${singbox_cfg_path}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    domain=$(curl -sS --connect-timeout 4 https://ip.me)
-    ip="${domain}"
+    get_public_ip
+    domain="${ip}"
 
-    wget -N ${singbox_anytls_url} -O append.json
+    wget -N ${singbox_anytls_append_url} -O append.json
     judge "AnyTLS 配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~114514~$port~" append.json
 
-    stop_service sing-box
-
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box
+    singbox_merge_append
 
     protocol_type="anytls"
     link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
@@ -1653,33 +1730,24 @@ singbox_reality_grpc_append() {
     protocol_type="reality_grpc"
     domain="$reality_sni"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
-    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
-    wget -N ${singbox_vless_reality_grpc_url} -O append.json
+    wget -N ${singbox_vless_reality_grpc_append_url} -O append.json
     judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~\${shortId}~$short_id~" append.json
     sed -i "s~\${ws_path}~$ws_path~" append.json
     sed -i "s~114514~$port~" append.json
     sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
-    stop_service sing-box
+    singbox_merge_append
 
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box
-
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=grpc&peer=$domain&allowInsecure=1&serviceName=$ws_path&mode=multi#$ip"
     vless_reality_grpc_outbound_config
     clash_config
     qx_config
@@ -1694,47 +1762,34 @@ singbox_reality_tcp_append() {
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(sing-box generate reality-keypair)
-    private_key=$(printf "%s\n" "$keys" | grep "PrivateKey" | awk '{print $2}')
-    public_key=$(printf "%s\n" "$keys" | grep "PublicKey" | awk '{print $2}')
-    # short_id=$(openssl rand -hex 8)
-    ip=$(curl -sS ipinfo.io/ip)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
-    wget -N ${singbox_vless_reality_tcp_url} -O append.json
+    wget -N ${singbox_vless_reality_tcp_append_url} -O append.json
     judge "配置文件下载"
 
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${privateKey}~$private_key~" append.json
     sed -i "s~\${pubicKey}~$public_key~" append.json
+    sed -i "s~\${shortId}~$short_id~" append.json
     sed -i "s~114514~$port~" append.json
     sed -i "s~\${reality_sni}~$reality_sni~" append.json
 
-    stop_service sing-box
+    singbox_merge_append
 
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box 
-
-    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
     vless_reality_tcp_outbound_config
     clash_config
     qx_config
-    
 }
 
 singbox_shadowsocket_append() {
     encrypt="4"
     ss_method="aes-128-gcm"
-    
-    # 2. 调用设置端口函数
     set_port
+    port_check $port
 
-    # 3. 打印菜单 (使用自定义的 menu_item 函数，更整洁)
     printf "选择加密方法\n"
     menu_item "1" "2022-blake3-aes-128-gcm" "$Green"
     menu_item "2" "2022-blake3-aes-256-gcm"
@@ -1743,8 +1798,6 @@ singbox_shadowsocket_append() {
     menu_item "5" "chacha20-ietf-poly1305"
     menu_item "6" "xchacha20-ietf-poly1305"
     printf "\n"
-
-    # 4. 获取用户输入 (兼容 Alpine：拆分提示语，替代 read -p)
     printf "选择加密方法(默认为4)："
     read -r encrypt
     case $encrypt in
@@ -1774,6 +1827,7 @@ singbox_shadowsocket_append() {
       ;;
     *)
       password=$(sing-box generate rand 16 --base64)
+      ss_method="aes-128-gcm"
       ;;
     esac
 
@@ -1783,22 +1837,13 @@ singbox_shadowsocket_append() {
     sed -i "s~\${password}~$password~" append.json
     sed -i "s~\${method}~$ss_method~" append.json
     sed -i "s~114514~$port~" append.json
-    
-    stop_service sing-box
 
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c  append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box
+    singbox_merge_append
 
     tmp="${ss_method}:${password}"
     tmp=$(printf "%s" "$tmp" | openssl base64)
-    domain=`curl -sS ipinfo.io/ip`
+    get_public_ip
+    domain="${ip}"
     link="ss://$tmp@${domain}:${port}"
 
     protocol_type="shadowsocket"
@@ -1808,13 +1853,11 @@ singbox_shadowsocket_append() {
 }
 
 singbox_redirect_append() {
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     set_port
-    # 1. 获取转发目标地址
+    port_check $port
     printf "输入转发的目标地址: "
     read -r re_ip
-
-    # 2. 获取转发目标端口
     printf "输入转发的目标端口: "
     read -r re_port
 
@@ -1824,25 +1867,13 @@ singbox_redirect_append() {
     sed -i "s~\${ip}~$re_ip~" append.json
     sed -i "s~114514~$port~" append.json
     sed -i "s~1919810~$re_port~" append.json
-    
-    restart_service sing-box
 
-    sing-box merge ${singbox_cfg_path}/tmp.json -c ${singbox_cfg_path}/config.json -c append.json
-
-    rm append.json
-
-    mv ${singbox_cfg_path}/config.json ${singbox_cfg_path}/config.json.bak
-
-    mv ${singbox_cfg_path}/tmp.json ${singbox_cfg_path}/config.json
-
-    restart_service sing-box
+    singbox_merge_append
 
     printf "${Green}IP为:${Font} ${ip}\n"
     printf "${Green}端口为:${Font} ${port}\n"
 }
-# SINGBOX END
 
-# MIHOMO START
 mihomo_install() {
     if ! command -v mihomo >/dev/null 2>&1; then
         curl -fsSL "$mihomo_install_url" | bash -s -- install
@@ -1898,6 +1929,7 @@ mihomo_shadowsocket() {
     encrypt=4
     ss_method="aes-128-gcm"
     set_port
+    port_check $port
 
     # 2. 打印菜单（使用之前定义的 menu_item）
     printf "选择加密方法\n"
@@ -1942,11 +1974,11 @@ mihomo_shadowsocket() {
       ;;
     esac
 
-    domain=`curl -sS ipinfo.io/ip`
-    ipv6=`curl -sS6 --connect-timeout 4 ip.me`
+    get_public_ip
+    domain="${ip}"
 
     mihomo_shadowsocket_config
-    restart_service mihomo
+    service_apply mihomo
 
     tmp="${ss_method}:${password}"
     tmp=$(printf "%s" "$tmp" | openssl base64)
@@ -1983,10 +2015,9 @@ mihomo_vless_reality_grpc() {
     protocol_type="reality_grpc"
     domain="$reality_sni"
     keys=$(mihomo generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${mihomo_vless_reality_grpc_url} -O tmp.yaml
     judge "Mihomo Reality 配置文件下载"
@@ -1995,6 +2026,7 @@ mihomo_vless_reality_grpc() {
     sed -i "s~\${name}~$ip~" tmp.yaml
     sed -i "s~\${privateKey}~$private_key~" tmp.yaml
     sed -i "s~\${publicKey}~$public_key~" tmp.yaml
+    sed -i "s~\${shortId}~$short_id~" tmp.yaml
     sed -i "s~\${ws_path}~$ws_path~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
     sed -i "s~\${reality_sni}~$reality_sni~" tmp.yaml
@@ -2005,10 +2037,10 @@ mihomo_vless_reality_grpc() {
 
     vless_reality_grpc_outbound_config
 
-    restart_service mihomo 
+    service_apply mihomo 
 
     clash_config
-    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=8eb7bab5a41eb27d&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
+    link="vless://$password@$ip:$port?encryption=none&security=reality&sni=$domain&sid=${short_id}&fp=safari&peer=$domain&allowInsecure=1&pbk=$public_key&type=grpc&serviceName=$ws_path&mode=multi#$ip"
 
 }
 
@@ -2021,10 +2053,9 @@ mihomo_vless_reality_tcp() {
     flow="xtls-rprx-vision"
     protocol_type="reality_tcp"
     keys=$(mihomo generate reality-keypair)
-    private_key=$(printf "%s" "$keys" | awk -F': ' '/PrivateKey|Private key/ {print $2}' | tr -d ' ')
-    public_key=$(printf "%s" "$keys" | awk -F': ' '/PublicKey|Public key/ {print $2}' | tr -d ' ')
-    ip=$(curl -sS --connect-timeout 4 ipinfo.io/ip)
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
+    parse_x25519_keys "$keys"
+    gen_short_id
+    get_public_ip
 
     wget -N ${mihomo_vless_reality_tcp_url} -O tmp.yaml
     judge "Mihomo Reality 配置文件下载"
@@ -2033,6 +2064,7 @@ mihomo_vless_reality_tcp() {
     sed -i "s~\${name}~$ip~" tmp.yaml
     sed -i "s~\${privateKey}~$private_key~" tmp.yaml
     sed -i "s~\${publicKey}~$public_key~" tmp.yaml
+    sed -i "s~\${shortId}~$short_id~" tmp.yaml
     sed -i "s~\${port}~$port~" tmp.yaml
     sed -i "s~\${reality_sni}~$reality_sni~" tmp.yaml
 
@@ -2042,44 +2074,39 @@ mihomo_vless_reality_tcp() {
 
     vless_reality_tcp_outbound_config
 
-    restart_service mihomo 
+    service_apply mihomo 
 
     clash_config
     qx_config
-    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
+    link="vless://$password@$ip:$port?encryption=none&flow=$flow&security=reality&sni=$domain&sid=${short_id}&fp=safari&pbk=$public_key&type=tcp&headerType=none#$ip"
 
 }
 
 mihomo_hysteria2() {
     set_port
-    ${PKG_MANAGER} openssl
+    port_check $port
+    _ensure_self_signed_tls "${mihomo_cfg}" "${reality_sni}"
 
     protocol_type="hysteria2_nodomain"
 
-    openssl ecparam -name prime256v1 -genkey -noout -out "${mihomo_cfg}/server.key"
-
-    openssl req -x509 -nodes -key "${mihomo_cfg}/server.key" -out "${mihomo_cfg}/server.crt" -subj "/CN=www.python.org" -days 36500
-    
-    chmod +775 ${mihomo_cfg}/server*
-
-    password=`tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1`
-    ip=$(curl -s https://ip.me)
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
+    get_public_ip
     domain=$ip
 
     wget -N ${mihomo_hysteria2_url} -O tmp.yaml
-    judge "Mihomo Reality 配置文件下载"
+    judge "Mihomo Hysteria2 配置文件下载"
 
-    sed -i "s/\${password}/$password/" tmp.yaml
-    sed -i "s/\${ip}/$ip/" tmp.yaml
-    sed -i "s/\${port}/$port/" tmp.yaml
+    sed -i "s~\${password}~$password~" tmp.yaml
+    sed -i "s~\${ip}~$ip~" tmp.yaml
+    sed -i "s~\${port}~$port~" tmp.yaml
 
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
-    cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
+    cat tmp.yaml >> ${mihomo_cfg}/config.yaml
     rm tmp.yaml
 
-    restart_service mihomo
+    service_apply mihomo
 
-    link="hysteria2://${password}@${domain}:${port}?sni=www.python.org&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
     singbox_hy2_outbound_config
     clash_config
 }
@@ -2092,9 +2119,8 @@ mihomo_anytls() {
     protocol_type="anytls"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    ip=$(curl -sS --connect-timeout 4 https://ip.me)
+    get_public_ip
     domain=$ip
-    ipv6=$(curl -sS6 --connect-timeout 4 ip.me)
 
     wget -N ${mihomo_anytls_url} -O tmp.yaml
     judge "AnyTLS 配置文件下载"
@@ -2107,7 +2133,7 @@ mihomo_anytls() {
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml
     rm tmp.yaml
 
-    restart_service mihomo
+    service_apply mihomo
 
     link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
     anytls_outbound_config
@@ -2119,8 +2145,9 @@ mihomo_anytls_append() {
 }
 
 mihomo_redirect() {
-    ip=`curl -sS ipinfo.io/ip`
+    get_public_ip
     set_port
+    port_check $port
     # 1. 获取转发目标地址
     printf "输入转发的目标地址: "
     read -r re_ip
@@ -2140,7 +2167,7 @@ mihomo_redirect() {
     cp ${mihomo_cfg}/config.yaml ${mihomo_cfg}/bak.yaml
     cat tmp.yaml >> ${mihomo_cfg}/config.yaml 
     rm tmp.yaml
-    restart_service mihomo
+    service_apply mihomo
     
     printf "${Green}IP为:${Font} ${ip}\n"
     printf "${Green}端口为:${Font} ${port}\n"
@@ -2150,6 +2177,16 @@ mihomo_clear_listeners() {
     sed -i '/listeners:/q' ${mihomo_cfg}/config.yaml
 }
 
+
+
+mihomo_replace_select() {
+    # 更换：清空 listeners 后走协议选择
+    if [ -f "${mihomo_cfg}/config.yaml" ]; then
+        mihomo_clear_listeners
+        ok "已清空旧 listeners"
+    fi
+    mihomo_select
+}
 
 # MIHOMO END
 
@@ -2204,6 +2241,14 @@ open_bbr() {
     elif [ "${ID}" = "centos" ]; then
         error "centos fuck out!"
         exit 1
+    elif [ "${ID}" = "alpine" ]; then
+        info "检测系统为 alpine"
+        mkdir -p /etc/sysctl.d
+        wget -N ${bbr_config_url} -O "${bbr_dropin}"
+        judge "配置文件下载"
+        sysctl --system >/dev/null 2>&1 || sysctl -p "${bbr_dropin}" || true
+        info "输入一下命令检测是否成功安装"
+        info "lsmod | grep bbr"
     else
         error "当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内"
         exit 1
@@ -2253,15 +2298,15 @@ info_return() {
 }
 
 show_xray_info() {
-    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" xray
+    run_config_script xray
 }
 
 show_singbox_info() {
-    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" singbox
+    run_config_script singbox
 }
 
 show_mihomo_info() {
-    run_remote_script "https://raw.githubusercontent.com/uerax/taffy-onekey/master/configuration.sh" mihomo
+    run_config_script mihomo
 }
 
 update_script() {
@@ -2723,6 +2768,7 @@ menu() {
     printf "${Green}21)  一键安装 Mihomo${Font}\n"
     printf "${Cyan}22)  插入 Mihomo 协议${Font}\n"
     printf "${Cyan}23)  更新 Mihomo ${Font}\n"
+    printf "${Cyan}24)  更换 Mihomo 协议${Font}\n"
     printf "${Purple}25)  查看 Mihomo 配置链接${Font}\n"
     
     printf "${Cyan}————————————————————————————————————————————————————————————————————————————————${Font}\n"
@@ -2781,6 +2827,9 @@ menu() {
     ;;
     23)
     mihomo_update
+    ;;
+    24)
+    mihomo_replace_select
     ;;
     25)
     show_mihomo_info

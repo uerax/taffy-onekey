@@ -1,0 +1,20 @@
+{
+    "inbounds": [
+        {
+            "type": "anytls",
+            "listen": "::",
+            "listen_port": 114514,
+            "users": [
+                {
+                    "name": "taffy",
+                    "password": "${password}"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "certificate_path": "/etc/sing-box/server.crt",
+                "key_path": "/etc/sing-box/server.key"
+            }
+        }
+    ]
+}
