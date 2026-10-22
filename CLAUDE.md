@@ -55,7 +55,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/uerax/taffy-onekey/master/
 ### Layers
 
 ```
-taffy.sh (v5.2.0, #!/bin/sh)     # full product: menu + protocol orchestration
+taffy.sh (v5.2.1, #!/bin/sh)     # full product: menu + protocol orchestration
 taffy-cn.sh (shim, bash)          # forwarder to taffy.sh with -cn flag
   → install-xray.sh / -cn        # binary + unit only (xray from XTLS install lineage)
   → install-singbox.sh           # sing-box: .deb (Debian/Ubuntu) or binary+OpenRC (Alpine)
@@ -100,8 +100,9 @@ Default SNIs (globals in `taffy.sh` / `configuration.sh`):
 
 | Use | Default |
 |-----|---------|
-| REALITY / hy2 self-sign / hy2 share link | `reality_sni=docs.oracle.com` |
-| anytls cert CN + share link | `anytls_sni=www.rust-lang.org` |
+| REALITY | `reality_sni=docs.oracle.com` |
+| hy2 self-sign / share link | server IP (`$ip`) |
+| anytls cert CN | `anytls_sni=www.rust-lang.org` (no `anytls://` share link) |
 
 Self-signed TLS for Sing-box/Mihomo hy2 & anytls lives as `server.crt` / `server.key` under the core config dir. **`_ensure_self_signed_tls`** reuses existing certs so append does not clobber a shared pair (anytls uses this; hy2 still regenerates on full replace).
 

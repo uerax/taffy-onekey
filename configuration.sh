@@ -512,10 +512,10 @@ singbox_hy2() {
     local up=$(printf "%s" "$item" | jq -r '.up_mbps')
     local down=$(printf "%s" "$item" | jq -r '.down_mbps')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
-    
-    local link="hysteria2://${password}@${ip}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: ${reality_sni}\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local link="hysteria2://${password}@${ip}:${port}?sni=${ip}&insecure=1&obfs=none#${ip}"
+
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: $ip\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -529,9 +529,9 @@ mihomo_hy2() {
     local down=$(yq -r ".listeners[$i].down" $mihomo_cfg)
     local password=$(yq -r ".listeners[$i].users.user1" $mihomo_cfg)
 
-    local link="hysteria2://${password}@${ip}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?sni=${ip}&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: ${reality_sni}\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: $ip\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -542,12 +542,11 @@ singbox_hy2_outbound_config() {
         --arg ip "$ip" \
         --argjson port "${port:-0}" \
         --arg password "$password" \
-        --arg sni "$reality_sni" \
+        --arg sni "$ip" \
         '{
             type: "hysteria2",
             server: $ip,
             server_port: $port,
-            network: "tcp",
             tls: {
                 enabled: true,
                 disable_sni: false,
@@ -570,7 +569,7 @@ singbox_anytls() {
     local port=$(printf "%s" "$item" | jq -r '.listen_port')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
 
-    local link="anytls://${password}@${ip}:${port}?sni=${anytls_sni}&insecure=1#${ip}"
+    local link=""
     local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: ${anytls_sni}\n    skip-cert-verify: true"
 
     anytls_outbound_config
@@ -584,7 +583,7 @@ mihomo_anytls() {
     # users 为 map: username: password，取第一个值
     local password=$(yq -r ".listeners[$i].users | to_entries | .[0].value" $mihomo_cfg)
 
-    local link="anytls://${password}@${ip}:${port}?sni=${anytls_sni}&insecure=1#${ip}"
+    local link=""
     local clash_cfg="  - name: $ip\n    type: anytls\n    server: '$ip'\n    port: $port\n    password: $password\n    client-fingerprint: chrome\n    udp: true\n    sni: ${anytls_sni}\n    skip-cert-verify: true"
 
     anytls_outbound_config

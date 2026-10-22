@@ -4,7 +4,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 stty erase ^?
 
-version="v5.2.0"
+version="v5.2.1"
 
 GH_PROXY="${GH_PROXY:-}"
 
@@ -549,10 +549,10 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: ${reality_sni}
+    sni: $domain
     skip-cert-verify: true
     alpn:
-    - h3"
+      - h3"
     ;;
     "anytls")
     clash_cfg="  - name: $domain
@@ -1169,16 +1169,16 @@ xray_redirect_append() {
 
 # outbound start
 singbox_hy2_outbound_config() {
+    _hy2_sni="${domain:-$ip}"
     singbox_outbound=$(jq -n \
         --arg ip "$ip" \
         --argjson port "${port:-0}" \
         --arg password "$password" \
-        --arg sni "$reality_sni" \
+        --arg sni "$_hy2_sni" \
         '{
             type: "hysteria2",
             server: $ip,
             server_port: $port,
-            network: "tcp",
             tls: {
                 enabled: true,
                 disable_sni: false,
@@ -1466,11 +1466,11 @@ singbox_routing_set() {
 singbox_hy2() {
     set_port
     port_check $port
-    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}"
-
-    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
     get_public_ip
     domain="${ip}"
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${ip}"
+
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
 
     wget -q ${singbox_hysteria2_url} -O config.json
     judge "配置文件下载"
@@ -1485,14 +1485,14 @@ singbox_hy2() {
     service_apply sing-box
 
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
 }
 
 _ensure_self_signed_tls() {
-    # $1=dir  $2=optional CN (默认 anytls_sni；hy2 传 reality_sni)
+    # $1=dir  $2=optional CN (默认 anytls_sni；hy2 传 ip)
     cert_dir="$1"
     cert_cn="${2:-$anytls_sni}"
     mkdir -p "${cert_dir}"
@@ -1502,8 +1502,25 @@ _ensure_self_signed_tls() {
             judge "openssl 安装"
         fi
         openssl ecparam -name prime256v1 -genkey -noout -out "${cert_dir}/server.key"
-        openssl req -x509 -nodes -key "${cert_dir}/server.key" -out "${cert_dir}/server.crt" \
-            -subj "/CN=${cert_cn}" -days 825
+        case "$cert_cn" in
+            *[!0-9.]*|'')
+                if [ -n "$ip" ]; then
+                    _san="DNS:${cert_cn},IP:${ip},DNS:localhost"
+                else
+                    _san="DNS:${cert_cn},DNS:localhost"
+                fi
+                ;;
+            *)
+                _san="IP:${cert_cn},DNS:localhost"
+                ;;
+        esac
+        if openssl req -x509 -nodes -key "${cert_dir}/server.key" -out "${cert_dir}/server.crt" \
+            -subj "/CN=${cert_cn}" -addext "subjectAltName=${_san}" -days 825 >/dev/null 2>&1; then
+            :
+        else
+            openssl req -x509 -nodes -key "${cert_dir}/server.key" -out "${cert_dir}/server.crt" \
+                -subj "/CN=${cert_cn}" -days 825
+        fi
         chmod 644 "${cert_dir}/server.crt"
         chmod 600 "${cert_dir}/server.key"
     fi
@@ -1512,11 +1529,11 @@ _ensure_self_signed_tls() {
 singbox_anytls() {
     set_port
     port_check $port
+    get_public_ip
+    domain="${ip}"
     _ensure_self_signed_tls "${singbox_cfg_path}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    get_public_ip
-    domain="${ip}"
 
     wget -q ${singbox_anytls_url} -O config.json
     judge "AnyTLS 配置文件下载"
@@ -1531,7 +1548,7 @@ singbox_anytls() {
     service_apply sing-box
 
     protocol_type="anytls"
-    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+    link=""
 
     anytls_outbound_config
     clash_config
@@ -1721,12 +1738,12 @@ singbox_redirect() {
 singbox_hy2_append() {
     set_port
     port_check $port
-    # 复用已有证书，避免冲掉 anytls/hy2 共用私钥
-    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}" "${reality_sni}"
-
-    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
     get_public_ip
     domain="${ip}"
+    # 复用已有证书，避免冲掉 anytls/hy2 共用私钥
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${ip}"
+
+    password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
 
     wget -q ${singbox_hysteria2_append_url} -O append.json
     judge "配置文件下载"
@@ -1737,7 +1754,7 @@ singbox_hy2_append() {
     singbox_merge_append
 
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
@@ -1746,11 +1763,11 @@ singbox_hy2_append() {
 singbox_anytls_append() {
     set_port
     port_check $port
+    get_public_ip
+    domain="${ip}"
     _ensure_self_signed_tls "${singbox_cfg_path}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    get_public_ip
-    domain="${ip}"
 
     wget -q ${singbox_anytls_append_url} -O append.json
     judge "AnyTLS 配置文件下载"
@@ -1761,7 +1778,7 @@ singbox_anytls_append() {
     singbox_merge_append
 
     protocol_type="anytls"
-    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+    link=""
 
     anytls_outbound_config
     clash_config
@@ -2130,13 +2147,13 @@ mihomo_vless_reality_tcp() {
 mihomo_hysteria2() {
     set_port
     port_check $port
-    _ensure_self_signed_tls "${mihomo_cfg}" "${reality_sni}"
+    get_public_ip
+    domain=$ip
+    _ensure_self_signed_tls "${mihomo_cfg}" "${ip}"
 
     protocol_type="hysteria2_nodomain"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
-    get_public_ip
-    domain=$ip
 
     wget -q ${mihomo_hysteria2_url} -O tmp.yaml
     judge "Mihomo Hysteria2 配置文件下载"
@@ -2151,7 +2168,7 @@ mihomo_hysteria2() {
 
     service_apply mihomo
 
-    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
     singbox_hy2_outbound_config
     clash_config
 }
@@ -2159,13 +2176,13 @@ mihomo_hysteria2() {
 mihomo_anytls() {
     set_port
     port_check $port
+    get_public_ip
+    domain=$ip
     _ensure_self_signed_tls "${mihomo_cfg}"
 
     protocol_type="anytls"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w32 | head -n1)
-    get_public_ip
-    domain=$ip
 
     wget -q ${mihomo_anytls_url} -O tmp.yaml
     judge "AnyTLS 配置文件下载"
@@ -2180,7 +2197,7 @@ mihomo_anytls() {
 
     service_apply mihomo
 
-    link="anytls://${password}@${domain}:${port}?sni=${anytls_sni}&insecure=1#${domain}"
+    link=""
     anytls_outbound_config
     clash_config
 }
@@ -2354,7 +2371,7 @@ info_return() {
     printf "%s\n" "------------------------------------------------"
     printf "${Green}密码为:${Font} %s\n" "${password}"
     printf "${Green}端口为:${Font} %s\n" "${port}"
-    printf "${Green}链接:${Font} %s\n" "${link}"
+    [ -n "$link" ] && printf "${Green}链接:${Font} %s\n" "${link}"
 
     # 使用 [ -n "$var" ] 判断变量是否非空
     if [ -n "$qx_cfg" ]; then
