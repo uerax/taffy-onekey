@@ -114,7 +114,7 @@ protocol_type=""
 ws_path="crayfish"
 ss_method=""
 anytls_sni="www.rust-lang.org"
-reality_sni="www.python.org"
+reality_sni="docs.oracle.com"
 short_id=""
 
 xray_outbound=""
@@ -549,7 +549,7 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: www.python.org
+    sni: ${reality_sni}
     skip-cert-verify: true
     alpn:
     - h3"
@@ -1173,6 +1173,7 @@ singbox_hy2_outbound_config() {
         --arg ip "$ip" \
         --argjson port "${port:-0}" \
         --arg password "$password" \
+        --arg sni "$reality_sni" \
         '{
             type: "hysteria2",
             server: $ip,
@@ -1181,7 +1182,7 @@ singbox_hy2_outbound_config() {
             tls: {
                 enabled: true,
                 disable_sni: false,
-                server_name: "www.python.org",
+                server_name: $sni,
                 insecure: true,
                 utls: { enabled: false, fingerprint: "chrome" }
             },

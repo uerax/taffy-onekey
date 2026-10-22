@@ -16,7 +16,7 @@ singbox_cfg="/etc/sing-box/config.json"
 xray_cfg="/usr/local/etc/xray/config.json"
 mihomo_cfg="/etc/mihomo/config.yaml"
 anytls_sni="www.rust-lang.org"
-reality_sni="www.python.org"
+reality_sni="docs.oracle.com"
 
 yq_install_url="https://github.com/uerax/taffy-onekey/raw/master/install-yq.sh"
 
