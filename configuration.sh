@@ -513,9 +513,9 @@ singbox_hy2() {
     local down=$(printf "%s" "$item" | jq -r '.down_mbps')
     local password=$(printf "%s" "$item" | jq -r '.users[0].password')
 
-    local link="hysteria2://${password}@${ip}:${port}?sni=${ip}&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: $ip\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: ${reality_sni}\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -529,9 +529,9 @@ mihomo_hy2() {
     local down=$(yq -r ".listeners[$i].down" $mihomo_cfg)
     local password=$(yq -r ".listeners[$i].users.user1" $mihomo_cfg)
 
-    local link="hysteria2://${password}@${ip}:${port}?sni=${ip}&insecure=1&obfs=none#${ip}"
+    local link="hysteria2://${password}@${ip}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${ip}"
 
-    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: $ip\n    skip-cert-verify: true\n    alpn:\n      - h3"
+    local clash_cfg="  - name: $ip\n    type: hysteria2\n    server: '$ip'\n    port: $port\n    up: $down Mbps\n    down: $up Mbps\n    password: $password\n    sni: ${reality_sni}\n    skip-cert-verify: true\n    alpn:\n      - h3"
 
     singbox_hy2_outbound_config
 }
@@ -542,7 +542,7 @@ singbox_hy2_outbound_config() {
         --arg ip "$ip" \
         --argjson port "${port:-0}" \
         --arg password "$password" \
-        --arg sni "$ip" \
+        --arg sni "$reality_sni" \
         '{
             type: "hysteria2",
             server: $ip,

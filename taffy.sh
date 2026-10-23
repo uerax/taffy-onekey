@@ -549,7 +549,7 @@ clash_config() {
     up: 50 Mbps
     down: 200 Mbps
     password: $password
-    sni: $domain
+    sni: ${reality_sni}
     skip-cert-verify: true
     alpn:
       - h3"
@@ -1169,12 +1169,11 @@ xray_redirect_append() {
 
 # outbound start
 singbox_hy2_outbound_config() {
-    _hy2_sni="${domain:-$ip}"
     singbox_outbound=$(jq -n \
         --arg ip "$ip" \
         --argjson port "${port:-0}" \
         --arg password "$password" \
-        --arg sni "$_hy2_sni" \
+        --arg sni "$reality_sni" \
         '{
             type: "hysteria2",
             server: $ip,
@@ -1468,7 +1467,7 @@ singbox_hy2() {
     port_check $port
     get_public_ip
     domain="${ip}"
-    _ensure_self_signed_tls "${singbox_cfg_path}" "${ip}"
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
 
@@ -1485,14 +1484,14 @@ singbox_hy2() {
     service_apply sing-box
 
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
 }
 
 _ensure_self_signed_tls() {
-    # $1=dir  $2=optional CN (默认 anytls_sni；hy2 传 ip)
+    # $1=dir  $2=optional CN (默认 anytls_sni；hy2 传 reality_sni)
     cert_dir="$1"
     cert_cn="${2:-$anytls_sni}"
     mkdir -p "${cert_dir}"
@@ -1741,7 +1740,7 @@ singbox_hy2_append() {
     get_public_ip
     domain="${ip}"
     # 复用已有证书，避免冲掉 anytls/hy2 共用私钥
-    _ensure_self_signed_tls "${singbox_cfg_path}" "${ip}"
+    _ensure_self_signed_tls "${singbox_cfg_path}" "${reality_sni}"
 
     password=$(tr -cd '0-9A-Za-z' < /dev/urandom | fold -w50 | head -n1)
 
@@ -1754,7 +1753,7 @@ singbox_hy2_append() {
     singbox_merge_append
 
     protocol_type="hysteria2_nodomain"
-    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
 
     singbox_hy2_outbound_config
     clash_config
@@ -2149,7 +2148,7 @@ mihomo_hysteria2() {
     port_check $port
     get_public_ip
     domain=$ip
-    _ensure_self_signed_tls "${mihomo_cfg}" "${ip}"
+    _ensure_self_signed_tls "${mihomo_cfg}" "${reality_sni}"
 
     protocol_type="hysteria2_nodomain"
 
@@ -2168,7 +2167,7 @@ mihomo_hysteria2() {
 
     service_apply mihomo
 
-    link="hysteria2://${password}@${domain}:${port}?sni=${domain}&insecure=1&obfs=none#${domain}"
+    link="hysteria2://${password}@${domain}:${port}?sni=${reality_sni}&insecure=1&obfs=none#${domain}"
     singbox_hy2_outbound_config
     clash_config
 }

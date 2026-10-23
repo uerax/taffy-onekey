@@ -100,8 +100,7 @@ Default SNIs (globals in `taffy.sh` / `configuration.sh`):
 
 | Use | Default |
 |-----|---------|
-| REALITY | `reality_sni=docs.oracle.com` |
-| hy2 self-sign / share link | server IP (`$ip`) |
+| REALITY / hy2 self-sign / hy2 share link | `reality_sni=docs.oracle.com` |
 | anytls cert CN | `anytls_sni=www.rust-lang.org` (no `anytls://` share link) |
 
 Self-signed TLS for Sing-box/Mihomo hy2 & anytls lives as `server.crt` / `server.key` under the core config dir. **`_ensure_self_signed_tls`** reuses existing certs so append does not clobber a shared pair (anytls uses this; hy2 still regenerates on full replace).
